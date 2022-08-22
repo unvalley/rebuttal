@@ -1,0 +1,11 @@
+/Users/unvalley/src/github.com/unvalley/rebuttal/api/target/debug/deps/futures_channel-ecb56cd4e3614b5c.rmeta: /Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/lib.rs /Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/lock.rs /Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/mpsc/mod.rs /Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/mpsc/queue.rs /Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/oneshot.rs
+
+/Users/unvalley/src/github.com/unvalley/rebuttal/api/target/debug/deps/libfutures_channel-ecb56cd4e3614b5c.rlib: /Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/lib.rs /Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/lock.rs /Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/mpsc/mod.rs /Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/mpsc/queue.rs /Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/oneshot.rs
+
+/Users/unvalley/src/github.com/unvalley/rebuttal/api/target/debug/deps/futures_channel-ecb56cd4e3614b5c.d: /Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/lib.rs /Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/lock.rs /Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/mpsc/mod.rs /Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/mpsc/queue.rs /Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/oneshot.rs
+
+/Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/lib.rs:
+/Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/lock.rs:
+/Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/mpsc/mod.rs:
+/Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/mpsc/queue.rs:
+/Users/unvalley/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-channel-0.3.23/src/oneshot.rs:
