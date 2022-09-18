@@ -1,0 +1,43 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id       Int     @id @default(autoincrement())
+    name     String?
+    crowd_id Int?
+    role     Role    @relation(fields: [role_id], references: [id])
+    role_id  Int
+
+    created_at DateTime @default(now())
+    updated_at DateTime @default(now()) @updatedAt
+
+    @@unique([role_id])
+    @@map("users")
+}
+
+enum RoleKind {
+    WRITER
+    WORKER
+    ADMIN
+}
+
+model Role {
+    id    Int      @id @default(autoincrement())
+    kind  RoleKind
+    users User[]
+
+    @@map("roles")
+}
+
+model Document {
+    id    Int     @id @default(autoincrement())
+    title String?
+    // should be lexical replesantation
+    body  String?
+}
