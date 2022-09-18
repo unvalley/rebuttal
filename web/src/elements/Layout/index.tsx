@@ -6,12 +6,22 @@ type Props = {
 
 export const Layout: React.FC<Props> = ({ children }) => {
   return (
-    <div>
+    <div className="flex flex-col h-screen justify-between">
       <header className="navbar bg-neutral text-neutral-content">
-        <a className="btn btn-ghost normal-case text-xl">daisyUI</a>
+        <div className="flex-1">
+          <a className="btn btn-ghost normal-case text-xl">Rebuttal</a>
+        </div>
+
+        <div className="flex-none">
+          <ul className="menu menu-horizontal p-0">
+            <li>
+              <a>ヘルプ</a>
+            </li>
+          </ul>
+        </div>
       </header>
-      <main>{children}</main>
-      <footer className="footer footer-center p-4 bg-neutral text-neutral-content">
+      <main className="flex-grow">{children}</main>
+      <footer className="footer footer-center h-10 p-4 bg-neutral text-neutral-content">
         <div>
           <p>Copyright © 2022 - All right reserved by unvalley</p>
         </div>
