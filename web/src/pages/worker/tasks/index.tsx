@@ -84,6 +84,7 @@ const Tasks = () => {
     <div className="container mx-auto p-4">
       <h2 className="text-xl font-bold">Tasks</h2>
 
+      {/* FEATURE: Stream (https://www.pinterest.jp/pin/608760074652174474/?nic_v3=1a5XeqvRz) */}
       <div className="py-4">
         <table className="table w-full">
           <thead>
