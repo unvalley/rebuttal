@@ -1,7 +1,7 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import { NextPage } from 'next'
-import { ReactNode } from 'react'
+import type { NextPage } from 'next'
+import type { ReactNode } from 'react'
 import { ThemeProvider } from 'next-themes'
 
 type NextPageWithAuthAndLayout = NextPage & {
