@@ -164,7 +164,7 @@ const Tasks = () => {
                   <th>
                     <button
                       className="btn btn-ghost btn-xl"
-                      onClick={() => router.push(`/writer/documents/${d.id}`)}
+                      onClick={() => router.push(`/workers/documents/${d.id}`)}
                     >
                       開く
                     </button>

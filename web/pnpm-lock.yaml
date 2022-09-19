@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@prisma/client': ^4.3.1
+  '@tailwindcss/line-clamp': ^0.4.2
   '@tailwindcss/typography': ^0.5.7
   '@types/node': 18.7.18
   '@types/react': 18.0.20
@@ -18,10 +19,12 @@ specifiers:
   react-dom: 18.2.0
   swr: ^1.3.0
   tailwindcss: ^3.1.8
+  ts-pattern: ^4.0.5
   typescript: 4.8.3
 
 dependencies:
   '@prisma/client': 4.3.1_prisma@4.3.1
+  '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.1.8
   autoprefixer: 10.4.11_postcss@8.4.16
   daisyui: 2.28.0_6b4luod745iryv24jvdbvzbbsa
   next: 12.3.0_biqbaboplfbrettd7655fr4n2y
@@ -40,6 +43,7 @@ devDependencies:
   eslint: 8.23.1
   eslint-config-next: 12.3.0_irgkl5vooow2ydyo6aokmferha
   prisma: 4.3.1
+  ts-pattern: 4.0.5
   typescript: 4.8.3
 
 packages:
@@ -275,6 +279,14 @@ packages:
     resolution: {integrity: sha512-rEUrBSGIoSFuYxwBYtlUFMlE2CwGhmW+w9355/5oduSw8e5h2+Tj4UrAGNNgP9915++wj5vkQo0UuOBqOAq4nw==}
     dependencies:
       tslib: 2.4.0
+    dev: false
+
+  /@tailwindcss/line-clamp/0.4.2_tailwindcss@3.1.8:
+    resolution: {integrity: sha512-HFzAQuqYCjyy/SX9sLGB1lroPzmcnWv1FHkIpmypte10hptf4oPUfucryMKovZh2u0uiS9U5Ty3GghWfEJGwVw==}
+    peerDependencies:
+      tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
+    dependencies:
+      tailwindcss: 3.1.8
     dev: false
 
   /@tailwindcss/typography/0.5.7_tailwindcss@3.1.8:
@@ -2143,6 +2155,10 @@ packages:
     engines: {node: '>=8.0'}
     dependencies:
       is-number: 7.0.0
+
+  /ts-pattern/4.0.5:
+    resolution: {integrity: sha512-Bq44KCEt7JVaNLa148mBCJkcQf4l7jtLEBDuDdeuLynWDA+1a60P4D0rMkqSM9mOKLQbIWUddE9h3XKyKwBeqA==}
+    dev: true
 
   /tsconfig-paths/3.14.1:
     resolution: {integrity: sha512-fxDhWnFSLt3VuTwtvJt5fpwxBHg5AdKWMsgcPOOIilyjymcYVZoCQF8fvFRezCNfblEXmi+PcM1eYHeOAgXCOQ==}

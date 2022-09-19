@@ -17,6 +17,7 @@ export default function tasksApi(
 ): void {
   const id = req.query['id']
   const task = fetchTask(Number(id))
+
   if (task) {
     res.status(200).json({ task })
   } else {

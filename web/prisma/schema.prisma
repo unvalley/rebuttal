@@ -8,10 +8,10 @@ datasource db {
 }
 
 model User {
-    id       Int     @id @default(autoincrement())
-    name     String?
-    crowd_id Int?
-    role     Role    @relation(fields: [role_id], references: [id])
+    id       Int    @id @default(autoincrement())
+    name     String
+    crowd_id Int
+    role     Role   @relation(fields: [role_id], references: [id])
     role_id  Int
 
     created_at DateTime @default(now())
@@ -36,8 +36,8 @@ model Role {
 }
 
 model Document {
-    id    Int     @id @default(autoincrement())
-    title String?
+    id    Int    @id @default(autoincrement())
+    title String
     // should be lexical replesantation
-    body  String?
+    body  String
 }

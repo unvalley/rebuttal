@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React from 'react'
 
 type Props = {
@@ -15,7 +16,9 @@ export const Layout: React.FC<Props> = ({ children }) => {
         <div className="flex-none">
           <ul className="menu menu-horizontal p-0">
             <li>
-              <a>ヘルプ</a>
+              <Link href="/help">
+                <a>ヘルプ</a>
+              </Link>
             </li>
           </ul>
         </div>
