@@ -10,7 +10,9 @@ export const Layout: React.FC<Props> = ({ children }) => {
     <div className="flex flex-col h-screen justify-between">
       <header className="navbar bg-neutral text-neutral-content">
         <div className="flex-1">
-          <a className="btn btn-ghost normal-case text-xl">Rebuttal</a>
+          <Link href="/workers/tasks">
+            <a className="btn btn-ghost normal-case text-xl">Rebuttal</a>
+          </Link>
         </div>
 
         <div className="flex-none">
