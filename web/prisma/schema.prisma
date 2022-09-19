@@ -10,16 +10,18 @@ datasource db {
 }
 
 model User {
-    id       Int    @id @default(autoincrement())
-    name     String
-    crowd_id Int
-    role     Role   @relation(fields: [role_id], references: [id])
-    role_id  Int
+    id      Int    @id @default(autoincrement())
+    name    String @unique
+    crowdId Int
+    role    Role   @relation(fields: [roleId], references: [id])
+    roleId  Int
 
-    created_at DateTime @default(now())
-    updated_at DateTime @default(now()) @updatedAt
+    created_at DateTime   @default(now())
+    updated_at DateTime   @default(now()) @updatedAt
+    Task       Task[]
+    Document   Document[]
 
-    @@unique([role_id])
+    @@unique([roleId])
     @@map("users")
 }
 
@@ -38,8 +40,49 @@ model Role {
 }
 
 model Document {
-    id    Int    @id @default(autoincrement())
-    title String
+    id              Int       @id @default(autoincrement())
+    title           String
     // should be lexical replesantation
-    body  String
+    body            String
+    isRebuttalReady Boolean   @default(false)
+    comments        Comment[]
+    author          User      @relation(fields: [authorId], references: [id])
+    authorId        Int
+
+    created_at DateTime @default(now())
+    updated_at DateTime @default(now()) @updatedAt
+
+    @@map("documents")
+}
+
+enum CommentKind {
+    REBUTTAL
+    INFORMATION
+}
+
+model Comment {
+    id   Int         @id @default(autoincrement())
+    body String
+    kind CommentKind
+
+    Document   Document @relation(fields: [documentId], references: [id])
+    documentId Int
+
+    created_at DateTime @default(now())
+    updated_at DateTime @default(now()) @updatedAt
+
+    @@map("comments")
+}
+
+model Task {
+    id         Int    @id @default(autoincrement())
+    title      String
+    body       String
+    assignee   User   @relation(fields: [assigneeId], references: [id])
+    assigneeId Int
+
+    created_at DateTime @default(now())
+    updated_at DateTime @default(now()) @updatedAt
+
+    @@map("tasks")
 }
