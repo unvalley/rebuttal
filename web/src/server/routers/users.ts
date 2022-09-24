@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { createRouter } from '.'
 
@@ -16,9 +17,17 @@ const data: { users: User[] } = {
 export const usersRouter = createRouter()
   .query('get', {
     input: z.object({ id: z.number() }),
-    async resolve({ input }) {
-      const user = data.users.find((user) => user.id === input.id)
-      return user ? { name: user.name } : undefined
+    async resolve({ ctx, input }) {
+      const _user = await ctx.prisma.user.findUnique({
+        where: { id: input.id }
+      })
+      if (!_user) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: `No user with input=${JSON.stringify(input)}`
+        })
+      }
+      return { name: _user.name, crowdId: _user.crowdId }
     }
   })
   .mutation('create', {
