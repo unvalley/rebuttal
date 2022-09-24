@@ -5,6 +5,8 @@ specifiers:
   '@prisma/client': ^4.3.1
   '@tailwindcss/line-clamp': ^0.4.2
   '@tailwindcss/typography': ^0.5.7
+  '@trpc/client': ^9.27.2
+  '@trpc/server': ^9.27.2
   '@types/node': 18.7.18
   '@types/react': ^18.0.21
   '@types/react-dom': 18.0.6
@@ -21,6 +23,7 @@ specifiers:
   react-hook-form: ^7.36.1
   swr: ^1.3.0
   tailwindcss: ^3.1.8
+  trpc-swr: ^0.1.5
   ts-node: ^10.9.1
   ts-pattern: ^4.0.5
   typescript: 4.8.3
@@ -31,6 +34,8 @@ dependencies:
   '@hookform/resolvers': 2.9.8_react-hook-form@7.36.1
   '@prisma/client': 4.3.1_prisma@4.3.1
   '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.1.8
+  '@trpc/client': 9.27.2_@trpc+server@9.27.2
+  '@trpc/server': 9.27.2
   autoprefixer: 10.4.11_postcss@8.4.16
   daisyui: 2.28.0_tv3qq2mmllep3n57drshkaozhe
   next: 12.3.0_biqbaboplfbrettd7655fr4n2y
@@ -41,6 +46,7 @@ dependencies:
   react-hook-form: 7.36.1_react@18.2.0
   swr: 1.3.0_react@18.2.0
   tailwindcss: 3.1.8_57znarxsqwmnneadci5z5fd5gu
+  trpc-swr: 0.1.5_g7ilnzdzr5ambf3gkwh6bvnde4
   zod: 3.19.1
 
 devDependencies:
@@ -71,7 +77,6 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.13.9
-    dev: true
 
   /@cspotcode/source-map-support/0.8.1:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -357,6 +362,19 @@ packages:
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.1.8_57znarxsqwmnneadci5z5fd5gu
     dev: true
+
+  /@trpc/client/9.27.2_@trpc+server@9.27.2:
+    resolution: {integrity: sha512-rpsgJJMalOtki5VjcyheL0zdft23mDnoBHn5cJMZLf3ssymCZq2crbvCiUmCRU289lYHrqffaaZ+9PqCSsVKfg==}
+    peerDependencies:
+      '@trpc/server': 9.27.2
+    dependencies:
+      '@babel/runtime': 7.19.0
+      '@trpc/server': 9.27.2
+    dev: false
+
+  /@trpc/server/9.27.2:
+    resolution: {integrity: sha512-LcXCC004SYWVdHqjSZVpoKkcM0tJNwWtvmjmE2Jir36F0siY1CCbr7g2vz6LcOtA/q7Jj5G2/x1qMWzlPq/Bwg==}
+    dev: false
 
   /@tsconfig/node10/1.0.9:
     resolution: {integrity: sha512-jNsYVVxU8v5g43Erja32laIDHXeoNvFEpX33OK4d6hljo3jDhCBDhx5dhCCTMWUojscpAagGiRkBKxpdl9fxqA==}
@@ -2298,7 +2316,6 @@ packages:
 
   /regenerator-runtime/0.13.9:
     resolution: {integrity: sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA==}
-    dev: true
 
   /regexp.prototype.flags/1.4.3:
     resolution: {integrity: sha512-fjggEOO3slI6Wvgjwflkc4NFRCTZAu5CnNfBd5qOMYhWdn67nJBBu34/TkD++eeFmd8C9r9jfXJ27+nSiRkSUA==}
@@ -2556,6 +2573,20 @@ packages:
     engines: {node: '>=8.0'}
     dependencies:
       is-number: 7.0.0
+
+  /trpc-swr/0.1.5_g7ilnzdzr5ambf3gkwh6bvnde4:
+    resolution: {integrity: sha512-e6XssT022gTvxtn9y2PlnxYjpePNjQ4oGwBocQs2mA7H2nAluP5xdMSvXv9jQIRhC9hCSEslnXPgdpnwpSGL6A==}
+    peerDependencies:
+      '@trpc/client': '>=9.23.2'
+      '@trpc/server': '>=9.23.2'
+      react: ^17 || ^18
+      swr: ^1
+    dependencies:
+      '@trpc/client': 9.27.2_@trpc+server@9.27.2
+      '@trpc/server': 9.27.2
+      react: 18.2.0
+      swr: 1.3.0_react@18.2.0
+    dev: false
 
   /ts-node/10.9.1_bidgzm5cq2du6gnjtweqqjrrn4:
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}

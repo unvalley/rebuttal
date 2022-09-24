@@ -1,11 +1,11 @@
 import React from 'react'
-import useSWR from 'swr'
 import {
   type Tab,
   useTabs,
   tabs
 } from '../../../elements/Documents/TabContents/useTabs'
 import { Layout } from '../../../elements/Layout'
+import { trpc } from '../../../lib/trpc'
 
 const styleTabClass = (targetActiveTab: Tab, currentActiveTab: Tab): string => {
   return targetActiveTab === currentActiveTab ? 'tab tab-active' : 'tab'
@@ -13,12 +13,9 @@ const styleTabClass = (targetActiveTab: Tab, currentActiveTab: Tab): string => {
 
 const Documents = () => {
   const { activeTab, setActiveTab, renderTabContents } = useTabs()
-  const { data, error } = useSWR('/api/tasks/1')
 
   const userId = 1
-  const { data: tasks, error: taskFetchError } = useSWR(`/api/tasks/${userId}`)
-
-  if (error) return <p>エラー</p>
+  const { data } = trpc.useSWR(['users.get', { id: userId }])
 
   console.log(JSON.stringify(data))
 
@@ -57,7 +54,7 @@ const Documents = () => {
           <div className="bg-base-200 p-2">
             <span className="font-bold">タスク</span>
           </div>
-          {/* {!tasks.length && <p>タスクは空です！</p>} */}
+          <p>{JSON.stringify(data)}</p>
         </div>
       </div>
     </div>
