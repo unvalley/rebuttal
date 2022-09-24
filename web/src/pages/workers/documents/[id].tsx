@@ -1,4 +1,5 @@
 import React from 'react'
+import useSWR from 'swr'
 import {
   type Tab,
   useTabs,
@@ -12,20 +13,32 @@ const styleTabClass = (targetActiveTab: Tab, currentActiveTab: Tab): string => {
 
 const Documents = () => {
   const { activeTab, setActiveTab, renderTabContents } = useTabs()
+  const { data, error } = useSWR('/api/tasks/1')
+
+  const userId = 1
+  const { data: tasks, error: taskFetchError } = useSWR(`/api/tasks/${userId}`)
+
+  if (error) return <p>エラー</p>
+
+  console.log(JSON.stringify(data))
 
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-xl font-bold">ドキュメント</h2>
-      <div className="grid grid-cols-2 gap-2">
-        <div className="">
-          <div className="card bg-base-100 shadow-xs">
-            <div className="card-body">
-              <h2 className="card-title">タイトル</h2>
-              <p>内容</p>
+      <div className="grid grid-cols-5 gap-2">
+        {/* ドキュメント */}
+        <div className="col-span-2">
+          <div className="bg-base-100">
+            <div className="">
+              <h2 className="font-bold">タイトル</h2>
+              <p>
+                恥の多い生涯を送って来ました。自分には、人間の生活というものが、見当つかないのです。自分は東北の田舎に生れましたので、汽車をはじめて見たのは、よほど大きくなってからでした。自分は停車場のブリッジを、上って、降りて、そうしてそれが線路をまたぎ越えるために造られたものだという事には全然気づかず、ただそれは停車場の構内を外国の遊戯場みたいに、複雑に楽しく、ハイカラにするためにのみ、設備せられてあるものだとばかり思っていました。しかも、かなり永い間そう思っていたのです。ブリッジの上ったり降りたりは、自分にはむしろ、ずいぶん垢抜けのした遊戯で、それは鉄道のサーヴィスの中でも、最も気のきいたサーヴィスの一つだと思っていたのですが、のちにそれはただ旅客が線路をまたぎ越えるための頗る実利的な階段に過ぎないのを発見して、にわかに興が覚めました。また、自分は子供の頃、絵本で地下鉄道というものを見て、これもやは
+              </p>
             </div>
           </div>
         </div>
-        <div className="">
+        {/* タブ */}
+        <div className="col-span-2">
           <div className="tabs tabs-boxed">
             {tabs.map((tab) => (
               <a
@@ -39,6 +52,12 @@ const Documents = () => {
           </div>
           {/* 内容 */}
           {renderTabContents(activeTab)}
+        </div>
+        <div className="col-span-1">
+          <div className="bg-base-200 p-2">
+            <span className="font-bold">タスク</span>
+          </div>
+          {/* {!tasks.length && <p>タスクは空です！</p>} */}
         </div>
       </div>
     </div>
