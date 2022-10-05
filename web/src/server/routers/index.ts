@@ -9,9 +9,9 @@ const tasksRouter = createRouter()
 const commentsRouter = createRouter()
 
 export const appRouter = createRouter()
-  .merge('users.', usersRouter)
-  .merge('documents', documentsRouter)
-  .merge('tasks', tasksRouter)
-  .merge('comments', commentsRouter)
+  .merge(`users.`, usersRouter)
+  .merge(`documents.`, documentsRouter)
+  .merge(`tasks.`, tasksRouter)
+  .merge(`comments.`, commentsRouter)
 
 export type AppRouter = typeof appRouter

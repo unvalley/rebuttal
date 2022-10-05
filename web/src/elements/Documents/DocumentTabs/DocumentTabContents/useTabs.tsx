@@ -1,9 +1,6 @@
 import { useState } from 'react'
 import { match } from 'ts-pattern'
-import { Analyze, Rebuttal, Information, AISupport } from './index'
-
-export const tabs = ['分析', '反論', '情報', 'AI支援'] as const
-export type Tab = typeof tabs[number]
+import { Analyze, Rebuttal, Information, AISupport, Tab } from './index'
 
 export const useTabs = () => {
   const [activeTab, setActiveTab] = useState<Tab>('分析')

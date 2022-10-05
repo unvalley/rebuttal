@@ -1,18 +1,19 @@
 import { createRouter } from '.'
 import { z } from 'zod'
 import type { Document } from '.prisma/client'
+import { TRPCError } from '@trpc/server'
 
 export const documentsRouter = createRouter()
-  .query('get', {
+  .query('getById', {
     input: z.object({ id: z.number() }),
-    async resolve({ input }) {
-      return undefined
-    }
-  })
-  .query('list', {
-    input: z.object({}),
-    async resolve({ input }) {
-      return
+    async resolve({ ctx, input }) {
+      const doc = await ctx.prisma.document.findUnique({
+        where: { id: input.id }
+      })
+      if (!doc) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Not found' })
+      }
+      return doc
     }
   })
   .mutation('create', {
