@@ -20,7 +20,7 @@ const Documents = () => {
   // eslint-disable-next-line no-console
   console.log(document, data)
 
-  // const {data: tasks}  = trpc.useSWR(["t"])
+  const { data: assignedTasks } = trpc.useSWR(['tasks.getByUserId', { userId }])
 
   return (
     <div className="container mx-auto p-4">
@@ -40,7 +40,18 @@ const Documents = () => {
           <div className="bg-base-200 p-2">
             <span className="font-bold">タスク</span>
           </div>
-          <p>{JSON.stringify(document)}</p>
+          <div>
+          {assignedTasks
+            ? <div>
+              {assignedTasks.map(task =>
+              <div>
+                {task.title}
+              </div>,
+              )}
+          </div>
+            : <span>タスクが割り当てられていません。</span>
+          }
+          </div>
         </div>
       </div>
     </div>

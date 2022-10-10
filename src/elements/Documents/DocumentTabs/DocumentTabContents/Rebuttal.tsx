@@ -1,6 +1,6 @@
 export const Rebuttal = () => {
   return (
-    <div>
+    <div className="">
       {/* 進捗状況 */}
       <div className="py-4">
         <div className="">

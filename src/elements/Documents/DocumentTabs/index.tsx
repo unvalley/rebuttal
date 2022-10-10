@@ -1,6 +1,6 @@
 import { useTabs } from './DocumentTabContents/useTabs'
 import type { DocumentTab } from './DocumentTabContents'
-import { documentTabs } from './DocumentTabContents'
+import { workerTaskflow } from './DocumentTabContents'
 
 const styleTabClass = (
   targetActiveTab: DocumentTab,
@@ -14,14 +14,15 @@ export const DocumentTabs: React.FC = () => {
   return (
     <div>
       <div className="tabs tabs-boxed">
-        {documentTabs.map(tab => (
+        {workerTaskflow.map(taskflow => (
+          <div key={taskflow.title} className="tooltip" data-tip={taskflow.message}>
           <a
-            key={tab}
-            className={styleTabClass(tab, activeTab)}
-            onClick={() => setActiveTab(tab)}
+            className={styleTabClass(taskflow.title, activeTab)}
+            onClick={() => setActiveTab(taskflow.title)}
           >
-            {tab}
+            {taskflow.title}
           </a>
+          </div>
         ))}
       </div>
       {renderTabContents(activeTab)}

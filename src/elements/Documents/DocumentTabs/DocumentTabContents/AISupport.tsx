@@ -1,7 +1,6 @@
 export const AISupport = () => {
   return (
-    <div>
-      <h2>AI支援を行う</h2>
+    <div className="">
       <p>もしかしたら反論タブの中に入れてもいい</p>
     </div>
   )

@@ -4,23 +4,23 @@ module.exports = {
   darkMode: 'class',
   i18n: {
     locales: ['en-US'],
-    defaultLocale: 'en-US'
+    defaultLocale: 'en-US',
   },
   theme: {
     extend: {
-      backgroundImage: (theme) => ({
-        check: "url('/icons/check.svg')",
-        landscape: "url('/images/landscape/2.jpg')"
-      })
-    }
+      backgroundImage: theme => ({
+        check: 'url(\'/icons/check.svg\')',
+        landscape: 'url(\'/images/landscape/2.jpg\')',
+      }),
+    },
   },
   variants: {
     extend: {
       backgroundColor: ['checked'],
       borderColor: ['checked'],
       inset: ['checked'],
-      zIndex: ['hover', 'active']
-    }
+      zIndex: ['hover', 'active'],
+    },
   },
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   plugins: [
@@ -28,9 +28,9 @@ module.exports = {
     require('autoprefixer'),
     require('@tailwindcss/typography'),
     require('@tailwindcss/line-clamp'),
-    require('daisyui')
+    require('daisyui'),
   ],
   daisyui: {
-    themes: ['light']
-  }
+    themes: ['light'],
+  },
 }
