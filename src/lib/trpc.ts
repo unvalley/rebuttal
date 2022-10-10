@@ -1,6 +1,6 @@
 import { createSWRHooks, getUseMatchMutate } from 'trpc-swr'
-import type { AppRouter } from '../server/routers'
 import { getUseSWRInfinite } from 'trpc-swr/infinite'
+import type { AppRouter } from '../server/routers'
 
 export const trpc = createSWRHooks<AppRouter>()
 export const useSWRInfinite = getUseSWRInfinite<AppRouter>()

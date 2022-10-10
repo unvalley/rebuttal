@@ -11,7 +11,7 @@ export default createNextApiHandler({
     }
   },
   batching: {
-    enabled: true
+    enabled: true,
   },
-  createContext
+  createContext,
 })

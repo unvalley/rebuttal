@@ -1,9 +1,10 @@
 import { useTabs } from './DocumentTabContents/useTabs'
-import { documentTabs, DocumentTab } from './DocumentTabContents'
+import type { DocumentTab } from './DocumentTabContents'
+import { documentTabs } from './DocumentTabContents'
 
 const styleTabClass = (
   targetActiveTab: DocumentTab,
-  currentActiveTab: DocumentTab
+  currentActiveTab: DocumentTab,
 ): string => {
   return targetActiveTab === currentActiveTab ? 'tab tab-active' : 'tab'
 }
@@ -13,7 +14,7 @@ export const DocumentTabs: React.FC = () => {
   return (
     <div>
       <div className="tabs tabs-boxed">
-        {documentTabs.map((tab) => (
+        {documentTabs.map(tab => (
           <a
             key={tab}
             className={styleTabClass(tab, activeTab)}

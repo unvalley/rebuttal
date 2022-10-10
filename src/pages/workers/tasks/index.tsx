@@ -11,22 +11,22 @@ const Tasks = () => {
       progress: [
         {
           title: '文書内容を理解するためのログ',
-          percentage: 20
+          percentage: 20,
         },
         {
           title: '主張と根拠のつながりの特定',
-          percentage: 40
+          percentage: 40,
         },
         {
           title: '反論の生成',
-          percentage: 80
+          percentage: 80,
         },
         {
           title: '反論の推敲',
-          percentage: 50
-        }
+          percentage: 50,
+        },
       ],
-      agreement: true
+      agreement: true,
     },
     {
       id: '2',
@@ -35,22 +35,22 @@ const Tasks = () => {
       progress: [
         {
           title: '文書内容を理解するためのログ',
-          percentage: 20
+          percentage: 20,
         },
         {
           title: '主張と根拠のつながりの特定',
-          percentage: 20
+          percentage: 20,
         },
         {
           title: '反論の生成',
-          percentage: 20
+          percentage: 20,
         },
         {
           title: '反論の推敲',
-          percentage: 20
-        }
+          percentage: 20,
+        },
       ],
-      agreement: false
+      agreement: false,
     },
     {
       id: '3',
@@ -59,23 +59,23 @@ const Tasks = () => {
       progress: [
         {
           title: '文書内容を理解するためのログ',
-          percentage: 20
+          percentage: 20,
         },
         {
           title: '主張と根拠のつながりの特定',
-          percentage: 20
+          percentage: 20,
         },
         {
           title: '反論の生成',
-          percentage: 20
+          percentage: 20,
         },
         {
           title: '反論の推敲',
-          percentage: 20
-        }
+          percentage: 20,
+        },
       ],
-      agreement: false
-    }
+      agreement: false,
+    },
   ]
 
   const router = useRouter()
@@ -146,7 +146,7 @@ const Tasks = () => {
                       >
                         <div className="card-body">
                           <h3 className="card-title">タスク進捗状況</h3>
-                          {d.progress.map((e) => (
+                          {d.progress.map(e => (
                             <div key={e.title}>
                               <span className="mr-2">{e.title}</span>
                               <progress

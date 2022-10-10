@@ -1,21 +1,21 @@
-import { Layout } from '../../elements/Layout'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/router'
+import { Layout } from '../../elements/Layout'
 
 const schema = z
   .object({
     name: z.string().min(1, { message: 'Required' }),
-    password: z.string()
+    password: z.string(),
   })
   .transform((x) => {
     return {
-      ...x
+      ...x,
     }
   })
 
-type FormInputs = {
+interface FormInputs {
   name: string
   password: string
 }
@@ -24,21 +24,20 @@ const Login = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<FormInputs>({ resolver: zodResolver(schema) })
   const router = useRouter()
 
   const onSubmit = async (data: FormInputs) => {
     const res = await fetch('/api/tasks', {
       method: 'POST',
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     })
 
-    if (res.ok) {
+    if (res.ok)
       router.push('')
-    } else {
+    else
       alert(JSON.stringify('エラー'))
-    }
   }
 
   return (
@@ -64,7 +63,7 @@ const Login = () => {
                 {...register('name')}
               />
             </div>
-            {errors['name']?.message && <p>エラー</p>}
+            {errors.name?.message && <p>エラー</p>}
             <div>
               <label className="label">
                 <span className="label-text">パスワード</span>
@@ -76,7 +75,7 @@ const Login = () => {
                 className="input input-bordered w-full"
                 {...register('password')}
               />
-              {errors['password']?.message && <p>エラー</p>}
+              {errors.password?.message && <p>エラー</p>}
             </div>
             <button type="submit" className="btn w-full">
               ログイン

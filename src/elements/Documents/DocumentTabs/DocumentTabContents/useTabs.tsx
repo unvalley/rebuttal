@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { match } from 'ts-pattern'
-import { Analyze, Rebuttal, Information, AISupport, Tab } from './index'
+import type { DocumentTab } from './index'
+import { AISupport, Analyze, Information, Rebuttal } from './index'
 
 export const useTabs = () => {
-  const [activeTab, setActiveTab] = useState<Tab>('分析')
-  const renderTabContents = (activeTab: Tab) =>
+  const [activeTab, setActiveTab] = useState<DocumentTab>('分析')
+  const renderTabContents = (activeTab: DocumentTab) =>
     match(activeTab)
       .with('分析', () => <Analyze />)
       .with('反論', () => <Rebuttal />)

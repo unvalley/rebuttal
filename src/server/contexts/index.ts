@@ -8,12 +8,12 @@ import { prisma } from '../../lib/prismaClient'
  */
 export const createContext = async ({
   req,
-  res
+  res,
 }: trpcNext.CreateNextContextOptions) => {
   return {
     req,
     res,
-    prisma
+    prisma,
   }
 }
 
