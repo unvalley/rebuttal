@@ -1,5 +1,18 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
+// @ts-ignore
+import { env } from "../server/env";
 
-export const prisma = new PrismaClient({
-  log: ['query', 'error', 'info', 'warn'],
-})
+const prismaGlobal = global as typeof global & {
+  prisma?: PrismaClient;
+};
+
+export const prisma: PrismaClient =
+  prismaGlobal.prisma ||
+  new PrismaClient({
+    log:
+      env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+  });
+
+if (env.NODE_ENV !== "production") {
+  prismaGlobal.prisma = prisma;
+}

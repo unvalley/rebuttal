@@ -1,35 +1,24 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
-import type { NextPage } from 'next'
-import type { ReactNode } from 'react'
-import { ThemeProvider } from 'next-themes'
-import { SWRConfig } from 'swr'
-import { createTRPCClient } from '@trpc/client'
-import { fetcher } from '../lib/fetcher'
-import { trpc } from '../lib/trpc'
+import "../styles/globals.css";
+import type { AppProps } from "next/app";
+import type { NextPage } from "next";
+import type { ReactNode } from "react";
+import { ThemeProvider } from "next-themes";
+import { trpc } from "../lib/trpc";
 
 type NextPageWithAuthAndLayout = NextPage & {
-  auth?: boolean
-  getLayout?: (page: React.ReactElement) => ReactNode
-}
+  auth?: boolean;
+  getLayout?: (page: React.ReactElement) => ReactNode;
+};
 
 type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithAuthAndLayout
-}
+  Component: NextPageWithAuthAndLayout;
+};
 
-const client = createTRPCClient({ url: 'http://localhost:3000/api/trpc' })
+const MyApp = ({ Component, pageProps }: AppPropsWithLayout) => {
+  const getLayout = Component.getLayout ?? ((page) => page);
+  const layout = getLayout(<Component {...pageProps} />);
 
-function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-  const getLayout = Component.getLayout ?? (page => page)
-  const layout = getLayout(<Component {...pageProps} />)
+  return <ThemeProvider>{layout}</ThemeProvider>;
+};
 
-  return (
-    <trpc.TRPCProvider client={client}>
-      <SWRConfig value={{ revalidateIfStale: false, fetcher }}>
-        <ThemeProvider>{layout}</ThemeProvider>
-      </SWRConfig>
-    </trpc.TRPCProvider>
-  )
-}
-
-export default MyApp
+export default trpc.withTRPC(MyApp);
