@@ -41,6 +41,9 @@ const Documents = () => {
             <span className="font-bold">タスク</span>
           </div>
           <div>
+            <div className="">
+              <div></div>
+            </div>
           {assignedTasks
             ? <div>
               {assignedTasks.map(task =>
