@@ -1,8 +1,8 @@
-import Link from 'next/link'
-import React from 'react'
+import Link from "next/link";
+import React from "react";
 
 interface Props {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export const Layout: React.FC<Props> = ({ children }) => {
@@ -10,8 +10,8 @@ export const Layout: React.FC<Props> = ({ children }) => {
     <div className="flex flex-col h-screen justify-between">
       <header className="navbar bg-neutral text-neutral-content">
         <div className="flex-1">
-          <Link href="/workers/tasks">
-            <a className="btn btn-ghost normal-case text-xl">Rebuttal</a>
+          <Link href="/">
+            <a className="btn btn-ghost normal-case text-xl">実験用サイト</a>
           </Link>
         </div>
 
@@ -32,5 +32,5 @@ export const Layout: React.FC<Props> = ({ children }) => {
         </div>
       </footer>
     </div>
-  )
-}
+  );
+};

@@ -16,10 +16,10 @@ model User {
     role    Role   @relation(fields: [roleId], references: [id])
     roleId  Int
 
-    created_at DateTime   @default(now())
-    updated_at DateTime   @default(now()) @updatedAt
-    Task       Task[]
-    Document   Document[]
+    created_at DateTime    @default(now())
+    updated_at DateTime    @default(now()) @updatedAt
+    microtask  Microtask[]
+    document   Document[]
 
     @@unique([roleId])
     @@map("users")
@@ -40,19 +40,30 @@ model Role {
 }
 
 model Document {
-    id              Int       @id @default(autoincrement())
+    id              Int         @id @default(autoincrement())
     title           String
     // should be lexical replesantation
     body            String
-    isRebuttalReady Boolean   @default(false)
+    isRebuttalReady Boolean     @default(false)
     comments        Comment[]
-    author          User      @relation(fields: [authorId], references: [id])
+    author          User        @relation(fields: [authorId], references: [id])
     authorId        Int
+    paragraphs      Paragraph[]
 
     created_at DateTime @default(now())
     updated_at DateTime @default(now()) @updatedAt
 
     @@map("documents")
+}
+
+model Paragraph {
+    id         Int         @id @default(autoincrement())
+    body       String
+    document   Document    @relation(fields: [documentId], references: [id])
+    documentId Int
+    microtasks Microtask[]
+
+    @@map("paragraphs")
 }
 
 enum CommentKind {
@@ -65,7 +76,7 @@ model Comment {
     body String
     kind CommentKind
 
-    Document   Document @relation(fields: [documentId], references: [id])
+    document   Document @relation(fields: [documentId], references: [id])
     documentId Int
 
     created_at DateTime @default(now())
@@ -74,22 +85,24 @@ model Comment {
     @@map("comments")
 }
 
-enum TaskStatus {
+enum MicrotaskStatus {
     CREATED
     ASSIGNED
     DONE
 }
 
-model Task {
-    id         Int        @id @default(autoincrement())
-    title      String
-    body       String
-    status     TaskStatus
-    assignee   User?      @relation(fields: [assigneeId], references: [id])
-    assigneeId Int?
+model Microtask {
+    id          Int             @id @default(autoincrement())
+    title       String
+    body        String
+    status      MicrotaskStatus
+    paragraph   Paragraph       @relation(fields: [paragraphId], references: [id])
+    paragraphId Int
+    assignee    User?           @relation(fields: [assigneeId], references: [id])
+    assigneeId  Int?
 
     created_at DateTime @default(now())
     updated_at DateTime @default(now()) @updatedAt
 
-    @@map("tasks")
+    @@map("microtasks")
 }

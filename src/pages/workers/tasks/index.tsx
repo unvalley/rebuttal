@@ -1,186 +1,137 @@
-import { useRouter } from 'next/router'
-import { Layout } from '../../../elements/Layout'
+import { Layout } from "../../../elements/Layout";
+import { trpc } from "../../../lib/trpc";
+
+const randomMicrotaskId = Math.floor(Math.random() * 3 + 1);
 
 const Tasks = () => {
-  // 候補: 賛成反対
-  const data = [
-    {
-      id: '1',
-      name: 'Mike',
-      title: 'Web3',
-      progress: [
-        {
-          title: '文書内容を理解するためのログ',
-          percentage: 20,
-        },
-        {
-          title: '主張と根拠のつながりの特定',
-          percentage: 40,
-        },
-        {
-          title: '反論の生成',
-          percentage: 80,
-        },
-        {
-          title: '反論の推敲',
-          percentage: 50,
-        },
-      ],
-      agreement: true,
-    },
-    {
-      id: '2',
-      name: 'Satoshi',
-      title: 'NFT',
-      progress: [
-        {
-          title: '文書内容を理解するためのログ',
-          percentage: 20,
-        },
-        {
-          title: '主張と根拠のつながりの特定',
-          percentage: 20,
-        },
-        {
-          title: '反論の生成',
-          percentage: 20,
-        },
-        {
-          title: '反論の推敲',
-          percentage: 20,
-        },
-      ],
-      agreement: false,
-    },
-    {
-      id: '3',
-      name: 'John',
-      title: 'Web3',
-      progress: [
-        {
-          title: '文書内容を理解するためのログ',
-          percentage: 20,
-        },
-        {
-          title: '主張と根拠のつながりの特定',
-          percentage: 20,
-        },
-        {
-          title: '反論の生成',
-          percentage: 20,
-        },
-        {
-          title: '反論の推敲',
-          percentage: 20,
-        },
-      ],
-      agreement: false,
-    },
-  ]
+  const userId = 3;
 
-  const router = useRouter()
+  const utils = trpc.useContext();
+  const microtaskQuery = trpc.microtasks.findByUserId.useQuery({
+    userId,
+  });
+
+  const assignMicrotask = trpc.microtasks.updateToAssign.useMutation({
+    async onSuccess() {
+      await utils.microtasks.findByUserId.invalidate({ userId });
+    },
+  });
+
+  const unassignMicrotask = trpc.microtasks.updateToUnassign.useMutation({
+    async onSuccess() {
+      await utils.microtasks.findByUserId.invalidate({ userId });
+    },
+  });
+
+  if (!microtaskQuery.error) {
+    <div>指定されたタスクは存在しません</div>;
+  }
+
+  const { data } = microtaskQuery;
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-xl font-bold">Tasks</h2>
+      <h2 className="text-2xl font-bold">Tasks</h2>
 
-      {/* FEATURE: Stream (https://www.pinterest.jp/pin/608760074652174474/?nic_v3=1a5XeqvRz) */}
-      <div className="py-4">
-        <table className="table w-full">
-          <thead>
-            <tr>
-              <th>
-                <label>
-                  <input type="checkbox" className="checkbox" />
-                </label>
-              </th>
-              <th>執筆ユーザー名</th>
-              <th>タイトル</th>
-              <th>更新日時</th>
-              <th>進捗</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((d) => {
-              return (
-                <tr key={d.id}>
-                  <th>
-                    <label>
-                      <input type="checkbox" className="checkbox" />
-                    </label>
-                  </th>
-                  <td>
-                    <div className="flex items-center space-x-3">
-                      <div className="avatar">
-                        <div className="mask mask-squircle w-12 h-12">
-                          <img
-                            src={`https://ui-avatars.com/api/?name=${d.name}`}
-                            alt="User Avatar"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <div className="font-bold">{d.name}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    {d.title}
-                    <br />
-                    <span className="badge badge-ghost badge-sm">
-                      {'補足情報を色々と書く'}
-                    </span>
-                  </td>
-                  <td>
-                    <span>2020/02/20 19:00:00</span>
-                  </td>
-                  <td>
-                    <div className="dropdown dropdown-end">
-                      <label tabIndex={0} className="btn m-1">
-                        執筆の進捗状況
-                      </label>
-                      <div
-                        tabIndex={0}
-                        className="dropdown-content card card-compact p-2 shadow bg-neutral text-primary-content"
-                      >
-                        <div className="card-body">
-                          <h3 className="card-title">タスク進捗状況</h3>
-                          {d.progress.map(e => (
-                            <div key={e.title}>
-                              <span className="mr-2">{e.title}</span>
-                              <progress
-                                className="progress progress-success w-56"
-                                value={e.percentage}
-                                max="100"
-                              />
-                              <span>{e.percentage} / 100</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <th>
+      <div className="grid grid-cols-5 gap-2 py-4">
+        <div className="col-span-3">
+          <div className="card w-full bg-base-100 shadow-md">
+            <div className="card-body">
+              {data && data.assigneeId ? (
+                <div>
+                  <div className="card-title text-md">割り当てられたタスク</div>
+                  <div className="text-lg">タスク：{data.title}</div>
+                  <span>
+                    次のパラグラフにおいて，意見と事実の切り分けを行ってください．
+                    {data.body && "data.body"}
+                  </span>
+                  <div className="font-semibold my-4">
+                    若年層のSNS利用は制限されるべきである．
+                    なぜなら，SNSを利用することによって承認欲求に駆られてしまい，社会的に不健全なことで注目を浴びるようなマネをとる若年層が増加傾向にあるからだ．いわゆる炎上事件が起きてしまった場合，その影響は所属する学校や組織にとどまらず，身内のプライバシーにも影響を与えかねない．SNSを利用するにあたって，この危険性から逃れることは難しい．このような不利点を考慮すると，リスクを犯してSNSを利用して得られる利点は無いといってよいだろう．
+                  </div>
+                  <div className="text-lg">
+                    <span className="bg-green-100 text-green-800">簡単</span>
+                    <span className="text-green-700">: 3-5分</span>
+                  </div>
+
+                  <div>TODO: タスク実施のためのUI実装</div>
+                  <div>TODO: ドキュメント画面へリンクさせるか検討</div>
+                  <div>TODO: 該当パラグラフ以外はblurさせれば良い？</div>
+                  <div className="card-actions">
                     <button
-                      className="btn btn-ghost btn-xl"
-                      onClick={() => router.push(`/workers/documents/${d.id}`)}
+                      className="btn"
+                      onClick={async () => {
+                        try {
+                          await unassignMicrotask.mutateAsync({
+                            id: randomMicrotaskId,
+                          });
+                        } catch (cause) {
+                          console.error(
+                            { cause },
+                            "Failed to assign microtask"
+                          );
+                        }
+                      }}
                     >
-                      開く
+                      割り当てを解除する
                     </button>
-                  </th>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div className="card-title text-md">
+                    タスクがまだ割り当てられていません
+                  </div>
+                  <p>ボタンを押すと，タスクが割り当てられます．</p>
+                  <div className="card-actions">
+                    <button
+                      className="btn btn-primary"
+                      onClick={async () => {
+                        try {
+                          await assignMicrotask.mutateAsync({
+                            id: randomMicrotaskId,
+                            assigneeId: userId,
+                          });
+                        } catch (cause) {
+                          console.error(
+                            { cause },
+                            "Failed to assign microtask"
+                          );
+                        }
+                      }}
+                    >
+                      割り当てを行う
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="col-span-2">
+          <div className="card w-full bg-base-101 shadow-md">
+            <div className="card-body">
+              <div className="card-title text-xl">あなたの貢献</div>
+              <p>これだけの貢献を行いました．</p>
+            </div>
+          </div>
+          <div className="card w-full bg-base-101 shadow-md">
+            <div className="card-body">
+              <div className="card-title text-xl">ヘルプ</div>
+              <ul>
+                <li>ヘルプ1</li>
+                <li>ヘルプ2</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 Tasks.getLayout = function getLayout(page: React.ReactElement) {
-  return <Layout>{page}</Layout>
-}
+  return <Layout>{page}</Layout>;
+};
 
-export default Tasks
+export default Tasks;

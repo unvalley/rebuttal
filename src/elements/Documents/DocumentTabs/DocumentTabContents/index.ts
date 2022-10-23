@@ -21,6 +21,7 @@ export const workerTaskflow = [
     message: 'AIによる支援を受け取る場所です',
   },
 ] as const
+
 export const documentTabs = ['分析', '反論', '情報', 'AI支援'] as const
 export type DocumentTab = typeof documentTabs[number]
 

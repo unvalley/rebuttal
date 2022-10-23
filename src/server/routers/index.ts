@@ -1,17 +1,13 @@
-import * as trpc from '@trpc/server'
-import type { Context } from '../contexts'
-import { usersRouter } from './users'
-import { documentsRouter } from './documents'
-import { tasksRouter } from './tasks'
+import { usersRouter } from "./users";
+import { documentsRouter } from "./documents";
+import { microtasksRouter } from "./microtasks";
+import { publicProcedure, router } from "../trpc";
 
-export const createRouter = () => trpc.router<Context>()
+export const appRouter = router({
+  healthcheck: publicProcedure.query(() => "yay!"),
+  users: usersRouter,
+  documents: documentsRouter,
+  microtasks: microtasksRouter,
+});
 
-const commentsRouter = createRouter()
-
-export const appRouter = createRouter()
-  .merge('users.', usersRouter)
-  .merge('documents.', documentsRouter)
-  .merge('tasks.', tasksRouter)
-  .merge('comments.', commentsRouter)
-
-export type AppRouter = typeof appRouter
+export type AppRouter = typeof appRouter;
