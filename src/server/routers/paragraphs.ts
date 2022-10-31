@@ -2,7 +2,7 @@
 // import { z } from "zod";
 // import { TRPCError } from "@trpc/server";
 
-// export const paragraphsRouter = createRouter().mutation(
+// export const sentencesRouter = createRouter().mutation(
 //   "createManyByDocumentId",
 //   {
 //     input: z.object({ documentId: z.number() }),
@@ -19,17 +19,17 @@
 //         });
 //       }
 //       // TEST:
-//       const splittedParagraphs = doc.body.split("\n");
-//       const insertData = splittedParagraphs.map((paragraph) => {
+//       const splittedSentences = doc.body.split("\n");
+//       const insertData = splittedSentences.map((sentence) => {
 //         return {
-//           body: paragraph,
+//           body: sentence,
 //           documentId: input.documentId,
 //         };
 //       });
-//       const paragraphs = await ctx.prisma.paragraph.createMany({
+//       const sentences = await ctx.prisma.sentence.createMany({
 //         data: insertData,
 //       });
-//       return paragraphs;
+//       return sentences;
 //     },
 //   }
 // );

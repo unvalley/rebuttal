@@ -66,9 +66,9 @@ async function main() {
   });
 
   const documentIds = [1, 2];
-  await createParagraphsByDocumentIds(documentIds);
+  await createSentencesByDocumentIds(documentIds);
 
-  const paragraphs = await prisma.paragraph.findMany({
+  const sentences = await prisma.sentence.findMany({
     where: {
       documentId: { in: documentIds },
     },
@@ -79,12 +79,12 @@ async function main() {
   });
 
   const createMicrotasksInsertData = (deafultMicrotasks: { title: string }[]) =>
-    paragraphs.flatMap((paragraph) => {
+    sentences.flatMap((sentence) => {
       return deafultMicrotasks.flatMap((microtask) => {
         return {
           title: microtask.title,
           body: "",
-          paragraphId: paragraph.id,
+          sentenceId: sentence.id,
           status: "CREATED",
         } as const;
       });
@@ -97,26 +97,26 @@ async function main() {
   });
 }
 
-const createParagraphsByDocumentIds = async (documentIds: number[]) => {
+const createSentencesByDocumentIds = async (documentIds: number[]) => {
   const docs = await prisma.document.findMany({
     where: {
       id: { in: documentIds },
     },
   });
 
-  // NOTE: document to paragraphs, create documentId and paragraphBody object
-  const documentAndParagraphs = docs.flatMap((doc) => {
-    const paragraphs = doc.body.split("\n");
-    return paragraphs.flatMap((paragraph) => {
+  // NOTE: document to sentences, create documentId and sentenceBody object
+  const documentAndSentences = docs.flatMap((doc) => {
+    const sentences = doc.body.split("\n");
+    return sentences.flatMap((sentence) => {
       return {
         documentId: doc.id,
-        body: paragraph,
+        body: sentence,
       };
     });
   });
 
-  await prisma.paragraph.createMany({
-    data: documentAndParagraphs,
+  await prisma.sentence.createMany({
+    data: documentAndSentences,
     skipDuplicates: true,
   });
 };

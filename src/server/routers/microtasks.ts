@@ -58,18 +58,18 @@ export const microtasksRouter = router({
     }),
 });
 
-//   .mutation("createManyByParagraphId", {
-//     input: z.object({ paragraphId: z.number() }),
+//   .mutation("createManyBySentenceId", {
+//     input: z.object({ sentenceId: z.number() }),
 //     async resolve({ ctx, input }) {
-//       const paragraph = await ctx.prisma.paragraph.findFirst({
+//       const sentence = await ctx.prisma.sentence.findFirst({
 //         where: {
-//           id: input.paragraphId,
+//           id: input.sentenceId,
 //         },
 //       });
-//       if (!paragraph) {
+//       if (!sentence) {
 //         throw new TRPCError({
 //           code: "NOT_FOUND",
-//           message: `Not found paragraphId=${input.paragraphId}`,
+//           message: `Not found sentenceId=${input.sentenceId}`,
 //         });
 //       }
 
@@ -79,19 +79,19 @@ export const microtasksRouter = router({
 //             title: MICROTASKS.SPLIT_OPINION_AND_FACT,
 //             body: "",
 //             status: "CREATED",
-//             paragraphId: input.paragraphId,
+//             sentenceId: input.sentenceId,
 //           },
 //           {
 //             title: MICROTASKS.CHECK_SOURCE,
 //             body: "",
 //             status: "CREATED",
-//             paragraphId: input.paragraphId,
+//             sentenceId: input.sentenceId,
 //           },
 //           {
 //             title: MICROTASKS.CHECK_VALID_FACT,
 //             body: "",
 //             status: "CREATED",
-//             paragraphId: input.paragraphId,
+//             sentenceId: input.sentenceId,
 //           },
 //         ],
 //       });

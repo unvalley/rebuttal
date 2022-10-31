@@ -40,15 +40,15 @@ model Role {
 }
 
 model Document {
-    id              Int         @id @default(autoincrement())
+    id              Int        @id @default(autoincrement())
     title           String
     // should be lexical replesantation
     body            String
-    isRebuttalReady Boolean     @default(false)
+    isRebuttalReady Boolean    @default(false)
     comments        Comment[]
-    author          User        @relation(fields: [authorId], references: [id])
+    author          User       @relation(fields: [authorId], references: [id])
     authorId        Int
-    paragraphs      Paragraph[]
+    sentences       Sentence[]
 
     created_at DateTime @default(now())
     updated_at DateTime @default(now()) @updatedAt
@@ -56,14 +56,14 @@ model Document {
     @@map("documents")
 }
 
-model Paragraph {
+model Sentence {
     id         Int         @id @default(autoincrement())
     body       String
     document   Document    @relation(fields: [documentId], references: [id])
     documentId Int
     microtasks Microtask[]
 
-    @@map("paragraphs")
+    @@map("sentences")
 }
 
 enum CommentKind {
@@ -92,14 +92,14 @@ enum MicrotaskStatus {
 }
 
 model Microtask {
-    id          Int             @id @default(autoincrement())
-    title       String
-    body        String
-    status      MicrotaskStatus
-    paragraph   Paragraph       @relation(fields: [paragraphId], references: [id])
-    paragraphId Int
-    assignee    User?           @relation(fields: [assigneeId], references: [id])
-    assigneeId  Int?
+    id         Int             @id @default(autoincrement())
+    title      String
+    body       String
+    status     MicrotaskStatus
+    sentence   Sentence        @relation(fields: [sentenceId], references: [id])
+    sentenceId Int
+    assignee   User?           @relation(fields: [assigneeId], references: [id])
+    assigneeId Int?
 
     created_at DateTime @default(now())
     updated_at DateTime @default(now()) @updatedAt
