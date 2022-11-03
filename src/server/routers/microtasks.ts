@@ -16,10 +16,11 @@ export const microtasksRouter = router({
   findByUserId: publicProcedure
     .input(z.object({ userId: z.number() }))
     .query(async ({ input }) => {
-      const microtask = await prisma.microtask.findFirst({
+      const microtaskWithSentence = await prisma.microtask.findFirst({
         where: { assigneeId: input.userId },
+        include: { sentence: true },
       });
-      return microtask;
+      return microtaskWithSentence;
     }),
   updateToAssign: publicProcedure
     .input(

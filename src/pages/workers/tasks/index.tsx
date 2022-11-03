@@ -1,3 +1,5 @@
+import { Microtask, MicrotaskKinds, Sentence } from ".prisma/client";
+import { match } from "ts-pattern";
 import { Layout } from "../../../elements/Layout";
 import { trpc } from "../../../lib/trpc";
 
@@ -7,7 +9,7 @@ const Tasks = () => {
   const userId = 3;
 
   const utils = trpc.useContext();
-  const microtaskQuery = trpc.microtasks.findByUserId.useQuery({
+  const microtaskWithSentenceQuery = trpc.microtasks.findByUserId.useQuery({
     userId,
   });
 
@@ -23,11 +25,11 @@ const Tasks = () => {
     },
   });
 
-  if (!microtaskQuery.error) {
+  if (!microtaskWithSentenceQuery.error) {
     <div>指定されたタスクは存在しません</div>;
   }
 
-  const { data } = microtaskQuery;
+  const { data } = microtaskWithSentenceQuery;
 
   return (
     <div className="container mx-auto p-4">
@@ -41,22 +43,21 @@ const Tasks = () => {
                 <div>
                   <div className="card-title text-md">割り当てられたタスク</div>
                   <div className="text-lg">タスク：{data.title}</div>
-                  <span>
-                    次のパラグラフにおいて，意見と事実の切り分けを行ってください．
-                    {data.body && "data.body"}
-                  </span>
-                  <div className="font-semibold my-4">
-                    若年層のSNS利用は制限されるべきである．
-                    なぜなら，SNSを利用することによって承認欲求に駆られてしまい，社会的に不健全なことで注目を浴びるようなマネをとる若年層が増加傾向にあるからだ．いわゆる炎上事件が起きてしまった場合，その影響は所属する学校や組織にとどまらず，身内のプライバシーにも影響を与えかねない．SNSを利用するにあたって，この危険性から逃れることは難しい．このような不利点を考慮すると，リスクを犯してSNSを利用して得られる利点は無いといってよいだろう．
-                  </div>
-                  <div className="text-lg">
-                    <span className="bg-green-100 text-green-800">簡単</span>
-                    <span className="text-green-700">: 3-5分</span>
-                  </div>
-
-                  <div>TODO: タスク実施のためのUI実装</div>
-                  <div>TODO: ドキュメント画面へリンクさせるか検討</div>
-                  <div>TODO: 該当パラグラフ以外はblurさせれば良い？</div>
+                  {match(data.kind)
+                    .with(MicrotaskKinds.CHECK_FACT_RESOURCE, () => (
+                      <MicrotaskDescription microtask={data} />
+                    ))
+                    .with(
+                      MicrotaskKinds.CHECK_IF_OPINION_HAS_VALID_FACT,
+                      () => <MicrotaskDescription microtask={data} />
+                    )
+                    .with(MicrotaskKinds.REVIEW_OTHER_WORKERS_RESULT, () => (
+                      <MicrotaskDescription microtask={data} />
+                    ))
+                    .with(MicrotaskKinds.DISTINGUISH_OPINION_AND_FACT, () => (
+                      <MicrotaskDescription microtask={data} />
+                    ))
+                    .exhaustive()}
                   <div className="card-actions">
                     <button
                       className="btn"
@@ -127,6 +128,23 @@ const Tasks = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const MicrotaskDescription: React.FC<{
+  microtask: Microtask & { sentence: Sentence };
+}> = ({ microtask }) => {
+  return (
+    <>
+      <span>
+        次のセンテンスにおいて，「{microtask.title}」を行ってください．
+      </span>
+      <div className="font-semibold my-4">{microtask.sentence.body}</div>
+      <div className="text-lg">
+        <span className="bg-green-100 text-green-800">簡単</span>
+        <span className="text-green-700">: 3-5分</span>
+      </div>
+    </>
   );
 };
 

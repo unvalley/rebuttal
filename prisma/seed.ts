@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import type { MicroTaskKinds } from "../constants/microtasks";
+import { split } from "sentence-splitter";
 
 const prisma = new PrismaClient({
   log: ["query", "error", "info", "warn"],
@@ -113,6 +114,14 @@ async function main() {
   });
 }
 
+const textToSentences = (text: string) =>
+  split(text).flatMap((s) => {
+    if (s.type !== "Sentence") {
+      return [];
+    }
+    return s.raw;
+  });
+
 const createSentencesByDocumentIds = async (documentIds: number[]) => {
   const docs = await prisma.document.findMany({
     where: {
@@ -122,7 +131,7 @@ const createSentencesByDocumentIds = async (documentIds: number[]) => {
 
   // NOTE: document to sentences, create documentId and sentenceBody object
   const documentAndSentences = docs.flatMap((doc) => {
-    const sentences = doc.body.split("\n");
+    const sentences = textToSentences(doc.body);
     return sentences.flatMap((sentence) => {
       return {
         documentId: doc.id,
