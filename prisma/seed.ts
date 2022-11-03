@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { MICROTASKS } from "../constants/microtasks";
+import type { MicroTaskKinds } from "../constants/microtasks";
 
 const prisma = new PrismaClient({
   log: ["query", "error", "info", "warn"],
@@ -74,11 +74,26 @@ async function main() {
     },
   });
 
-  const deafultMicrotasks = Object.values(MICROTASKS).map((task) => {
-    return { title: task };
+  const deafultMicrotasks = (
+    [
+      { title: "意見と事実の切り分け", kind: "DISTINGUISH_OPINION_AND_FACT" },
+      {
+        title: "事実に対する文献情報の有無の確認",
+        kind: "CHECK_FACT_RESOURCE",
+      },
+      {
+        title: "意見に対して，それを裏付ける事実が書かれているかの確認",
+        kind: "CHECK_IF_OPINION_HAS_VALID_FACT",
+      },
+      { title: "評価", kind: "REVIEW_OTHER_WORKERS_RESULT" },
+    ] as { title: string; kind: MicroTaskKinds }[]
+  ).map(({ title, kind }) => {
+    return { title, kind };
   });
 
-  const createMicrotasksInsertData = (deafultMicrotasks: { title: string }[]) =>
+  const createMicrotasksInsertData = (
+    deafultMicrotasks: { title: string; kind: MicroTaskKinds }[]
+  ) =>
     sentences.flatMap((sentence) => {
       return deafultMicrotasks.flatMap((microtask) => {
         return {
@@ -86,6 +101,7 @@ async function main() {
           body: "",
           sentenceId: sentence.id,
           status: "CREATED",
+          kind: microtask.kind,
         } as const;
       });
     });

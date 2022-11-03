@@ -91,11 +91,19 @@ enum MicrotaskStatus {
     DONE
 }
 
+enum MicrotaskKinds {
+    DISTINGUISH_OPINION_AND_FACT
+    CHECK_FACT_RESOURCE
+    CHECK_IF_OPINION_HAS_VALID_FACT
+    REVIEW_OTHER_WORKERS_RESULT
+}
+
 model Microtask {
     id         Int             @id @default(autoincrement())
     title      String
     body       String
     status     MicrotaskStatus
+    kind       MicrotaskKinds
     sentence   Sentence        @relation(fields: [sentenceId], references: [id])
     sentenceId Int
     assignee   User?           @relation(fields: [assigneeId], references: [id])
