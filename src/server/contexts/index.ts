@@ -1,8 +1,10 @@
 import type * as trpc from "@trpc/server";
 import type * as trpcNext from "@trpc/server/adapters/next";
+import { Session, unstable_getServerSession } from "next-auth";
+import { nextAuthOptions } from "../../lib/nextAuth";
 
 interface CreateContextOptions {
-  // session: Session | null
+  session: Session | null;
 }
 
 /**
@@ -20,7 +22,11 @@ export type Context = trpc.inferAsyncReturnType<typeof createContextInner>;
  * @link https://trpc.io/docs/context
  */
 export async function createContext(
-  _: trpcNext.CreateNextContextOptions
+  ctx: trpcNext.CreateNextContextOptions
 ): Promise<Context> {
-  return await createContextInner({});
+  const { req, res } = ctx;
+  const session = await unstable_getServerSession(req, res, nextAuthOptions);
+  return await createContextInner({
+    session,
+  });
 }

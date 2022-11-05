@@ -15,6 +15,7 @@ model User {
     crowdId Int
     role    Role   @relation(fields: [roleId], references: [id])
     roleId  Int
+    password String
 
     created_at DateTime    @default(now())
     updated_at DateTime    @default(now()) @updatedAt
