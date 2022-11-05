@@ -2,6 +2,7 @@ import { Microtask, MicrotaskKinds, Sentence } from ".prisma/client";
 import { match } from "ts-pattern";
 import { Layout } from "../../../elements/Layout";
 import { trpc } from "../../../lib/trpc";
+import { useSession } from "next-auth/react";
 
 const randomMicrotaskId = Math.floor(Math.random() * 3 + 1);
 
@@ -30,10 +31,21 @@ const Tasks = () => {
   }
 
   const { data } = microtaskWithSentenceQuery;
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return <div>Loading</div>;
+  }
+
+  if (status === "unauthenticated") {
+    return <div>Need authentication</div>;
+  }
 
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold">Tasks</h2>
+      {session && <>Signed in as {session.user?.name}</>}
+      {!session && <>Not signed in</>}
 
       <div className="grid grid-cols-5 gap-2 py-4">
         <div className="col-span-3">
@@ -109,7 +121,7 @@ const Tasks = () => {
             </div>
           </div>
         </div>
-        <div className="col-span-2">
+        {/* <div className="col-span-2">
           <div className="card w-full bg-base-101 shadow-md">
             <div className="card-body">
               <div className="card-title text-xl">あなたの貢献</div>
@@ -125,7 +137,7 @@ const Tasks = () => {
               </ul>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

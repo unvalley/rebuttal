@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import type { MicroTaskKinds } from "../constants/microtasks";
 import { split } from "sentence-splitter";
+import { hash } from "argon2";
 
 const prisma = new PrismaClient({
   log: ["query", "error", "info", "warn"],
@@ -31,16 +32,19 @@ async function main() {
         name: "admin user",
         crowdId: 1,
         roleId: 1,
+        password: await hash("adminPassword"),
       },
       {
         name: "writer user",
         crowdId: 2,
         roleId: 2,
+        password: await hash("writerPassword"),
       },
       {
         name: "worker user",
         crowdId: 3,
         roleId: 3,
+        password: await hash("workerPassword"),
       },
     ],
     skipDuplicates: true,
