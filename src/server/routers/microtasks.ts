@@ -43,6 +43,8 @@ export const microtasksRouter = router({
           assigneeId: true,
           sentence: {
             select: {
+              id: true,
+              body: true,
               documentId: true,
             },
           },
