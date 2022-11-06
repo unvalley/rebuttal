@@ -92,20 +92,11 @@ const Documents = () => {
                     <div>ステータス：{task.status}</div>
                     <div>対象センテンス：{task.sentence.body}</div>
                     <div className="">
-                      {task.assignee ? (
-                        <span>
-                          アサインされたユーザー:
-                          {task.assignee.name}
-                        </span>
-                      ) : (
-                        <span>
-                          このタスクは、まだ誰にも割り当てられていません。
-                        </span>
-                      )}
+                      <span>
+                        アサインユーザー：
+                        {task.assignee ? task.assignee.name : "未アサイン"}
+                      </span>
                     </div>
-                    {/* <div className="card-actions justify-end">
-                      <button className="btn btn-primary">Buy Now</button>
-                    </div> */}
                   </div>
                 </div>
               ))}
