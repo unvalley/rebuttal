@@ -15,12 +15,20 @@ const Index = () => {
   const { data: session } = useSession();
 
   return (
-    <div>
-      <div className="m-4">
+    <div className="m-4">
+      <div className="mt-4">
+        <h2 className="font-bold text-2xl">トップページ</h2>
+        <h3 className="font-bold text-xl">実験の説明</h3>
+        <p>これは実験用サイトです。ここに説明を書きます。</p>
+      </div>
+      <div className="mt-4">
         {session ? (
           <div>
             {session.user && (
-              <div>{session.user.name}としてサインイン中です。</div>
+              <div>
+                {session.user.name}としてサインイン中です。 役割は、
+                {session.user.roleKind}です。
+              </div>
             )}
             <button className="btn" onClick={() => signOut()}>
               Sign Out
@@ -32,7 +40,7 @@ const Index = () => {
               タスクの実施には、サインイン（ログイン）が必要です。
               下記のボタンを押すと、サインインページに移動します。
             </div>
-            <button className="btn mt-4" onClick={() => signIn()}>
+            <button className="btn" onClick={() => signIn()}>
               Sign In
             </button>
             <div className="mt-4">

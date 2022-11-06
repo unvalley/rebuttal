@@ -7,22 +7,32 @@ import { useSession } from "next-auth/react";
 const randomMicrotaskId = Math.floor(Math.random() * 3 + 1);
 
 const Tasks = () => {
-  const userId = 3;
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return <div>Loading</div>;
+  } else if (status === "unauthenticated" || !session) {
+    return <div>Need authentication</div>;
+  }
 
   const utils = trpc.useContext();
   const microtaskWithSentenceQuery = trpc.microtasks.findByUserId.useQuery({
-    userId,
+    userId: session.user.id,
   });
 
   const assignMicrotask = trpc.microtasks.updateToAssign.useMutation({
     async onSuccess() {
-      await utils.microtasks.findByUserId.invalidate({ userId });
+      await utils.microtasks.findByUserId.invalidate({
+        userId: session.user.id,
+      });
     },
   });
 
   const unassignMicrotask = trpc.microtasks.updateToUnassign.useMutation({
     async onSuccess() {
-      await utils.microtasks.findByUserId.invalidate({ userId });
+      await utils.microtasks.findByUserId.invalidate({
+        userId: session.user.id,
+      });
     },
   });
 
@@ -31,15 +41,6 @@ const Tasks = () => {
   }
 
   const { data } = microtaskWithSentenceQuery;
-  const { data: session, status } = useSession();
-
-  if (status === "loading") {
-    return <div>Loading</div>;
-  }
-
-  if (status === "unauthenticated") {
-    return <div>Need authentication</div>;
-  }
 
   return (
     <div className="container mx-auto p-4">
@@ -103,7 +104,7 @@ const Tasks = () => {
                         try {
                           await assignMicrotask.mutateAsync({
                             id: randomMicrotaskId,
-                            assigneeId: userId,
+                            assigneeId: session.user.id,
                           });
                         } catch (cause) {
                           console.error(

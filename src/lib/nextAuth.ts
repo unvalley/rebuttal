@@ -23,6 +23,9 @@ export const nextAuthOptions: NextAuthOptions = {
           const { name, password } = await loginSchema.parseAsync(credentials);
           const user = await prisma.user.findFirst({
             where: { name },
+            include: {
+              role: true,
+            },
           });
           if (!user) {
             // throw new Error("user is none");
@@ -34,7 +37,11 @@ export const nextAuthOptions: NextAuthOptions = {
             // throw new Error("Invalid Password");
             return null;
           }
-          return { id: user.id.toString(), name: user.name };
+          return {
+            id: user.id,
+            name: user.name,
+            roleKind: user.role.kind,
+          };
         } catch (err: any) {
           return null;
         }
@@ -43,27 +50,22 @@ export const nextAuthOptions: NextAuthOptions = {
   ],
   callbacks: {
     jwt: async ({ token, user }) => {
-      // console.log("=====jwt======");
-      // console.log(`token=${JSON.stringify(token)}`);
-      // console.log(`user=${JSON.stringify(user)}`);
       if (user) {
         return {
           ...token,
-          user: { name: user.name, id: user.id },
+          user: { name: user.name, id: user.id, roleKind: user.roleKind },
         };
       }
       return token;
     },
     session: async ({ session, token }) => {
-      // console.log("=====session======");
-      // console.log(`session=${JSON.stringify(session)}`);
-      // console.log(`token=${JSON.stringify(token)}`);
       if (token && token.name) {
         return {
           ...session,
           user: {
             name: token.name,
-            id: token["user.id"],
+            id: token.user.id,
+            roleKind: token.user.roleKind,
           },
         };
       }
