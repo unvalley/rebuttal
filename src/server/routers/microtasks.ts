@@ -22,6 +22,39 @@ export const microtasksRouter = router({
       });
       return microtaskWithSentence;
     }),
+  findManyByDocumentId: publicProcedure
+    .input(z.object({ documentId: z.number() }))
+    .query(async ({ input }) => {
+      const microtasks = await prisma.microtask.findMany({
+        select: {
+          id: true,
+          title: true,
+          body: true,
+          status: true,
+          kind: true,
+          sentenceId: true,
+          assignee: {
+            select: {
+              id: true,
+              name: true,
+              crowdId: true,
+            },
+          },
+          assigneeId: true,
+          sentence: {
+            select: {
+              documentId: true,
+            },
+          },
+        },
+        where: {
+          sentence: {
+            documentId: input.documentId,
+          },
+        },
+      });
+      return microtasks;
+    }),
   updateToAssign: publicProcedure
     .input(
       z.object({
