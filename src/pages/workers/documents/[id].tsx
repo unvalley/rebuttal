@@ -5,12 +5,14 @@ import { Layout } from "../../../elements/Layout";
 import { Document } from "../../../elements/Documents/Document";
 import NextError from "next/error";
 import { useRouter } from "next/router";
+import { MicrotaskStatus } from ".prisma/client";
 
 const Documents = () => {
   const router = useRouter();
   const { id } = router.query;
+  const documentId = Number(id);
   // TODO: more safety
-  const documentQuery = trpc.documents.findById.useQuery({ id: Number(id) });
+  const documentQuery = trpc.documents.findById.useQuery({ id: documentId });
   if (documentQuery.error) {
     return (
       <NextError
@@ -20,21 +22,48 @@ const Documents = () => {
     );
   }
 
-  if (documentQuery.status === "loading") {
+  const microtasksQuery = trpc.microtasks.findManyByDocumentId.useQuery({
+    documentId,
+  });
+  if (microtasksQuery.error) {
+    return (
+      <NextError
+        title={microtasksQuery.error.message}
+        statusCode={microtasksQuery.error.data?.httpStatus ?? 500}
+      />
+    );
+  }
+
+  if (documentQuery.isLoading || microtasksQuery.isLoading) {
     return <>Loading...</>;
   }
 
   const { data: document } = documentQuery;
+  const { data: microtasks } = microtasksQuery;
+
+  const microtaskCount = microtasks.length;
+  const doneMicrotaskCount = microtasks.filter(
+    (microtask) => microtask.status === MicrotaskStatus.DONE
+  ).length;
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-xl font-bold">ドキュメント</h2>
+      <h2 className="text-xl font-bold">ワーカー用ドキュメントページ</h2>
       <div className="grid grid-cols-8 gap-2">
         <div className="col-span-2">
-          <span>何かしらの情報</span>
+          <div className="bg-base-200 p-2">
+            <div className="font-bold">情報</div>
+          </div>
+          <p>
+            このページでは、学生が書いたレポートに対して、フィードバックタスクを行ってもらいます。
+          </p>
+          <p>他になにか必要な情報があれば、ここに書き加えます。</p>
         </div>
 
         <div className="col-span-4">
+          <div className="bg-base-200 p-2">
+            <div className="font-bold">レポート</div>
+          </div>
           <Document
             title={document.title}
             body={`
@@ -47,19 +76,43 @@ const Documents = () => {
 
         <div className="col-span-2">
           <div className="bg-base-200 p-2">
-            <span className="font-bold">タスク</span>
+            <div className="font-bold">
+              タスク ({doneMicrotaskCount} / {microtaskCount})
+            </div>
+            {/* <span className="text-xs">
+              このドキュメントのフィードバックを完成させるためには、あとXつのタスクをこなす必要があります。
+            </span> */}
           </div>
           <div>
-            {/* <div className=""></div> */}
-            {/* {assignedTasks ? (
-              <div>
-                {assignedTasks.map((task) => (
-                  <div key={task.id}>{task.title}</div>
-                ))}
-              </div>
-            ) : ( */}
-            <span>タスクが割り当てられていません。</span>
-            {/* )} */}
+            <div>
+              {microtasks.map((task) => (
+                <div
+                  key={task.id}
+                  className="mt-2 card card-compact w-full bg-base-100 shadow-lg"
+                >
+                  <div className="card-body">
+                    <div className="card-title font-semibold text-sm">
+                      {task.title}
+                    </div>
+                    <div className="">
+                      {task.assignee ? (
+                        <span>
+                          アサインされたユーザー:
+                          {task.assignee.name}
+                        </span>
+                      ) : (
+                        <span>
+                          このタスクは、まだ誰にも割り当てられていません。
+                        </span>
+                      )}
+                    </div>
+                    {/* <div className="card-actions justify-end">
+                      <button className="btn btn-primary">Buy Now</button>
+                    </div> */}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
