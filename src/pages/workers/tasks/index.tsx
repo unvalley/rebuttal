@@ -2,6 +2,7 @@ import type { Microtask, Sentence } from ".prisma/client";
 import { Layout } from "../../../elements/Layout";
 import { trpc } from "../../../lib/trpc";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 const randomMicrotaskId = Math.floor(Math.random() * 3 + 1);
 
@@ -61,9 +62,10 @@ const Tasks = () => {
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold">ワーカー向けタスク実施ページ</h2>
+      <span>ここでは、文書改善タスクを行っていただきます。</span>
 
-      <div className="grid grid-cols-5 pt-4">
-        <div className="col-span-3">
+      <div className="grid grid-cols-6 pt-4">
+        <div className="col-span-4">
           <div className="w-full bg-base-100">
             {isMicrotaskAssigned ? (
               <MicrotaskAssigned
@@ -75,6 +77,12 @@ const Tasks = () => {
             )}
           </div>
         </div>
+        <div className="col-span-2">
+          <div className="bg-base-200 p-2">
+            <div className="font-bold">タスク実施履歴</div>
+          </div>
+          <div>タスクを実施していません。</div>
+        </div>
       </div>
     </div>
   );
@@ -84,6 +92,7 @@ const MicrotaskAssigned: React.FC<{
   unassignMicrotask: () => Promise<void>;
   microtask: Microtask & { sentence: Sentence };
 }> = ({ microtask }) => {
+  const router = useRouter();
   return (
     <div>
       <MicrotaskDescription
@@ -92,7 +101,11 @@ const MicrotaskAssigned: React.FC<{
           <div className="flex flex-row gap-x-4 mt-4">
             <button
               className="btn"
-              onClick={() => confirm("タスクを終了しますか？")}
+              onClick={() => {
+                if (confirm("タスクを終了しますか？")) {
+                  router.push("/workers/tasks/done");
+                }
+              }}
             >
               回答して実験を終了する
             </button>
@@ -144,27 +157,29 @@ const MicrotaskDescription: React.FC<{
       <div className="mt-2">
         <span>次の文（センテンス）は、意見と事実のどちらですか？</span>
         <div className="font-semibold mt-4">{microtask.sentence.body}</div>
-        <div className="form-control">
-          <label className="label cursor-pointer">
-            <span className="label-text text-lg">意見</span>
-            <input
-              type="radio"
-              name="radio"
-              className="radio checked:bg-red-500"
-              checked={true}
-            />
-          </label>
-        </div>
-        <div className="form-control">
-          <label className="label cursor-pointer">
-            <span className="label-text text-lg">事実</span>
-            <input
-              type="radio"
-              name="radio"
-              className="radio checked:bg-blue-500"
-              checked={true}
-            />
-          </label>
+        <div className="w-96">
+          <div className="form-control">
+            <label className="label cursor-pointer">
+              <span className="label-text text-lg">意見</span>
+              <input
+                type="radio"
+                name="radio"
+                className="radio checked:bg-red-500"
+                checked={true}
+              />
+            </label>
+          </div>
+          <div className="form-control">
+            <label className="label cursor-pointer">
+              <span className="label-text text-lg">事実</span>
+              <input
+                type="radio"
+                name="radio"
+                className="radio checked:bg-blue-500"
+                checked={true}
+              />
+            </label>
+          </div>
         </div>
       </div>
       {microtaskAction}
