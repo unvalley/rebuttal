@@ -1,5 +1,4 @@
-import { Microtask, MicrotaskKinds, Sentence } from ".prisma/client";
-import { match } from "ts-pattern";
+import type { Microtask, Sentence } from ".prisma/client";
 import { Layout } from "../../../elements/Layout";
 import { trpc } from "../../../lib/trpc";
 import { useSession } from "next-auth/react";
@@ -8,6 +7,47 @@ const randomMicrotaskId = Math.floor(Math.random() * 3 + 1);
 
 const Tasks = () => {
   const { data: session, status } = useSession();
+  const utils = trpc.useContext();
+  const microtaskWithSentenceQuery = trpc.microtasks.findByUserId.useQuery({
+    userId: session?.user.id as number,
+  });
+  const _assigneMicrotask = trpc.microtasks.updateToAssign.useMutation({
+    async onSuccess() {
+      await utils.microtasks.findByUserId.invalidate({
+        userId: session?.user.id as number,
+      });
+    },
+  });
+  const assignMicrotask = async () => {
+    try {
+      await _assigneMicrotask.mutateAsync({
+        id: randomMicrotaskId,
+        assigneeId: session?.user.id as number,
+      });
+    } catch (cause) {
+      console.error({ cause }, "Failed to assign microtask");
+    }
+  };
+  const _unassignMicrotask = trpc.microtasks.updateToUnassign.useMutation({
+    async onSuccess() {
+      await utils.microtasks.findByUserId.invalidate({
+        userId: session?.user.id as number,
+      });
+    },
+  });
+  const unassignMicrotask = async () => {
+    try {
+      await _unassignMicrotask.mutateAsync({
+        id: randomMicrotaskId,
+      });
+    } catch (cause) {
+      console.error({ cause }, "Failed to assign microtask");
+    }
+  };
+
+  if (!microtaskWithSentenceQuery.error) {
+    <div>指定されたタスクは存在しません</div>;
+  }
 
   if (status === "loading") {
     return <div>Loading</div>;
@@ -15,130 +55,71 @@ const Tasks = () => {
     return <div>Need authentication</div>;
   }
 
-  const utils = trpc.useContext();
-  const microtaskWithSentenceQuery = trpc.microtasks.findByUserId.useQuery({
-    userId: session.user.id,
-  });
-
-  const assignMicrotask = trpc.microtasks.updateToAssign.useMutation({
-    async onSuccess() {
-      await utils.microtasks.findByUserId.invalidate({
-        userId: session.user.id,
-      });
-    },
-  });
-
-  const unassignMicrotask = trpc.microtasks.updateToUnassign.useMutation({
-    async onSuccess() {
-      await utils.microtasks.findByUserId.invalidate({
-        userId: session.user.id,
-      });
-    },
-  });
-
-  if (!microtaskWithSentenceQuery.error) {
-    <div>指定されたタスクは存在しません</div>;
-  }
-
   const { data } = microtaskWithSentenceQuery;
+  const isMicrotaskAssigned = data?.assigneeId === session?.user.id;
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold">Tasks</h2>
-      {session && <>Signed in as {session.user?.name}</>}
-      {!session && <>Not signed in</>}
+      <h2 className="text-2xl font-bold">ワーカー向けタスク実施ページ</h2>
 
-      <div className="grid grid-cols-5 gap-2 py-4">
+      <div className="grid grid-cols-5 pt-4">
         <div className="col-span-3">
-          <div className="card w-full bg-base-100 shadow-md">
-            <div className="card-body">
-              {data && data.assigneeId ? (
-                <div>
-                  <div className="card-title text-md">割り当てられたタスク</div>
-                  <div className="text-lg">タスク：{data.title}</div>
-                  {match(data.kind)
-                    .with(MicrotaskKinds.CHECK_FACT_RESOURCE, () => (
-                      <MicrotaskDescription microtask={data} />
-                    ))
-                    .with(
-                      MicrotaskKinds.CHECK_IF_OPINION_HAS_VALID_FACT,
-                      () => <MicrotaskDescription microtask={data} />
-                    )
-                    .with(MicrotaskKinds.REVIEW_OTHER_WORKERS_RESULT, () => (
-                      <MicrotaskDescription microtask={data} />
-                    ))
-                    .with(MicrotaskKinds.DISTINGUISH_OPINION_AND_FACT, () => (
-                      <MicrotaskDescription microtask={data} />
-                    ))
-                    .exhaustive()}
-                  <div className="card-actions">
-                    <button
-                      className="btn"
-                      onClick={async () => {
-                        try {
-                          await unassignMicrotask.mutateAsync({
-                            id: randomMicrotaskId,
-                          });
-                        } catch (cause) {
-                          console.error(
-                            { cause },
-                            "Failed to assign microtask"
-                          );
-                        }
-                      }}
-                    >
-                      割り当てを解除する
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <div className="card-title text-md">
-                    タスクがまだ割り当てられていません
-                  </div>
-                  <p>ボタンを押すと，タスクが割り当てられます．</p>
-                  <div className="card-actions">
-                    <button
-                      className="btn btn-primary"
-                      onClick={async () => {
-                        try {
-                          await assignMicrotask.mutateAsync({
-                            id: randomMicrotaskId,
-                            assigneeId: session.user.id,
-                          });
-                        } catch (cause) {
-                          console.error(
-                            { cause },
-                            "Failed to assign microtask"
-                          );
-                        }
-                      }}
-                    >
-                      割り当てを行う
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+          <div className="w-full bg-base-100">
+            {isMicrotaskAssigned ? (
+              <MicrotaskAssigned
+                microtask={data}
+                unassignMicrotask={unassignMicrotask}
+              />
+            ) : (
+              <MicrotaskUnassigned assignMicrotask={assignMicrotask} />
+            )}
           </div>
         </div>
-        {/* <div className="col-span-2">
-          <div className="card w-full bg-base-101 shadow-md">
-            <div className="card-body">
-              <div className="card-title text-xl">あなたの貢献</div>
-              <p>これだけの貢献を行いました．</p>
-            </div>
+      </div>
+    </div>
+  );
+};
+
+const MicrotaskAssigned: React.FC<{
+  unassignMicrotask: () => Promise<void>;
+  microtask: Microtask & { sentence: Sentence };
+}> = ({ microtask }) => {
+  return (
+    <div>
+      <MicrotaskDescription
+        microtask={microtask}
+        microtaskAction={
+          <div className="flex flex-row gap-x-4 mt-4">
+            <button
+              className="btn"
+              onClick={() => confirm("タスクを終了しますか？")}
+            >
+              回答して実験を終了する
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={() => confirm("次のタスクへ")}
+            >
+              回答して次のタスクへ
+            </button>
           </div>
-          <div className="card w-full bg-base-101 shadow-md">
-            <div className="card-body">
-              <div className="card-title text-xl">ヘルプ</div>
-              <ul>
-                <li>ヘルプ1</li>
-                <li>ヘルプ2</li>
-              </ul>
-            </div>
-          </div>
-        </div> */}
+        }
+      />
+    </div>
+  );
+};
+
+const MicrotaskUnassigned: React.FC<{
+  assignMicrotask: () => Promise<void>;
+}> = ({ assignMicrotask }) => {
+  return (
+    <div>
+      <div className="text-md">タスクがまだ割り当てられていません</div>
+      <p>ボタンを押すと，タスクが割り当てられます．</p>
+      <div className="">
+        <button className="btn btn-primary" onClick={assignMicrotask}>
+          割り当てを行う
+        </button>
       </div>
     </div>
   );
@@ -146,18 +127,48 @@ const Tasks = () => {
 
 const MicrotaskDescription: React.FC<{
   microtask: Microtask & { sentence: Sentence };
-}> = ({ microtask }) => {
+  microtaskAction: React.ReactNode;
+}> = ({ microtask, microtaskAction }) => {
   return (
-    <>
-      <span>
-        次のセンテンスにおいて，「{microtask.title}」を行ってください．
-      </span>
-      <div className="font-semibold my-4">{microtask.sentence.body}</div>
-      <div className="text-lg">
-        <span className="bg-green-100 text-green-800">簡単</span>
-        <span className="text-green-700">: 3-5分</span>
+    <div>
+      <div className="">
+        <div>
+          <span>タスク：</span>
+          <span className="text-lg font-bold">{microtask.title}</span>
+        </div>
+        <div className="text-lg">
+          <span className="bg-green-100 text-green-800">簡単</span>
+          <span className="text-green-700">: 3-5分</span>
+        </div>
       </div>
-    </>
+      <div className="mt-2">
+        <span>次の文（センテンス）は、意見と事実のどちらですか？</span>
+        <div className="font-semibold mt-4">{microtask.sentence.body}</div>
+        <div className="form-control">
+          <label className="label cursor-pointer">
+            <span className="label-text text-lg">意見</span>
+            <input
+              type="radio"
+              name="radio"
+              className="radio checked:bg-red-500"
+              checked={true}
+            />
+          </label>
+        </div>
+        <div className="form-control">
+          <label className="label cursor-pointer">
+            <span className="label-text text-lg">事実</span>
+            <input
+              type="radio"
+              name="radio"
+              className="radio checked:bg-blue-500"
+              checked={true}
+            />
+          </label>
+        </div>
+      </div>
+      {microtaskAction}
+    </div>
   );
 };
 
