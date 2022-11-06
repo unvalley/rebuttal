@@ -5,11 +5,15 @@ import { Layout } from "../elements/Layout";
 const Index = () => {
   const files = [
     "/",
+    "====[workers]=====",
     "/workers/documents/1",
     "/workers/tasks",
+    "====[writers]=====",
     "/writers/documents/1",
-    "/writers/tasks/1",
+    "/writers/tasks",
+    "====[help]=====",
     "/help",
+    "====[auth]=====",
     "/auth/login",
   ];
   const { data: session } = useSession();

@@ -4,7 +4,7 @@ const Tasks = () => {
       <h2 className="text-xl font-bold">執筆タスク</h2>
       <p>NFT賛成ですか, 反対ですか</p>
     </div>
-  )
-}
+  );
+};
 
-export default Tasks
+export default Tasks;
