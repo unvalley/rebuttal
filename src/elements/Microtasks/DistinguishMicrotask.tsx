@@ -19,6 +19,9 @@ export const DistinguishMicrotask: React.FC<DistinguishMicrotaskProps> = (
   return (
     <>
       <span>次の文（センテンス）は、意見と事実のどちらですか？</span>
+      <div>
+        なぜ意見なのか、なぜ事実なのか、回答の理由を書かせても良いかもしれない
+      </div>
       <div className="font-semibold mt-4">{props.microtask.sentence.body}</div>
       <div className="w-96">
         <form onSubmit={handleSubmitOpinionOrFact}>
@@ -48,10 +51,13 @@ export const DistinguishMicrotask: React.FC<DistinguishMicrotaskProps> = (
           </div>
           <div className="flex flex-row gap-x-4 mt-4">
             <button
+              type="submit"
               className="btn"
               onClick={() => {
                 if (confirm("タスクを終了しますか？")) {
                   router.push("/workers/tasks/done");
+                } else {
+                  return;
                 }
               }}
             >
@@ -61,6 +67,10 @@ export const DistinguishMicrotask: React.FC<DistinguishMicrotaskProps> = (
               type="submit"
               className="btn btn-primary"
               onClick={() => {
+                if (opinionOrFact === "NONE") {
+                  alert("回答は必須です。");
+                  return;
+                }
                 confirm("回答を送信しました。次のタスクに進みます。");
                 router.reload();
               }}

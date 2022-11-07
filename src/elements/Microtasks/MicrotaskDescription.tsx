@@ -24,9 +24,20 @@ export const MicrotaskDescription: React.FC<{
           .with("DISTINGUISH_OPINION_AND_FACT", () => (
             <DistinguishMicrotask microtask={microtask} />
           ))
-          .with("CHECK_FACT_RESOURCE", () => <></>)
-          .with("CHECK_IF_OPINION_HAS_VALID_FACT", () => <></>)
-          .with("REVIEW_OTHER_WORKERS_RESULT", () => <></>)
+          .with("CHECK_FACT_RESOURCE", () => (
+            <div>
+              <div>SHOW MOREというか全文章出しても良いかも</div>
+            </div>
+          ))
+          .with("CHECK_IF_OPINION_HAS_VALID_FACT", () => (
+            <div>
+              <p>意見を表示する</p>
+              <div>SHOW MOREというか全文章出しても良いかも</div>
+            </div>
+          ))
+          .with("REVIEW_OTHER_WORKERS_RESULT", () => (
+            <div>評価タスク。どうやる？</div>
+          ))
           .exhaustive()}
       </div>
     </div>

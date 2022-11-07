@@ -5,17 +5,13 @@ export const useDistinguishMicrotask = (props: {
   microtaskId: number;
   sentenceId: number;
 }) => {
-  const [opinionOrFact, setOpinionOrFact] = useState<
-    "OPINION" | "FACT" | "NONE"
-  >("NONE");
+  const [opinionOrFact, setOpinionOrFact] = useState<"OPINION" | "FACT">(
+    "OPINION"
+  );
   const mutation = trpc.microtasks.completeDistinguishTask.useMutation();
 
   const handleSubmitOpinionOrFact = (e: React.FormEvent) => {
     e.preventDefault();
-    if (opinionOrFact === "NONE") {
-      alert("回答は必須です");
-      return;
-    }
     mutation.mutate({
       id: props.microtaskId,
       sentenceId: props.sentenceId,

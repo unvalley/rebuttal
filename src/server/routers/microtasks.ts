@@ -22,6 +22,15 @@ export const microtasksRouter = router({
       });
       return microtaskWithSentence;
     }),
+  findManyByUserId: publicProcedure
+    .input(z.object({ userId: z.number() }))
+    .query(async ({ input }) => {
+      const microtaskWithSentence = await prisma.microtask.findMany({
+        where: { assigneeId: input.userId },
+        include: { sentence: true },
+      });
+      return microtaskWithSentence;
+    }),
   findManyByDocumentId: publicProcedure
     .input(z.object({ documentId: z.number() }))
     .query(async ({ input }) => {
@@ -73,6 +82,33 @@ export const microtasksRouter = router({
           assigneeId: input.assigneeId,
           status: "ASSIGNED",
         },
+      });
+    }),
+  assignSomeMicrotasks: publicProcedure
+    .input(
+      z.object({
+        assigneeId: z.number(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const assignCount = 5;
+      const microtasks = await prisma.microtask.findMany({
+        select: {
+          id: true,
+        },
+        where: {
+          status: "CREATED",
+        },
+        take: assignCount,
+      });
+      const microtasksIds = microtasks.map((e) => e.id);
+
+      return await prisma.microtask.updateMany({
+        data: {
+          assigneeId: input.assigneeId,
+          status: "ASSIGNED",
+        },
+        where: { id: { in: microtasksIds } },
       });
     }),
   updateToUnassign: publicProcedure
