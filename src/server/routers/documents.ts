@@ -15,6 +15,18 @@ export const documentsRouter = router({
       }
       return doc;
     }),
+  findWithSentencesById: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input }) => {
+      const doc = await prisma.document.findUnique({
+        where: { id: input.id },
+        include: { sentences: true },
+      });
+      if (!doc) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Not found" });
+      }
+      return doc;
+    }),
 });
 
 // .mutation("create", {

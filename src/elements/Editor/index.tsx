@@ -2,27 +2,29 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import React from "react";
 import Highlight from "@tiptap/extension-highlight";
+import { Sentence, SentenceKind } from "@prisma/client";
 
 type EditorProps = {
-  sentences: { body: string; kind: string }[];
+  sentences: Sentence[];
 };
 
-export const Editor: React.FC<EditorProps> = ({ sentences }) => {
-  const contents = sentences
+const styleHighlightBySentenceKind = (sentences: Sentence[]) =>
+  sentences
     .map((sentence) => {
-      if (sentence.kind === "OPINION") {
-        return `<mark style="background-color: red">${sentence.body}</mark>`;
-      } else if (sentence.kind === "FACT") {
-        return `<mark style="background-color: blue">${sentence.body}</mark>`;
+      if (sentence.kind === SentenceKind.OPINION) {
+        return `<mark style="background-color: #FDF5E6">${sentence.body}</mark>`;
+      } else if (sentence.kind === SentenceKind.FACT) {
+        return `<mark style="background-color: #93BCF1">${sentence.body}</mark>`;
       } else {
         return sentence.body;
       }
     })
     .join("");
 
+export const Editor: React.FC<EditorProps> = ({ sentences }) => {
   const editor = useEditor({
     extensions: [StarterKit, Highlight.configure({ multicolor: true })],
-    content: contents,
+    content: styleHighlightBySentenceKind(sentences),
   });
 
   return (

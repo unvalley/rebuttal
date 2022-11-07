@@ -12,7 +12,9 @@ const Documents = () => {
   const { id } = router.query;
   const documentId = Number(id);
   // TODO: more safety
-  const documentQuery = trpc.documents.findById.useQuery({ id: documentId });
+  const documentQuery = trpc.documents.findWithSentencesById.useQuery({
+    id: documentId,
+  });
   if (documentQuery.error) {
     return (
       <NextError
@@ -67,6 +69,7 @@ const Documents = () => {
           <Document
             title={document.title}
             body={document.body}
+            sentences={document.sentences}
             canEdit={false}
           />
         </div>
