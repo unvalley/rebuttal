@@ -92,6 +92,33 @@ export const microtasksRouter = router({
         },
       });
     }),
+  completeDistinguishTask: publicProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        sentenceId: z.number(),
+        distinguishResult: z.enum(["OPINION", "FACT"]),
+      })
+    )
+    .mutation(async ({ input }) => {
+      await prisma.microtask.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          status: "DONE",
+        },
+      });
+
+      await prisma.sentence.update({
+        where: {
+          id: input.sentenceId,
+        },
+        data: {
+          kind: input.distinguishResult,
+        },
+      });
+    }),
 });
 
 //   .mutation("createManyBySentenceId", {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 // import { useRouter } from "next/router";
 import { trpc } from "../../../lib/trpc";
 import { Layout } from "../../../elements/Layout";
@@ -12,9 +12,14 @@ const Documents = () => {
   const { id } = router.query;
   const documentId = Number(id);
   // TODO: more safety
-  const documentQuery = trpc.documents.findWithSentencesById.useQuery({
-    id: documentId,
-  });
+  // TODO: invalidate cache
+  const documentQuery = trpc.documents.findWithSentencesById.useQuery(
+    {
+      id: documentId,
+    }
+    // { refetchInterval: 1000 }
+  );
+
   if (documentQuery.error) {
     return (
       <NextError

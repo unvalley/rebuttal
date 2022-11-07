@@ -2,7 +2,7 @@ import type { Microtask, Sentence } from ".prisma/client";
 import { Layout } from "../../../elements/Layout";
 import { trpc } from "../../../lib/trpc";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
+import { MicrotaskDescription } from "../../../elements/Microtasks/MicrotaskDescription";
 
 const randomMicrotaskId = Math.floor(Math.random() * 3 + 1);
 
@@ -92,32 +92,9 @@ const MicrotaskAssigned: React.FC<{
   unassignMicrotask: () => Promise<void>;
   microtask: Microtask & { sentence: Sentence };
 }> = ({ microtask }) => {
-  const router = useRouter();
   return (
     <div>
-      <MicrotaskDescription
-        microtask={microtask}
-        microtaskAction={
-          <div className="flex flex-row gap-x-4 mt-4">
-            <button
-              className="btn"
-              onClick={() => {
-                if (confirm("タスクを終了しますか？")) {
-                  router.push("/workers/tasks/done");
-                }
-              }}
-            >
-              回答して実験を終了する
-            </button>
-            <button
-              className="btn btn-primary"
-              onClick={() => confirm("次のタスクへ")}
-            >
-              回答して次のタスクへ
-            </button>
-          </div>
-        }
-      />
+      <MicrotaskDescription microtask={microtask} />
     </div>
   );
 };
@@ -134,55 +111,6 @@ const MicrotaskUnassigned: React.FC<{
           割り当てを行う
         </button>
       </div>
-    </div>
-  );
-};
-
-const MicrotaskDescription: React.FC<{
-  microtask: Microtask & { sentence: Sentence };
-  microtaskAction: React.ReactNode;
-}> = ({ microtask, microtaskAction }) => {
-  return (
-    <div>
-      <div className="">
-        <div>
-          <span>タスク：</span>
-          <span className="text-lg font-bold">{microtask.title}</span>
-        </div>
-        <div className="text-lg">
-          <span className="bg-green-100 text-green-800">簡単</span>
-          <span className="text-green-700">: 3-5分</span>
-        </div>
-      </div>
-      <div className="mt-2">
-        <span>次の文（センテンス）は、意見と事実のどちらですか？</span>
-        <div className="font-semibold mt-4">{microtask.sentence.body}</div>
-        <div className="w-96">
-          <div className="form-control">
-            <label className="label cursor-pointer">
-              <span className="label-text text-lg">意見</span>
-              <input
-                type="radio"
-                name="radio"
-                className="radio checked:bg-red-500"
-                checked={true}
-              />
-            </label>
-          </div>
-          <div className="form-control">
-            <label className="label cursor-pointer">
-              <span className="label-text text-lg">事実</span>
-              <input
-                type="radio"
-                name="radio"
-                className="radio checked:bg-blue-500"
-                checked={true}
-              />
-            </label>
-          </div>
-        </div>
-      </div>
-      {microtaskAction}
     </div>
   );
 };
