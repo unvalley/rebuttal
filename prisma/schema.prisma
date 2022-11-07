@@ -57,11 +57,18 @@ model Document {
     @@map("documents")
 }
 
+enum SentenceKind {
+    OPINION
+    FACT
+    NONE
+}
+
 model Sentence {
     id         Int         @id @default(autoincrement())
     body       String
     document   Document    @relation(fields: [documentId], references: [id])
     documentId Int
+    kind     SentenceKind  @default(NONE)
     microtasks Microtask[]
 
     @@map("sentences")
@@ -103,7 +110,7 @@ model Microtask {
     id         Int             @id @default(autoincrement())
     title      String
     body       String
-    status     MicrotaskStatus
+    status     MicrotaskStatus @default(CREATED)
     kind       MicrotaskKinds
     sentence   Sentence        @relation(fields: [sentenceId], references: [id])
     sentenceId Int
