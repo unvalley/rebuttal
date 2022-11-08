@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { MicrotaskDescription } from "../../../elements/Microtasks/MicrotaskDescription";
 import { useEffect } from "react";
 import type { Session } from "next-auth";
+import { Wizard } from "react-use-wizard";
 
 // アサインロジックは、5回完了した次のユーザのことも考える必要あり
 const Tasks = () => {
@@ -35,7 +36,6 @@ const Tasks = () => {
   useEffect(() => {
     const f = async (session: Session) => await assignMicrotasks(session);
     if (microtasks?.length === 0 && session) {
-      console.log("========================");
       f(session);
     }
   }, []);
@@ -78,10 +78,14 @@ const Tasks = () => {
                   >
                     <div className="card-body">
                       <div className="card-title font-semibold text-sm">
-                        {task.title}
+                        {task.title} (ID={task.id})
                       </div>
-                      <div>ステータス：{task.status}</div>
-                      <div>対象センテンス：{task.sentence.body}</div>
+                      <div>タスクステータス: {task.status}</div>
+                      <div>
+                        対象センテンス(ID={task.sentenceId}):{" "}
+                        {task.sentence.body}
+                      </div>
+                      <div>対象センテンスの種別: {task.sentence.kind}</div>
                     </div>
                   </div>
                 ))}
@@ -98,9 +102,11 @@ const MicrotaskAssigned: React.FC<{
 }> = (props) => {
   return (
     <div>
-      {props.microtasks.map((microtask) => (
-        <MicrotaskDescription key={microtask.id} microtask={microtask} />
-      ))}
+      <Wizard>
+        {props.microtasks.map((microtask) => (
+          <MicrotaskDescription key={microtask.id} microtask={microtask} />
+        ))}
+      </Wizard>
     </div>
   );
 };

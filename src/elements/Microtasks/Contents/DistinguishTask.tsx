@@ -1,30 +1,47 @@
 import { useRouter } from "next/router";
-import { useDistinguishMicrotask } from "./hooks/useDistinguishMicrotask";
-import type { MicrotaskWithSentence } from "./MicrotaskDescription";
+import { useWizard } from "react-use-wizard";
+import { useDistinguishTask } from "../hooks/useDistinguishOpinionAndFactMicrotask";
+import type { MicrotaskWithSentence } from "../MicrotaskDescription";
 
-type DistinguishMicrotaskProps = {
+type DistinguishTaskProps = {
   microtask: MicrotaskWithSentence;
+  actions?: React.ReactNode;
 };
 
-export const DistinguishMicrotask: React.FC<DistinguishMicrotaskProps> = (
-  props
-) => {
+export const DistinguishTask: React.FC<DistinguishTaskProps> = (props) => {
   const { opinionOrFact, setOpinionOrFact, handleSubmitOpinionOrFact } =
-    useDistinguishMicrotask({
+    useDistinguishTask({
       microtaskId: props.microtask.id,
       sentenceId: props.microtask.sentenceId,
     });
-
+  const { previousStep, nextStep, isLastStep } = useWizard();
   const router = useRouter();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSubmitOpinionOrFact();
+    if (confirm("回答を送信しました。次のタスクに進みます。")) {
+      nextStep();
+      if (isLastStep) {
+        router.push("/workers/tasks/done");
+      }
+    }
+  };
+
   return (
     <>
-      <span>次の文（センテンス）は、意見と事実のどちらですか？</span>
-      <div>
-        なぜ意見なのか、なぜ事実なのか、回答の理由を書かせても良いかもしれない
+      <span className="text-2xl font-semibold">
+        次の文（センテンス）は、意見と事実のどちらですか？
+      </span>
+      <div className="text-lg">
+        <span className="bg-green-100 text-green-800">簡単</span>
+        <span className="text-green-700">: 3-5分</span>
+      </div>
+      <div className="text-red-600">
+        検討：なぜ意見なのか、なぜ事実なのか、回答の理由を書かせても良いかもしれない
       </div>
       <div className="font-semibold mt-4">{props.microtask.sentence.body}</div>
       <div className="w-96">
-        <form onSubmit={handleSubmitOpinionOrFact}>
+        <form onSubmit={handleSubmit}>
           <div className="form-control">
             <label className="label cursor-pointer">
               <span className="label-text text-lg">意見</span>
@@ -50,31 +67,10 @@ export const DistinguishMicrotask: React.FC<DistinguishMicrotaskProps> = (
             </label>
           </div>
           <div className="flex flex-row gap-x-4 mt-4">
-            <button
-              type="submit"
-              className="btn"
-              onClick={() => {
-                if (confirm("タスクを終了しますか？")) {
-                  router.push("/workers/tasks/done");
-                } else {
-                  return;
-                }
-              }}
-            >
-              回答して実験を終了する
+            <button className="btn bg-slate-500" onClick={() => previousStep()}>
+              戻る（dev Only）
             </button>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              onClick={() => {
-                if (opinionOrFact === "NONE") {
-                  alert("回答は必須です。");
-                  return;
-                }
-                confirm("回答を送信しました。次のタスクに進みます。");
-                router.reload();
-              }}
-            >
+            <button type="submit" className="btn btn-primary">
               回答して次のタスクへ
             </button>
           </div>

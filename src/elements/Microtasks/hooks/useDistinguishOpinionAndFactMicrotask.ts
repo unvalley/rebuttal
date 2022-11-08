@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { trpc } from "../../../lib/trpc";
 
-export const useDistinguishMicrotask = (props: {
+export const useDistinguishTask = (props: {
   microtaskId: number;
   sentenceId: number;
 }) => {
@@ -10,8 +10,7 @@ export const useDistinguishMicrotask = (props: {
   );
   const mutation = trpc.microtasks.completeDistinguishTask.useMutation();
 
-  const handleSubmitOpinionOrFact = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmitOpinionOrFact = () => {
     mutation.mutate({
       id: props.microtaskId,
       sentenceId: props.sentenceId,
