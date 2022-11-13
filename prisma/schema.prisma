@@ -1,139 +1,157 @@
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["referentialIntegrity"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
 }
 
 datasource db {
-    provider             = "mysql"
-    url                  = env("DATABASE_URL")
-    referentialIntegrity = "prisma"
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
 }
 
 model User {
-    id      Int    @id @default(autoincrement())
-    name    String @unique
-    crowdId Int
-    role    Role   @relation(fields: [roleId], references: [id])
-    roleId  Int
-    password String
+  id       Int    @id @default(autoincrement())
+  name     String @unique
+  crowdId  Int
+  role     Role   @relation(fields: [roleId], references: [id])
+  roleId   Int
+  password String
 
-    created_at DateTime    @default(now())
-    updated_at DateTime    @default(now()) @updatedAt
-    microtask  Microtask[]
-    document   Document[]
+  created_at DateTime    @default(now())
+  updated_at DateTime    @default(now()) @updatedAt
+  microtask  Microtask[]
+  document   Document[]
 
-    @@unique([roleId])
-    @@map("users")
+  @@unique([roleId])
+  @@map("users")
 }
 
 enum RoleKind {
-    WRITER
-    WORKER
-    ADMIN
+  WRITER
+  WORKER
+  ADMIN
 }
 
 model Role {
-    id    Int      @id @default(autoincrement())
-    kind  RoleKind
-    users User[]
+  id    Int      @id @default(autoincrement())
+  kind  RoleKind
+  users User[]
 
-    @@map("roles")
+  @@map("roles")
 }
 
 model Document {
-    id              Int        @id @default(autoincrement())
-    title           String
-    // should be lexical replesantation
-    body            String
-    isRebuttalReady Boolean    @default(false)
-    comments        Comment[]
-    author          User       @relation(fields: [authorId], references: [id])
-    authorId        Int
-    paragrahs       Paragraph[]
+  id              Int         @id @default(autoincrement())
+  title           String
+  // should be lexical replesantation
+  body            String
+  isRebuttalReady Boolean     @default(false)
+  comments        Comment[]
+  author          User        @relation(fields: [authorId], references: [id])
+  authorId        Int
+  paragrahs       Paragraph[]
 
-    created_at DateTime @default(now())
-    updated_at DateTime @default(now()) @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
-    @@map("documents")
+  @@map("documents")
 }
 
 enum SentenceKind {
-    OPINION
-    FACT
-    NONE
+  OPINION
+  FACT
+  NONE
 }
 
 model Sentence {
-    id         Int         @id @default(autoincrement())
-    body       String
-    kind     SentenceKind  @default(NONE)
-    
-    paragraph Paragraph    @relation(fields: [paragraphId], references: [id]) 
-    paragraphId Int
+  id   Int          @id @default(autoincrement())
+  body String
+  kind SentenceKind @default(NONE)
 
-    @@map("sentences")
-}
+  paragraph   Paragraph @relation(fields: [paragraphId], references: [id])
+  paragraphId Int
 
-enum CommentKind {
-    REBUTTAL
-    INFORMATION
-}
-
-model Comment {
-    id   Int         @id @default(autoincrement())
-    body String
-    kind CommentKind
-
-    document   Document @relation(fields: [documentId], references: [id])
-    documentId Int
-
-    created_at DateTime @default(now())
-    updated_at DateTime @default(now()) @updatedAt
-
-    @@map("comments")
-}
-
-enum MicrotaskStatus {
-    CREATED
-    ASSIGNED
-    DONE
-}
-
-enum MicrotaskKinds {
-    DISTINGUISH_OPINION_AND_FACT
-    CHECK_FACT_RESOURCE
-    CHECK_IF_OPINION_HAS_VALID_FACT
-    REVIEW_OTHER_WORKERS_RESULT
-}
-
-model Microtask {
-    id         Int             @id @default(autoincrement())
-    title      String
-    body       String
-    status     MicrotaskStatus @default(CREATED)
-    kind       MicrotaskKinds
-    paragraph  Paragraph @relation(fields: [paragraphId], references: [id])
-    paragraphId Int
-    assignee   User?           @relation(fields: [assigneeId], references: [id])
-    assigneeId Int?
-
-    created_at DateTime @default(now())
-    updated_at DateTime @default(now()) @updatedAt
-
-    @@map("microtasks")
+  @@map("sentences")
 }
 
 model Paragraph {
-    id         Int           @id @default(autoincrement())
-    title      String
-    body       String
-    document   Document    @relation(fields: [documentId], references: [id])
-    documentId Int
-    microtasks Microtask[]
-    sentences Sentence[]
+  id         Int         @id @default(autoincrement())
+  title      String
+  body       String
+  document   Document    @relation(fields: [documentId], references: [id])
+  documentId Int
+  microtasks Microtask[]
+  sentences  Sentence[]
 
-    created_at DateTime @default(now())
-    updated_at DateTime @default(now()) @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
-    @@map("paragrahs")
+  @@map("paragrahs")
+}
+
+enum CommentKind {
+  REBUTTAL
+  INFORMATION
+}
+
+model Comment {
+  id   Int         @id @default(autoincrement())
+  body String
+  kind CommentKind
+
+  document   Document @relation(fields: [documentId], references: [id])
+  documentId Int
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@map("comments")
+}
+
+enum MicrotaskStatus {
+  CREATED
+  ASSIGNED
+  DONE
+}
+
+enum MicrotaskKinds {
+  DISTINGUISH_OPINION_AND_FACT
+  CHECK_FACT_RESOURCE
+  CHECK_IF_OPINION_HAS_VALID_FACT
+  REVIEW_OTHER_WORKERS_RESULT
+}
+
+model Microtask {
+  id               Int               @id @default(autoincrement())
+  title            String
+  body             String
+  status           MicrotaskStatus   @default(CREATED)
+  kind             MicrotaskKinds
+  paragraph        Paragraph         @relation(fields: [paragraphId], references: [id])
+  paragraphId      Int
+  microtaskResults MicrotaskResult[]
+  assignee         User?             @relation(fields: [assigneeId], references: [id])
+  assigneeId       Int?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@map("microtasks")
+}
+
+enum Executor {
+  WORKER
+  SYSTEM
+}
+
+model MicrotaskResult {
+  id          Int       @id @default(autoincrement())
+  value       String
+  executor    Executor  @default(WORKER)
+  microtask   Microtask @relation(fields: [microtaskId], references: [id])
+  microtaskId Int
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @default(now()) @updatedAt
+
+  @@map("microtask_results")
 }

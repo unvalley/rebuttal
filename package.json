@@ -10,6 +10,7 @@
     "lint:fix": "next lint --fix",
     "test": "vitest",
     "db:push": "prisma db push",
+    "db:format": "prisma format",
     "db:generate": "prisma generate",
     "db:reset": "prisma migrate reset",
     "db:seed": "ts-node --compilerOptions '{\"isolatedModules\":false, \"module\":\"CommonJS\"}' prisma/seed.ts",
