@@ -12,7 +12,7 @@ const styleHighlightBySentenceKind = (sentences: Sentence[]) =>
   sentences
     .map((sentence) => {
       if (sentence.kind === SentenceKind.OPINION) {
-        return `<mark style="background-color: #FDF5E6">${sentence.body}</mark>`;
+        return `<mark style="background-color: #FDDDDD">${sentence.body}</mark>`;
       } else if (sentence.kind === SentenceKind.FACT) {
         return `<mark style="background-color: #93BCF1">${sentence.body}</mark>`;
       } else {

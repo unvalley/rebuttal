@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
-// import { useRouter } from "next/router";
+import React from "react";
 import { trpc } from "../../../lib/trpc";
 import { Layout } from "../../../elements/Layout";
 import { Document } from "../../../elements/Documents/Document";
 import NextError from "next/error";
 import { useRouter } from "next/router";
 import { MicrotaskStatus } from ".prisma/client";
+import { ScreenLoading } from "../../../elements/Parts/Loading";
 
 const Documents = () => {
   const router = useRouter();
@@ -42,7 +42,7 @@ const Documents = () => {
   }
 
   if (documentQuery.isLoading || microtasksQuery.isLoading) {
-    return <>Loading...</>;
+    return <ScreenLoading />;
   }
 
   const { data: document } = documentQuery;
@@ -60,6 +60,13 @@ const Documents = () => {
         <div className="col-span-2">
           <div className="bg-base-200 p-2">
             <div className="font-bold">情報</div>
+          </div>
+          <p className="text-red-600 font-bold">
+            センテンス数: {document.sentences.length}
+          </p>
+          <div className="py-4">
+            <p>オレンジ色のハイライト箇所: 意見</p>
+            <p>青色のハイライト箇所: 事実</p>
           </div>
           <p>
             このページでは、学生が書いたレポートに対して、フィードバックタスクを行ってもらいます。

@@ -49,7 +49,7 @@ model Document {
     comments        Comment[]
     author          User       @relation(fields: [authorId], references: [id])
     authorId        Int
-    sentences       Sentence[]
+    paragrahs       Paragraph[]
 
     created_at DateTime @default(now())
     updated_at DateTime @default(now()) @updatedAt
@@ -66,10 +66,10 @@ enum SentenceKind {
 model Sentence {
     id         Int         @id @default(autoincrement())
     body       String
-    document   Document    @relation(fields: [documentId], references: [id])
-    documentId Int
     kind     SentenceKind  @default(NONE)
-    microtasks Microtask[]
+    
+    paragraph Paragraph    @relation(fields: [paragraphId], references: [id]) 
+    paragraphId Int
 
     @@map("sentences")
 }
@@ -112,8 +112,8 @@ model Microtask {
     body       String
     status     MicrotaskStatus @default(CREATED)
     kind       MicrotaskKinds
-    sentence   Sentence        @relation(fields: [sentenceId], references: [id])
-    sentenceId Int
+    paragraph  Paragraph @relation(fields: [paragraphId], references: [id])
+    paragraphId Int
     assignee   User?           @relation(fields: [assigneeId], references: [id])
     assigneeId Int?
 
@@ -121,4 +121,19 @@ model Microtask {
     updated_at DateTime @default(now()) @updatedAt
 
     @@map("microtasks")
+}
+
+model Paragraph {
+    id         Int           @id @default(autoincrement())
+    title      String
+    body       String
+    document   Document    @relation(fields: [documentId], references: [id])
+    documentId Int
+    microtasks Microtask[]
+    sentences Sentence[]
+
+    created_at DateTime @default(now())
+    updated_at DateTime @default(now()) @updatedAt
+
+    @@map("paragrahs")
 }

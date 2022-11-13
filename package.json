@@ -13,6 +13,7 @@
     "db:generate": "prisma generate",
     "db:reset": "prisma migrate reset",
     "db:seed": "ts-node --compilerOptions '{\"isolatedModules\":false, \"module\":\"CommonJS\"}' prisma/seed.ts",
+    "db:rebuild": "npm run db:reset && npm run db:push && npm run db:seed",
     "db:studio": "prisma studio"
   },
   "dependencies": {

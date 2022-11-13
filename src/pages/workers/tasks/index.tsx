@@ -3,7 +3,6 @@ import { Layout } from "../../../elements/Layout";
 import { trpc } from "../../../lib/trpc";
 import { useSession } from "next-auth/react";
 import { MicrotaskDescription } from "../../../elements/Microtasks/MicrotaskDescription";
-import { useEffect } from "react";
 import type { Session } from "next-auth";
 import { Wizard } from "react-use-wizard";
 
@@ -14,6 +13,7 @@ const Tasks = () => {
   const { data: microtasks } = trpc.microtasks.findManyByUserId.useQuery({
     userId: session?.user?.id as number,
   });
+
   const assignMicrotasksMutation =
     trpc.microtasks.assignSomeMicrotasks.useMutation({
       onSuccess() {
@@ -33,19 +33,11 @@ const Tasks = () => {
     }
   };
 
-  useEffect(() => {
-    const f = async (session: Session) => await assignMicrotasks(session);
-    if (microtasks?.length === 0 && session) {
-      f(session);
-    }
-  }, []);
-
   if (microtasks === undefined) {
     <div>Not Found Microtasks</div>;
   }
 
-  const isMicrotaskAssigned = Boolean(microtasks);
-  console.log(JSON.stringify(microtasks));
+  const isMicrotaskAssigned = microtasks?.length !== 0;
 
   return (
     <div className="container mx-auto p-4">
@@ -59,7 +51,10 @@ const Tasks = () => {
             {isMicrotaskAssigned && microtasks ? (
               <MicrotaskAssigned microtasks={microtasks} />
             ) : (
-              <MicrotaskUnassigned />
+              <MicrotaskUnassigned
+                session={session}
+                assign={assignMicrotasks}
+              />
             )}
           </div>
         </div>
@@ -112,14 +107,18 @@ const MicrotaskAssigned: React.FC<{
 };
 
 const MicrotaskUnassigned: React.FC<{
-  assignMicrotask?: () => Promise<void>;
-}> = ({ assignMicrotask }) => {
+  session: Session;
+  assign: (session: Session) => Promise<void>;
+}> = ({ session, assign }) => {
+  const handleClick = async () => {
+    await assign(session);
+  };
   return (
     <div>
       <div className="text-md">タスクがまだ割り当てられていません</div>
       <p>ボタンを押すと，タスクが割り当てられます．</p>
       <div className="">
-        <button className="btn btn-primary" onClick={assignMicrotask}>
+        <button className="btn btn-primary" onClick={handleClick}>
           割り当てを行う
         </button>
       </div>
