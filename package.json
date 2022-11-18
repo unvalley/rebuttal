@@ -22,6 +22,7 @@
     "@prisma/client": "^4.5.0",
     "@tailwindcss/line-clamp": "^0.4.2",
     "@tanstack/react-query": "^4.13.0",
+    "@textlint/text-to-ast": "^12.2.3",
     "@tiptap/extension-highlight": "^2.0.0-beta.202",
     "@tiptap/react": "^2.0.0-beta.202",
     "@tiptap/starter-kit": "^2.0.0-beta.202",
