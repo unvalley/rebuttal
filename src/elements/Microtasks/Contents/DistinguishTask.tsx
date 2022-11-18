@@ -1,10 +1,10 @@
 import { useRouter } from "next/router";
 import { useWizard } from "react-use-wizard";
+import type { MicrotaskWithParagraph } from "../../../types/MicrotaskResponse";
 import { useDistinguishTask } from "../hooks/useDistinguishOpinionAndFactMicrotask";
-import type { MicrotaskWithSentence } from "../MicrotaskDescription";
 
 type DistinguishTaskProps = {
-  microtask: MicrotaskWithSentence;
+  microtask: MicrotaskWithParagraph;
   actions?: React.ReactNode;
 };
 
@@ -12,7 +12,7 @@ export const DistinguishTask: React.FC<DistinguishTaskProps> = (props) => {
   const { opinionOrFact, setOpinionOrFact, handleSubmitOpinionOrFact } =
     useDistinguishTask({
       microtaskId: props.microtask.id,
-      sentenceId: props.microtask.sentenceId,
+      sentenceId: 1, // TODO: sentenceId,
     });
   const { previousStep, nextStep, isLastStep } = useWizard();
   const router = useRouter();
@@ -39,7 +39,8 @@ export const DistinguishTask: React.FC<DistinguishTaskProps> = (props) => {
       <div className="text-red-600">
         検討：なぜ意見なのか、なぜ事実なのか、回答の理由を書かせても良いかもしれない
       </div>
-      <div className="font-semibold mt-4">{props.microtask.sentence.body}</div>
+      {/* // センテンスでループ */}
+      <div className="font-semibold mt-4">{props.microtask.paragraph.body}</div>
       <div className="w-96">
         <form onSubmit={handleSubmit}>
           <div className="form-control">

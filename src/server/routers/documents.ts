@@ -20,7 +20,13 @@ export const documentsRouter = router({
     .query(async ({ input }) => {
       const doc = await prisma.document.findUnique({
         where: { id: input.id },
-        include: { sentences: true },
+        include: {
+          paragrahs: {
+            include: {
+              sentences: true,
+            },
+          },
+        },
       });
       if (!doc) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Not found" });
@@ -28,24 +34,3 @@ export const documentsRouter = router({
       return doc;
     }),
 });
-
-// .mutation("create", {
-//   input: z.object({
-//     title: z.string().min(1).max(32),
-//     // TODO: typing
-//     body: z.any(),
-//     userId: z.number(),
-//   }),
-//   async resolve({ ctx, input }) {
-//     // ts(7022) error handling
-//     const doc: Document = await ctx.prisma.document.create({
-//       data: {
-//         title: input.title,
-//         body: input.body,
-//         isRebuttalReady: false,
-//         authorId: input.userId,
-//       },
-//     });
-//     return doc;
-//   },
-// });

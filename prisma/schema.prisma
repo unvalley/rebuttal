@@ -76,7 +76,6 @@ model Sentence {
 
 model Paragraph {
   id         Int         @id @default(autoincrement())
-  title      String
   body       String
   document   Document    @relation(fields: [documentId], references: [id])
   documentId Int

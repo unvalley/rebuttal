@@ -1,10 +1,10 @@
-import type { Microtask, Sentence } from ".prisma/client";
 import { Layout } from "../../../elements/Layout";
 import { trpc } from "../../../lib/trpc";
 import { useSession } from "next-auth/react";
 import { MicrotaskDescription } from "../../../elements/Microtasks/MicrotaskDescription";
 import type { Session } from "next-auth";
 import { Wizard } from "react-use-wizard";
+import type { MicrotaskWithParagraph } from "../../../types/MicrotaskResponse";
 
 // アサインロジックは、5回完了した次のユーザのことも考える必要あり
 const Tasks = () => {
@@ -33,8 +33,12 @@ const Tasks = () => {
     }
   };
 
+  if (session == null) {
+    return <p>ログインが必要です</p>;
+  }
+
   if (microtasks === undefined) {
-    <div>Not Found Microtasks</div>;
+    return <div>Not Found Microtasks</div>;
   }
 
   const isMicrotaskAssigned = microtasks?.length !== 0;
@@ -76,11 +80,7 @@ const Tasks = () => {
                         {task.title} (ID={task.id})
                       </div>
                       <div>タスクステータス: {task.status}</div>
-                      <div>
-                        対象センテンス(ID={task.sentenceId}):{" "}
-                        {task.sentence.body}
-                      </div>
-                      <div>対象センテンスの種別: {task.sentence.kind}</div>
+                      <div>対象パラグラフ(ID={task.paragraphId}): </div>
                     </div>
                   </div>
                 ))}
@@ -93,7 +93,7 @@ const Tasks = () => {
 };
 
 const MicrotaskAssigned: React.FC<{
-  microtasks: Array<Microtask & { sentence: Sentence }>;
+  microtasks: MicrotaskWithParagraph[];
 }> = (props) => {
   return (
     <div>

@@ -18,7 +18,7 @@ export const microtasksRouter = router({
     .query(async ({ input }) => {
       const microtaskWithSentence = await prisma.microtask.findFirst({
         where: { assigneeId: input.userId },
-        include: { sentence: true },
+        include: { paragraph: true },
       });
       return microtaskWithSentence;
     }),
@@ -27,7 +27,7 @@ export const microtasksRouter = router({
     .query(async ({ input }) => {
       const microtaskWithSentence = await prisma.microtask.findMany({
         where: { assigneeId: input.userId },
-        include: { sentence: true },
+        include: { paragraph: true },
       });
       return microtaskWithSentence;
     }),
@@ -41,7 +41,7 @@ export const microtasksRouter = router({
           body: true,
           status: true,
           kind: true,
-          sentenceId: true,
+          paragraphId: true,
           assignee: {
             select: {
               id: true,
@@ -50,16 +50,17 @@ export const microtasksRouter = router({
             },
           },
           assigneeId: true,
-          sentence: {
+          paragraph: {
             select: {
               id: true,
               body: true,
               documentId: true,
+              sentences: true,
             },
           },
         },
         where: {
-          sentence: {
+          paragraph: {
             documentId: input.documentId,
           },
         },
@@ -125,33 +126,6 @@ export const microtasksRouter = router({
         data: {
           assigneeId: null,
           status: "CREATED",
-        },
-      });
-    }),
-  completeDistinguishTask: publicProcedure
-    .input(
-      z.object({
-        id: z.number(),
-        sentenceId: z.number(),
-        distinguishResult: z.enum(["OPINION", "FACT"]),
-      })
-    )
-    .mutation(async ({ input }) => {
-      await prisma.microtask.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          status: "DONE",
-        },
-      });
-
-      await prisma.sentence.update({
-        where: {
-          id: input.sentenceId,
-        },
-        data: {
-          kind: input.distinguishResult,
         },
       });
     }),

@@ -1,14 +1,12 @@
-import type { Microtask, Sentence } from "@prisma/client";
 import { match } from "ts-pattern";
 import { CheckResourceTask } from "./Contents/CheckResourceTask";
 import { DistinguishTask } from "./Contents/DistinguishTask";
 import { ReviewTask } from "./Contents/ReviewTask";
 import { CheckOpinionValidnessTask } from "./Contents/CheckOpinionValidnessTask";
-
-export type MicrotaskWithSentence = Microtask & { sentence: Sentence };
+import type { MicrotaskWithParagraph } from "../../types/MicrotaskResponse";
 
 export const MicrotaskDescription: React.FC<{
-  microtask: MicrotaskWithSentence;
+  microtask: MicrotaskWithParagraph;
 }> = ({ microtask }) => {
   return (
     <div>

@@ -8,13 +8,13 @@ export const useDistinguishTask = (props: {
   const [opinionOrFact, setOpinionOrFact] = useState<"OPINION" | "FACT">(
     "OPINION"
   );
-  const mutation = trpc.microtasks.completeDistinguishTask.useMutation();
+  const mutation = trpc.microtask_results.completeMicrotask.useMutation();
 
   const handleSubmitOpinionOrFact = () => {
     mutation.mutate({
-      id: props.microtaskId,
+      microtaskId: props.microtaskId,
       sentenceId: props.sentenceId,
-      distinguishResult: opinionOrFact,
+      value: opinionOrFact,
     });
   };
 

@@ -71,9 +71,12 @@ async function main() {
   });
 
   const documentIds = [1, 2];
-  await createSentencesByDocumentIds(documentIds);
 
-  const sentences = await prisma.sentence.findMany({
+  await createParagraphsByDocumentIds(documentIds);
+
+  // await createSentencesByDocumentIds(documentIds);
+
+  const paragraphs = await prisma.paragraph.findMany({
     where: {
       documentId: { in: documentIds },
     },
@@ -102,12 +105,12 @@ async function main() {
   const createMicrotasksInsertData = (
     deafultMicrotasks: { title: string; kind: MicroTaskKinds }[]
   ) =>
-    sentences.flatMap((sentence) => {
+    paragraphs.flatMap((paragraph) => {
       return deafultMicrotasks.flatMap((microtask) => {
         return {
           title: microtask.title,
           body: "",
-          sentenceId: sentence.id,
+          paragraphId: paragraph.id,
           status: "CREATED",
           kind: microtask.kind,
         } as const;
@@ -121,15 +124,23 @@ async function main() {
   });
 }
 
-const textToSentences = (text: string) =>
+// const textToSentences = (text: string) =>
+//   split(text).flatMap((s) => {
+//     if (s.type !== "Sentence") {
+//       return [];
+//     }
+//     return s.raw;
+//   });
+
+const textToParagraphs = (text: string) =>
   split(text).flatMap((s) => {
-    if (s.type !== "Sentence") {
+    if (s.type !== "Paragraph") {
       return [];
     }
     return s.raw;
   });
 
-const createSentencesByDocumentIds = async (documentIds: number[]) => {
+const createParagraphsByDocumentIds = async (documentIds: number[]) => {
   const docs = await prisma.document.findMany({
     where: {
       id: { in: documentIds },
@@ -137,18 +148,18 @@ const createSentencesByDocumentIds = async (documentIds: number[]) => {
   });
 
   // NOTE: document to sentences, create documentId and sentenceBody object
-  const documentAndSentences = docs.flatMap((doc) => {
-    const sentences = textToSentences(doc.body);
-    return sentences.flatMap((sentence) => {
+  const documentAndParagraphs = docs.flatMap((doc) => {
+    const paragraphs = textToParagraphs(doc.body);
+    return paragraphs.flatMap((p) => {
       return {
         documentId: doc.id,
-        body: sentence,
+        body: p,
       };
     });
   });
 
-  await prisma.sentence.createMany({
-    data: documentAndSentences,
+  await prisma.paragraph.createMany({
+    data: documentAndParagraphs,
     skipDuplicates: true,
   });
 };

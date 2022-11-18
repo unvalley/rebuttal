@@ -46,6 +46,7 @@ const Documents = () => {
   }
 
   const { data: document } = documentQuery;
+  const sentences = document.paragrahs.flatMap((p) => p.sentences);
   const { data: microtasks } = microtasksQuery;
 
   const microtaskCount = microtasks.length;
@@ -61,9 +62,9 @@ const Documents = () => {
           <div className="bg-base-200 p-2">
             <div className="font-bold">情報</div>
           </div>
-          <p className="text-red-600 font-bold">
+          {/* <p className="text-red-600 font-bold">
             センテンス数: {document.sentences.length}
-          </p>
+          </p> */}
           <div className="py-4">
             <p>オレンジ色のハイライト箇所: 意見</p>
             <p>青色のハイライト箇所: 事実</p>
@@ -81,7 +82,7 @@ const Documents = () => {
           <Document
             title={document.title}
             body={document.body}
-            sentences={document.sentences}
+            sentences={sentences}
             canEdit={false}
           />
         </div>
@@ -105,7 +106,7 @@ const Documents = () => {
                       {task.title}
                     </div>
                     <div>ステータス：{task.status}</div>
-                    <div>対象センテンス：{task.sentence.body}</div>
+                    <div>対象パラグラフ：{task.paragraph.body}</div>
                     <div className="">
                       <span>
                         アサインユーザー：
