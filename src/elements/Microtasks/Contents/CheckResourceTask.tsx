@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
 import { useWizard } from "react-use-wizard";
-import type { MicrotaskWithSentence } from "../MicrotaskDescription";
+import type { MicrotaskWithParagraph } from "../../../types/MicrotaskResponse";
 
 type CheckResourceTask = {
-  microtask: MicrotaskWithSentence;
+  microtask: MicrotaskWithParagraph;
 };
 
 export const CheckResourceTask: React.FC<CheckResourceTask> = (props) => {
@@ -28,7 +28,7 @@ export const CheckResourceTask: React.FC<CheckResourceTask> = (props) => {
         <span className="text-green-700">: 3-5分</span>
       </div>
       <div className="text-red-600">検討：全文章表示するべきか</div>
-      <div className="font-semibold mt-4">{props.microtask.sentence.body}</div>
+      <div className="font-semibold mt-4">{props.microtask.paragraph.body}</div>
       <div className="w-96">
         <form onSubmit={handleSubmit}>
           <div className="flex flex-row gap-x-4 mt-4">

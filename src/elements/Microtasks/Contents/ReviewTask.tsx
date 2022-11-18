@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
 import { useWizard } from "react-use-wizard";
-import type { MicrotaskWithSentence } from "../MicrotaskDescription";
+import type { MicrotaskWithParagraph } from "../../../types/MicrotaskResponse";
 
 export type ReviewTaskProps = {
-  microtask: MicrotaskWithSentence;
+  microtask: MicrotaskWithParagraph;
 };
 
 export const ReviewTask: React.FC<ReviewTaskProps> = (props) => {
@@ -28,7 +28,7 @@ export const ReviewTask: React.FC<ReviewTaskProps> = (props) => {
       <div className="text-red-600">
         検討：評価対象はワーカーのマイクロタスク。評価タイミングはいつ？評価するために表示する情報は？
       </div>
-      <div className="font-semibold mt-4">{props.microtask.sentence.body}</div>
+      <div className="font-semibold mt-4">{props.microtask.paragraph.body}</div>
       <div className="w-96">
         <form onSubmit={handleSubmit}>
           <div className="flex flex-row gap-x-4 mt-4">

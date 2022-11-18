@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
 import { useWizard } from "react-use-wizard";
-import type { MicrotaskWithSentence } from "../MicrotaskDescription";
+import type { MicrotaskWithParagraph } from "../../../types/MicrotaskResponse";
 
 type CheckOpinionValidnessProps = {
-  microtask: MicrotaskWithSentence;
+  microtask: MicrotaskWithParagraph;
 };
 
 export const CheckOpinionValidnessTask: React.FC<CheckOpinionValidnessProps> = (
@@ -33,7 +33,7 @@ export const CheckOpinionValidnessTask: React.FC<CheckOpinionValidnessProps> = (
       <div className="text-red-600">
         検討：周囲の文章を表示しないと実施不可能
       </div>
-      <div className="font-semibold mt-4">{props.microtask.sentence.body}</div>
+      <div className="font-semibold mt-4">{props.microtask.paragraph.body}</div>
       <div className="w-96">
         <form onSubmit={handleSubmit}>
           <div className="flex flex-row gap-x-4 mt-4">

@@ -6,10 +6,8 @@ import type { Session } from "next-auth";
 import { Wizard } from "react-use-wizard";
 import type { MicrotaskWithParagraph } from "../../../types/MicrotaskResponse";
 
-// アサインロジックは、5回完了した次のユーザのことも考える必要あり
-const Tasks = () => {
+const useAssignMicrotask = (session: Session | null) => {
   const utils = trpc.useContext();
-  const { data: session } = useSession();
   const { data: microtasks } = trpc.microtasks.findManyByUserId.useQuery({
     userId: session?.user?.id as number,
   });
@@ -32,6 +30,14 @@ const Tasks = () => {
       console.error(cause);
     }
   };
+  return { microtasks, assignMicrotasks };
+};
+
+// アサインロジックは、5回完了した次のユーザのことも考える必要あり
+const Tasks = () => {
+  const { data: session } = useSession();
+  // TOOD: sessionのnull対応
+  const { microtasks, assignMicrotasks } = useAssignMicrotask(session);
 
   if (session == null) {
     return <p>ログインが必要です</p>;
