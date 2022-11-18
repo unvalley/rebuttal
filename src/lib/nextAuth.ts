@@ -9,7 +9,7 @@ import type { GetServerSideProps, GetServerSidePropsContext } from "next";
 export const nextAuthOptions: NextAuthOptions = {
   providers: [
     Credentials({
-      id: "credentials",
+      id: "login",
       credentials: {
         name: {
           label: "name",
@@ -27,15 +27,14 @@ export const nextAuthOptions: NextAuthOptions = {
               role: true,
             },
           });
+
           if (!user) {
-            // throw new Error("user is none");
-            return null;
+            throw new Error("user is none");
           }
           const isValidPassword = await verify(user.password, password);
 
           if (!isValidPassword) {
-            // throw new Error("Invalid Password");
-            return null;
+            throw new Error("Invalid Password");
           }
           return {
             id: user.id,
@@ -70,10 +69,6 @@ export const nextAuthOptions: NextAuthOptions = {
         };
       }
       return session;
-    },
-    async signIn() {
-      // TODO: タスクアサイン
-      return true;
     },
   },
   jwt: {

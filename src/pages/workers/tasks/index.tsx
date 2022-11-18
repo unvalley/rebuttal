@@ -2,8 +2,8 @@ import { Layout } from "../../../elements/Layout";
 import { trpc } from "../../../lib/trpc";
 import { useSession } from "next-auth/react";
 import { MicrotaskDescription } from "../../../elements/Microtasks/MicrotaskDescription";
-import type { Session } from "next-auth";
 import { Wizard } from "react-use-wizard";
+import type { Session } from "next-auth";
 import type { MicrotaskWithParagraph } from "../../../types/MicrotaskResponse";
 
 const useAssignMicrotask = (session: Session | null) => {
@@ -12,19 +12,21 @@ const useAssignMicrotask = (session: Session | null) => {
     userId: session?.user?.id as number,
   });
 
-  const assignMicrotasksMutation =
-    trpc.microtasks.assignSomeMicrotasks.useMutation({
+  const assignMicrotasksMutation = trpc.microtasks.assignMicrotasks.useMutation(
+    {
       onSuccess() {
         utils.microtasks.findManyByUserId.invalidate({
           userId: session?.user?.id as number,
         });
       },
-    });
+    }
+  );
 
   const assignMicrotasks = async (session: Session) => {
     try {
       await assignMicrotasksMutation.mutateAsync({
         assigneeId: session.user.id,
+        assignCount: 5,
       });
     } catch (cause: any) {
       console.error(cause);
@@ -33,7 +35,6 @@ const useAssignMicrotask = (session: Session | null) => {
   return { microtasks, assignMicrotasks };
 };
 
-// アサインロジックは、5回完了した次のユーザのことも考える必要あり
 const Tasks = () => {
   const { data: session } = useSession();
   // TOOD: sessionのnull対応

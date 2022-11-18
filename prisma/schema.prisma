@@ -12,7 +12,7 @@ datasource db {
 model User {
   id       Int    @id @default(autoincrement())
   name     String @unique
-  crowdId  Int
+  crowdId  String
   role     Role   @relation(fields: [roleId], references: [id])
   roleId   Int
   password String
@@ -22,7 +22,6 @@ model User {
   microtask  Microtask[]
   document   Document[]
 
-  @@unique([roleId])
   @@map("users")
 }
 
@@ -34,7 +33,7 @@ enum RoleKind {
 
 model Role {
   id    Int      @id @default(autoincrement())
-  kind  RoleKind
+  kind  RoleKind @unique
   users User[]
 
   @@map("roles")
