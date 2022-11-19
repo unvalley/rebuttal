@@ -18,7 +18,7 @@ export const usersRouter = router({
           message: `No user with input=${JSON.stringify(input)}`,
         });
       }
-      return { name: _user.name, crowdId: _user.crowdId };
+      return { crowdId: _user.crowdId };
     }),
   create: publicProcedure
     .input(
@@ -41,7 +41,6 @@ export const usersRouter = router({
       const password = await hash(input.password);
       return await prisma.user.create({
         data: {
-          name: "",
           password,
           roleId: role.id,
           crowdId: input.crowdId,
