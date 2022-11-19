@@ -1,4 +1,4 @@
-import { MicrotaskKinds, PrismaClient } from "@prisma/client";
+import { MicrotaskKinds, MicrotaskStatus, PrismaClient } from "@prisma/client";
 import type { MicroTaskKinds } from "../constants/microtasks";
 import { hash } from "argon2";
 import { parse } from "@textlint/text-to-ast";
@@ -79,6 +79,9 @@ async function main() {
     where: {
       documentId: { in: documentIds },
     },
+    include: {
+      sentences: true,
+    },
   });
 
   const deafultMicrotasks = (
@@ -95,7 +98,6 @@ async function main() {
         title: "意見に対して，それを裏付ける事実が書かれているかの確認",
         kind: MicrotaskKinds.CHECK_IF_OPINION_HAS_VALID_FACT,
       },
-      // { title: "評価", kind: MicrotaskKinds.REVIEW_OTHER_WORKERS_RESULT },
     ] as { title: string; kind: MicroTaskKinds }[]
   ).map(({ title, kind }) => {
     return { title, kind };
@@ -103,18 +105,37 @@ async function main() {
 
   const createMicrotasksInsertData = (
     deafultMicrotasks: { title: string; kind: MicroTaskKinds }[]
-  ) =>
-    paragraphs.flatMap((paragraph) => {
+  ) => {
+    return paragraphs.flatMap((paragraph) => {
       return deafultMicrotasks.flatMap((microtask) => {
-        return {
-          title: microtask.title,
-          body: "",
-          paragraphId: paragraph.id,
-          status: "CREATED",
-          kind: microtask.kind,
-        } as const;
+        if (microtask.kind === MicrotaskKinds.DISTINGUISH_OPINION_AND_FACT) {
+          const tasks = paragraph.sentences.flatMap((sentence) => {
+            return {
+              title: microtask.title,
+              body: "",
+              sentenceId: sentence.id,
+              paragraphId: paragraph.id,
+              status: MicrotaskStatus.CREATED,
+              kind: microtask.kind,
+            } as const;
+          });
+          return tasks;
+        } else {
+          const tasks = [
+            {
+              title: microtask.title,
+              body: "",
+              sentenceId: paragraph.sentences[0]?.id as number,
+              paragraphId: paragraph.id,
+              status: MicrotaskStatus.CREATED,
+              kind: microtask.kind as MicrotaskKinds,
+            } as const,
+          ];
+          return tasks;
+        }
       });
     });
+  };
   const microtasksInsertData = createMicrotasksInsertData(deafultMicrotasks);
 
   await prisma.microtask.createMany({

@@ -6,12 +6,10 @@ import { Wizard } from "react-use-wizard";
 import type { Session } from "next-auth";
 import type { MicrotaskWithParagraph } from "../../../types/MicrotaskResponse";
 import { ScreenLoading } from "../../../elements/Parts/Loading";
+import { MicrotaskStatus } from ".prisma/client";
 
 const useAssignMicrotask = (session: Session | null) => {
   const utils = trpc.useContext();
-  const microtasksQuery = trpc.microtasks.findManyByUserId.useQuery({
-    userId: session?.user?.id as number,
-  });
 
   const assignMicrotasksMutation = trpc.microtasks.assignMicrotasks.useMutation(
     {
@@ -33,13 +31,16 @@ const useAssignMicrotask = (session: Session | null) => {
       console.error(cause);
     }
   };
-  return { microtasksQuery, assignMicrotasks };
+  return { assignMicrotasks };
 };
 
 const Tasks = () => {
   const { data: session } = useSession();
   // TOOD: sessionのnull対応
-  const { microtasksQuery, assignMicrotasks } = useAssignMicrotask(session);
+  const { assignMicrotasks } = useAssignMicrotask(session);
+  const microtasksQuery = trpc.microtasks.findManyByUserId.useQuery({
+    userId: session?.user?.id as number,
+  });
 
   if (session == null) {
     return <p>ログインが必要です</p>;
@@ -51,6 +52,8 @@ const Tasks = () => {
 
   const { data: microtasks } = microtasksQuery;
   const isMicrotaskAssigned = microtasks?.length !== 0;
+  const hasDoneAllAssignedMicrotasks =
+    microtasks && microtasks.every((m) => m.status === MicrotaskStatus.DONE);
 
   return (
     <div className="container mx-auto p-4">
@@ -61,13 +64,20 @@ const Tasks = () => {
         {/* Left Column */}
         <div className="col-span-4">
           <div className="w-full bg-base-100">
-            {isMicrotaskAssigned && microtasks ? (
+            {isMicrotaskAssigned &&
+            microtasks &&
+            !hasDoneAllAssignedMicrotasks ? (
               <MicrotaskAssigned microtasks={microtasks} />
             ) : (
-              <MicrotaskUnassigned
-                session={session}
-                assign={assignMicrotasks}
-              />
+              <>
+                {hasDoneAllAssignedMicrotasks === true && (
+                  <p>再度タスクを行っていただきありがとうございます．</p>
+                )}
+                <MicrotaskUnassigned
+                  session={session}
+                  assign={assignMicrotasks}
+                />
+              </>
             )}
           </div>
         </div>
