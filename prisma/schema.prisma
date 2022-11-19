@@ -68,6 +68,7 @@ model Sentence {
 
   paragraph   Paragraph @relation(fields: [paragraphId], references: [id])
   paragraphId Int
+  microtasks Microtask[]
 
   @@map("sentences")
 }
@@ -118,6 +119,7 @@ enum MicrotaskKinds {
   REVIEW_OTHER_WORKERS_RESULT
 }
 
+// センテンスとパラグラフを一意に特定できるモデル
 model Microtask {
   id               Int               @id @default(autoincrement())
   title            String
@@ -126,6 +128,8 @@ model Microtask {
   kind             MicrotaskKinds
   paragraph        Paragraph         @relation(fields: [paragraphId], references: [id])
   paragraphId      Int
+  sentence         Sentence          @relation(fields: [sentenceId], references: [id])
+  sentenceId       Int
   microtaskResults MicrotaskResult[]
   assignee         User?             @relation(fields: [assigneeId], references: [id])
   assigneeId       Int?
@@ -135,7 +139,6 @@ model Microtask {
 
   @@map("microtasks")
 }
-
 enum Executor {
   WORKER
   SYSTEM
@@ -143,10 +146,13 @@ enum Executor {
 
 model MicrotaskResult {
   id          Int       @id @default(autoincrement())
+  // MTask1: OPINION or FACT
+  // MTask2/3: TRUE or FALSE (as string)
   value       String
+  reason      String?
   executor    Executor  @default(WORKER)
   microtask   Microtask @relation(fields: [microtaskId], references: [id])
-  microtaskId Int
+  microtaskId Int       @unique
   created_at  DateTime  @default(now())
   updated_at  DateTime  @default(now()) @updatedAt
 

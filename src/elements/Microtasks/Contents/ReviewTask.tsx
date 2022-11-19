@@ -35,7 +35,7 @@ export const ReviewTask: React.FC<ReviewTaskProps> = (props) => {
             <button className="btn bg-slate-500" onClick={() => previousStep()}>
               戻る（dev Only）
             </button>
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="btn ">
               回答して次のタスクへ
             </button>
           </div>

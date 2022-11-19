@@ -95,7 +95,7 @@ async function main() {
         title: "意見に対して，それを裏付ける事実が書かれているかの確認",
         kind: MicrotaskKinds.CHECK_IF_OPINION_HAS_VALID_FACT,
       },
-      { title: "評価", kind: MicrotaskKinds.REVIEW_OTHER_WORKERS_RESULT },
+      // { title: "評価", kind: MicrotaskKinds.REVIEW_OTHER_WORKERS_RESULT },
     ] as { title: string; kind: MicroTaskKinds }[]
   ).map(({ title, kind }) => {
     return { title, kind };

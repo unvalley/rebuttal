@@ -30,7 +30,7 @@ const Index = () => {
           <div>
             {session.user && (
               <div>
-                {session.user.name}としてサインイン中です。 役割は、
+                {session.user.crowdId}としてサインイン中です。 役割は、
                 {session.user.roleKind}です。
               </div>
             )}

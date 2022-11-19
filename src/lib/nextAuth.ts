@@ -11,12 +11,12 @@ export const nextAuthOptions: NextAuthOptions = {
     Credentials({
       id: "login",
       credentials: {
-        name: {
-          label: "name",
+        crowdId: {
+          label: "crowdId",
           type: "text",
           placeholder: "",
         },
-        password: { label: "Password", type: "password" },
+        password: { label: "password", type: "password" },
       },
       authorize: async (credentials) => {
         try {
@@ -54,7 +54,7 @@ export const nextAuthOptions: NextAuthOptions = {
       if (user) {
         return {
           ...token,
-          user: { name: user.crowdId, id: user.id, roleKind: user.roleKind },
+          user: { crowdId: user.crowdId, id: user.id, roleKind: user.roleKind },
         };
       }
       return token;

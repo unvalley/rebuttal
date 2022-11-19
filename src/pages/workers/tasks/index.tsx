@@ -127,7 +127,7 @@ const MicrotaskUnassigned: React.FC<{
       <div className="text-md">タスクがまだ割り当てられていません</div>
       <p>ボタンを押すと，タスクが割り当てられます．</p>
       <div className="">
-        <button className="btn btn-primary" onClick={handleClick}>
+        <button className="btn " onClick={handleClick}>
           割り当てを行う
         </button>
       </div>

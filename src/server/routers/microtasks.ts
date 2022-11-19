@@ -46,7 +46,6 @@ export const microtasksRouter = router({
           assignee: {
             select: {
               id: true,
-              name: true,
               crowdId: true,
             },
           },

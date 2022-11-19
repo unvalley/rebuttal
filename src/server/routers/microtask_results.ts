@@ -8,17 +8,15 @@ export const microtaskResultsRouter = router({
     .input(
       z.object({
         microtaskId: z.number(),
-        sentenceId: z.number(),
         value: z.string(),
       })
     )
     .mutation(async ({ input }) => {
-      await prisma.microtaskResult.update({
-        where: {
-          id: input.microtaskId,
-        },
+      await prisma.microtaskResult.create({
         data: {
+          microtaskId: input.microtaskId,
           value: input.value,
+          executor: "WORKER",
         },
       });
     }),
