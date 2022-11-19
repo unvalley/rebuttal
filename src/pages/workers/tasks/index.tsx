@@ -5,10 +5,11 @@ import { MicrotaskDescription } from "../../../elements/Microtasks/MicrotaskDesc
 import { Wizard } from "react-use-wizard";
 import type { Session } from "next-auth";
 import type { MicrotaskWithParagraph } from "../../../types/MicrotaskResponse";
+import { ScreenLoading } from "../../../elements/Parts/Loading";
 
 const useAssignMicrotask = (session: Session | null) => {
   const utils = trpc.useContext();
-  const { data: microtasks } = trpc.microtasks.findManyByUserId.useQuery({
+  const microtasksQuery = trpc.microtasks.findManyByUserId.useQuery({
     userId: session?.user?.id as number,
   });
 
@@ -32,22 +33,23 @@ const useAssignMicrotask = (session: Session | null) => {
       console.error(cause);
     }
   };
-  return { microtasks, assignMicrotasks };
+  return { microtasksQuery, assignMicrotasks };
 };
 
 const Tasks = () => {
   const { data: session } = useSession();
   // TOOD: sessionのnull対応
-  const { microtasks, assignMicrotasks } = useAssignMicrotask(session);
+  const { microtasksQuery, assignMicrotasks } = useAssignMicrotask(session);
 
   if (session == null) {
     return <p>ログインが必要です</p>;
   }
 
-  if (microtasks === undefined) {
-    return <div>Not Found Microtasks</div>;
+  if (microtasksQuery.isLoading) {
+    return <ScreenLoading />;
   }
 
+  const { data: microtasks } = microtasksQuery;
   const isMicrotaskAssigned = microtasks?.length !== 0;
 
   return (
