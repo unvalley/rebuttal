@@ -31,20 +31,17 @@ async function main() {
   await prisma.user.createMany({
     data: [
       {
-        name: "admin user",
-        crowdId: 1,
+        crowdId: "admin",
         roleId: 1,
         password: await hash("adminPassword"),
       },
       {
-        name: "writer user",
-        crowdId: 2,
+        crowdId: "writer",
         roleId: 2,
         password: await hash("writerPassword"),
       },
       {
-        name: "worker user",
-        crowdId: 3,
+        crowdId: "worker",
         roleId: 3,
         password: await hash("workerPassword"),
       },

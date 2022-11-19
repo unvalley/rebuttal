@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 export const loginSchema = z.object({
-  name: z.string(),
+  crowdId: z.string(),
   password: z.string().min(4).max(36),
 });
 

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { publicProcedure } from "../trpc";
 import { router } from "../trpc";
 import { prisma } from "../../lib/prismaClient";
+import { Microtask, MicrotaskKinds } from ".prisma/client";
 
 export const microtasksRouter = router({
   findById: publicProcedure
@@ -85,31 +86,50 @@ export const microtasksRouter = router({
         },
       });
     }),
-  assignSomeMicrotasks: publicProcedure
+  assignMicrotasks: publicProcedure
     .input(
       z.object({
         assigneeId: z.number(),
+        assignCount: z.number(),
       })
     )
     .mutation(async ({ input }) => {
-      const assignCount = 5;
-      const microtasks = await prisma.microtask.findMany({
-        select: {
-          id: true,
-        },
-        where: {
-          status: "CREATED",
-        },
-        take: assignCount,
-      });
-      const microtasksIds = microtasks.map((e) => e.id);
+      const ASSIGN_COUNT = input.assignCount;
+
+      const prepareMicrotasksToAssign = async () => {
+        let result: Microtask[] = [];
+        // Sequential and mutable, but its ok for now.
+        for (const kind of Object.values(MicrotaskKinds)) {
+          const _tasks = await findUnassignedMicrotasksByKind(kind);
+          result = [...result, ..._tasks];
+          if (result.length >= ASSIGN_COUNT) {
+            console.info("OK: We get enough new tasks.");
+            break;
+          }
+        }
+        return result.slice(0, ASSIGN_COUNT);
+      };
+
+      const findUnassignedMicrotasksByKind = async (kind: MicrotaskKinds) => {
+        const tasks = await prisma.microtask.findMany({
+          where: {
+            kind: kind,
+            status: "CREATED",
+          },
+          take: ASSIGN_COUNT,
+          orderBy: { created_at: "asc" },
+        });
+        return tasks;
+      };
+
+      const microtasks = await prepareMicrotasksToAssign();
 
       return await prisma.microtask.updateMany({
         data: {
           assigneeId: input.assigneeId,
           status: "ASSIGNED",
         },
-        where: { id: { in: microtasksIds } },
+        where: { id: { in: microtasks.map((m) => m.id) } },
       });
     }),
   updateToUnassign: publicProcedure

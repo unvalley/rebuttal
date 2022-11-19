@@ -14,7 +14,7 @@ const Index = () => {
     "====[help]=====",
     "/help",
     "====[auth]=====",
-    "/auth/login",
+    "/auth/signUp",
   ];
   const { data: session } = useSession();
 

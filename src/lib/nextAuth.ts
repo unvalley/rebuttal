@@ -9,7 +9,7 @@ import type { GetServerSideProps, GetServerSidePropsContext } from "next";
 export const nextAuthOptions: NextAuthOptions = {
   providers: [
     Credentials({
-      id: "credentials",
+      id: "login",
       credentials: {
         name: {
           label: "name",
@@ -20,26 +20,27 @@ export const nextAuthOptions: NextAuthOptions = {
       },
       authorize: async (credentials) => {
         try {
-          const { name, password } = await loginSchema.parseAsync(credentials);
+          const { crowdId, password } = await loginSchema.parseAsync(
+            credentials
+          );
           const user = await prisma.user.findFirst({
-            where: { name },
+            where: { crowdId },
             include: {
               role: true,
             },
           });
+
           if (!user) {
-            // throw new Error("user is none");
-            return null;
+            throw new Error("user is none");
           }
           const isValidPassword = await verify(user.password, password);
 
           if (!isValidPassword) {
-            // throw new Error("Invalid Password");
-            return null;
+            throw new Error("Invalid Password");
           }
           return {
             id: user.id,
-            name: user.name,
+            crowdId: user.crowdId,
             roleKind: user.role.kind,
           };
         } catch (err: any) {
@@ -53,27 +54,23 @@ export const nextAuthOptions: NextAuthOptions = {
       if (user) {
         return {
           ...token,
-          user: { name: user.name, id: user.id, roleKind: user.roleKind },
+          user: { name: user.crowdId, id: user.id, roleKind: user.roleKind },
         };
       }
       return token;
     },
     session: async ({ session, token }) => {
-      if (token && token.name) {
+      if (token && token.user.crowdId) {
         return {
           ...session,
           user: {
-            name: token.name,
+            crowdId: token.user.crowdId,
             id: token.user.id,
             roleKind: token.user.roleKind,
           },
         };
       }
       return session;
-    },
-    async signIn() {
-      // TODO: タスクアサイン
-      return true;
     },
   },
   jwt: {
