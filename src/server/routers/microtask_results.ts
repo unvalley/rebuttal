@@ -10,6 +10,7 @@ export const microtaskResultsRouter = router({
       z.object({
         microtaskId: z.number(),
         value: z.string(),
+        reason: z.string(),
       })
     )
     .mutation(async ({ input }) => {
@@ -26,6 +27,7 @@ export const microtaskResultsRouter = router({
         data: {
           microtaskId: input.microtaskId,
           value: input.value,
+          reason: input.reason,
           executor: "WORKER",
         },
       });

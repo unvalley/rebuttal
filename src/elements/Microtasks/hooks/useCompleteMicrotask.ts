@@ -10,11 +10,13 @@ export const useCompleteMicrotask = (microtaskId: number) => {
   const mutation = trpc.microtask_results.completeMicrotask.useMutation();
   const complete = () => {
     if (!value) {
-      return alert("必須項目が入力されていません");
+      alert("必須項目が入力されていません");
+      throw new Error("Invalid Input");
     }
     return mutation.mutate({
       microtaskId,
       value: value,
+      reason,
     });
   };
   return { complete, value, setValue, reason, setReason };

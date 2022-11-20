@@ -3,27 +3,28 @@ import Link from "next/link";
 import { Layout } from "../elements/Layout";
 
 const Index = () => {
-  const files = [
-    "/",
-    "====[workers]=====",
-    "/workers/documents/1",
-    "/workers/tasks",
-    "====[writers]=====",
-    "/writers/documents/1",
-    "/writers/tasks",
-    "====[help]=====",
-    "/help",
-    "====[auth]=====",
-    "/auth/signUp",
-  ];
+  // const files = [
+  //   "/",
+  //   "====[workers]=====",
+  //   "/workers/documents/1",
+  //   "/workers/tasks",
+  //   "====[writers]=====",
+  //   "/writers/documents/1",
+  //   "/writers/tasks",
+  //   "====[help]=====",
+  //   "/help",
+  //   "====[auth]=====",
+  //   "/auth/signUp",
+  // ];
   const { data: session } = useSession();
 
   return (
     <div className="m-4">
       <div className="mt-4">
         <h2 className="font-bold text-2xl">トップページ</h2>
-        <h3 className="font-bold text-xl">実験の説明</h3>
-        <p>これは実験用サイトです。ここに説明を書きます。</p>
+        <article className="mt-4">
+          <p>これは実験用サイトです。ここに説明を書きます。</p>
+        </article>
       </div>
       <div className="mt-4">
         {session ? (
@@ -34,9 +35,14 @@ const Index = () => {
                 {session.user.roleKind}です。
               </div>
             )}
-            <button className="btn" onClick={() => signOut()}>
-              Sign Out
-            </button>
+            <div className="mt-4">
+              <button className="btn" onClick={() => signOut()}>
+                Sign Out
+              </button>
+              <Link href="/workers/tasks">
+                <button className="btn btn-primary ml-4">タスクへ</button>
+              </Link>
+            </div>
           </div>
         ) : (
           <div>
@@ -44,7 +50,7 @@ const Index = () => {
               タスクの実施には、サインイン（ログイン）が必要です。
               下記のボタンを押すと、サインインページに移動します。
             </div>
-            <button className="btn" onClick={() => signIn()}>
+            <button className="btn mt-4" onClick={() => signIn()}>
               Sign In
             </button>
             <div className="mt-4">
@@ -53,7 +59,7 @@ const Index = () => {
           </div>
         )}
       </div>
-      {process.env.NODE_ENV === "development" && (
+      {/* {process.env.NODE_ENV === "development" && (
         <ul className="mt-14">
           {files.map((file) => {
             return (
@@ -65,7 +71,7 @@ const Index = () => {
             );
           })}
         </ul>
-      )}
+      )} */}
     </div>
   );
 };

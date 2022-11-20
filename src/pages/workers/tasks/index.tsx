@@ -7,40 +7,23 @@ import type { Session } from "next-auth";
 import type { MicrotaskWithParagraph } from "../../../types/MicrotaskResponse";
 import { ScreenLoading } from "../../../elements/Parts/Loading";
 import { MicrotaskStatus } from ".prisma/client";
-
-const useAssignMicrotask = (session: Session | null) => {
-  const utils = trpc.useContext();
-
-  const assignMicrotasksMutation = trpc.microtasks.assignMicrotasks.useMutation(
-    {
-      onSuccess() {
-        utils.microtasks.findManyByUserId.invalidate({
-          userId: session?.user?.id as number,
-        });
-      },
-    }
-  );
-
-  const assignMicrotasks = async (session: Session) => {
-    try {
-      await assignMicrotasksMutation.mutateAsync({
-        assigneeId: session.user.id,
-        assignCount: 5,
-      });
-    } catch (cause: any) {
-      console.error(cause);
-    }
-  };
-  return { assignMicrotasks };
-};
+import { useAssignMicrotasks } from "../../../elements/Microtasks/hooks/useAssignMicrotasks";
+import { useState } from "react";
 
 const Tasks = () => {
   const { data: session } = useSession();
   // TOOD: sessionのnull対応
-  const { assignMicrotasks } = useAssignMicrotask(session);
-  const microtasksQuery = trpc.microtasks.findManyByUserId.useQuery({
-    userId: session?.user?.id as number,
-  });
+  const { assignMicrotasks, errorMessage: assignErrorMessage } =
+    useAssignMicrotasks(session);
+  const microtasksQuery =
+    trpc.microtasks.findAssignedMicrotasksByUserId.useQuery(
+      {
+        userId: session?.user?.id as number,
+      },
+      {
+        refetchOnWindowFocus: false,
+      }
+    );
 
   if (session == null) {
     return <p>ログインが必要です</p>;
@@ -50,10 +33,13 @@ const Tasks = () => {
     return <ScreenLoading />;
   }
 
-  const { data: microtasks } = microtasksQuery;
-  const isMicrotaskAssigned = microtasks?.length !== 0;
+  const { data: assignedMicrotasks } = microtasksQuery;
+  const isMicrotaskAssigned = assignedMicrotasks?.length !== 0;
   const hasDoneAllAssignedMicrotasks =
-    microtasks && microtasks.every((m) => m.status === MicrotaskStatus.DONE);
+    assignedMicrotasks &&
+    assignedMicrotasks?.length >= 1 &&
+    // NOTE: [].every() return true
+    assignedMicrotasks.every((m) => m.status === MicrotaskStatus.DONE);
 
   return (
     <div className="container mx-auto p-4">
@@ -65,9 +51,9 @@ const Tasks = () => {
         <div className="col-span-4">
           <div className="w-full bg-base-100">
             {isMicrotaskAssigned &&
-            microtasks &&
+            assignedMicrotasks &&
             !hasDoneAllAssignedMicrotasks ? (
-              <MicrotaskAssigned microtasks={microtasks} />
+              <MicrotaskAssigned microtasks={assignedMicrotasks} />
             ) : (
               <>
                 {hasDoneAllAssignedMicrotasks === true && (
@@ -76,6 +62,7 @@ const Tasks = () => {
                 <MicrotaskUnassigned
                   session={session}
                   assign={assignMicrotasks}
+                  errorMessage={assignErrorMessage}
                 />
               </>
             )}
@@ -88,8 +75,8 @@ const Tasks = () => {
               <div className="font-bold">アサインされたタスク</div>
             </div>
             <div>
-              {microtasks &&
-                microtasks.map((task) => (
+              {assignedMicrotasks &&
+                assignedMicrotasks.map((task) => (
                   <div
                     key={task.id}
                     className="mt-2 card card-compact w-full bg-base-100 shadow-lg"
@@ -127,19 +114,35 @@ const MicrotaskAssigned: React.FC<{
 
 const MicrotaskUnassigned: React.FC<{
   session: Session;
+  errorMessage: string;
   assign: (session: Session) => Promise<void>;
-}> = ({ session, assign }) => {
+}> = ({ session, assign, errorMessage }) => {
+  const [loading, setLoading] = useState(false);
   const handleClick = async () => {
-    await assign(session);
+    setLoading(true);
+    await assign(session)
+      .then(() => {
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        setLoading(false);
+      });
   };
+
   return (
     <div>
       <div className="text-md">タスクがまだ割り当てられていません</div>
       <p>ボタンを押すと，タスクが割り当てられます．</p>
+      {errorMessage && <p className="text-red-600">{errorMessage}</p>}
       <div className="">
-        <button className="btn " onClick={handleClick}>
-          割り当てを行う
-        </button>
+        {loading ? (
+          <button className="btn btn-square loading"></button>
+        ) : (
+          <button className="btn mt-4" onClick={handleClick}>
+            割り当てを行う
+          </button>
+        )}
       </div>
     </div>
   );

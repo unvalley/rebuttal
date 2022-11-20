@@ -2,7 +2,8 @@ import { z } from "zod";
 import { publicProcedure } from "../trpc";
 import { router } from "../trpc";
 import { prisma } from "../../lib/prismaClient";
-import { Microtask, MicrotaskKinds } from ".prisma/client";
+import { Microtask, MicrotaskKinds, MicrotaskStatus } from ".prisma/client";
+import { TRPCError } from "@trpc/server";
 
 export const microtasksRouter = router({
   findById: publicProcedure
@@ -24,13 +25,32 @@ export const microtasksRouter = router({
       return microtaskWithSentence;
     }),
   findManyByUserId: publicProcedure
+    .input(z.object({ userId: z.number(), status: z.string() }))
+    .query(async ({ input }) => {
+      if (input.status === MicrotaskStatus.DONE) {
+        throw new Error("don't return microtasks that is status DONE.");
+      }
+      const microtask = await prisma.microtask.findMany({
+        where: {
+          assigneeId: input.userId,
+          // FIXME
+          status: input.status as MicrotaskStatus,
+        },
+        include: { paragraph: true, sentence: true },
+      });
+      return microtask;
+    }),
+  findAssignedMicrotasksByUserId: publicProcedure
     .input(z.object({ userId: z.number() }))
     .query(async ({ input }) => {
-      const microtaskWithSentence = await prisma.microtask.findMany({
-        where: { assigneeId: input.userId },
-        include: { paragraph: true },
+      const microtask = await prisma.microtask.findMany({
+        where: {
+          assigneeId: input.userId,
+          status: MicrotaskStatus.ASSIGNED,
+        },
+        include: { paragraph: true, sentence: true },
       });
-      return microtaskWithSentence;
+      return microtask;
     }),
   findManyByDocumentId: publicProcedure
     .input(z.object({ documentId: z.number() }))
@@ -122,6 +142,15 @@ export const microtasksRouter = router({
       };
 
       const microtasks = await prepareMicrotasksToAssign();
+
+      if (!microtasks.length) {
+        throw new TRPCError({
+          // correct?
+          code: "INTERNAL_SERVER_ERROR",
+          // message: `All microtasks are already done. No microtasks to assign.`,
+          message: `全てのマイクロタスクが完了されています．現在，次に取り組むべきタスクが存在しません．`,
+        });
+      }
 
       return await prisma.microtask.updateMany({
         data: {

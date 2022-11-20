@@ -9,6 +9,7 @@ export type ReviewTaskProps = {
 export const ReviewTask: React.FC<ReviewTaskProps> = (props) => {
   const { previousStep, nextStep, isLastStep } = useWizard();
   const router = useRouter();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (confirm("回答を送信しました。次のタスクに進みます。")) {
@@ -30,16 +31,22 @@ export const ReviewTask: React.FC<ReviewTaskProps> = (props) => {
       </div>
       <div className="font-semibold mt-4">{props.microtask.paragraph.body}</div>
       <div className="w-96">
-        <form onSubmit={handleSubmit}>
-          <div className="flex flex-row gap-x-4 mt-4">
-            <button className="btn bg-slate-500" onClick={() => previousStep()}>
-              戻る（dev Only）
-            </button>
-            <button type="submit" className="btn ">
-              回答して次のタスクへ
-            </button>
+        <div className="flex flex-row gap-x-4 mt-4">
+          <button
+            type="button"
+            className="btn bg-slate-500"
+            onClick={() => previousStep()}
+          >
+            戻る（dev Only）
+          </button>
+          <div>
+            <form onSubmit={handleSubmit}>
+              <button type="submit" className="btn ">
+                回答して次のタスクへ
+              </button>
+            </form>
           </div>
-        </form>
+        </div>
       </div>
     </>
   );

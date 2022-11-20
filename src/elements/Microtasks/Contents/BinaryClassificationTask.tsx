@@ -15,17 +15,21 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
   const { value, setValue, reason, setReason, complete } = useCompleteMicrotask(
     props.microtask.id
   );
-  const { previousStep, nextStep, isLastStep } = useWizard();
+  const { nextStep, isLastStep } = useWizard();
   const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    complete();
-    if (confirm("回答を送信しました。次のタスクに進みます。")) {
-      nextStep();
-      if (isLastStep) {
-        router.push("/workers/tasks/done");
+    try {
+      complete();
+      if (confirm("回答を送信しました。次のタスクに進みます。")) {
+        nextStep();
+        if (isLastStep) {
+          router.push("/workers/tasks/done");
+        }
       }
+    } catch {
+      alert("必須項目が入力されていません");
     }
   };
 
@@ -37,8 +41,9 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
         <span className="text-green-700">: 3-5分</span>
       </div>
       <div className="font-semibold mt-4">{props.microtask.paragraph.body}</div>
-      <div className="w-96">
+      <div className="mt-8 w-5/6 mr-auto">
         <form onSubmit={handleSubmit}>
+          <p>下記のいずれかを選択してください．</p>
           {props.microtask.kind ===
           MicrotaskKinds.DISTINGUISH_OPINION_AND_FACT ? (
             <>
@@ -71,7 +76,7 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
             <>
               <div className="form-control">
                 <label className="label cursor-pointer">
-                  <span className="label-text text-lg">ある</span>
+                  <span className="label-text text-lg">書かれている</span>
                   <input
                     type="radio"
                     value="TRUE"
@@ -83,7 +88,7 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
               </div>
               <div className="form-control">
                 <label className="label cursor-pointer">
-                  <span className="label-text text-lg">ない</span>
+                  <span className="label-text text-lg">書かれていない</span>
                   <input
                     type="radio"
                     value="FALSE"
@@ -97,10 +102,10 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
           )}
           {/* 理由 */}
           {props.withReason && (
-            <div className="form-control">
-              <label className="label cursor-pointer">
-                <span className="label-text text-lg">理由</span>
-              </label>
+            <div className="form-control mt-4">
+              <span className="label-text text-lg">
+                上記の回答理由を述べてください．
+              </span>
               <textarea
                 className="textarea textarea-accent"
                 name="textarea"
@@ -109,11 +114,8 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
               />
             </div>
           )}
-          <div className="flex flex-row gap-x-4 mt-4">
-            <button className="btn bg-slate-500" onClick={() => previousStep()}>
-              戻る（dev Only）
-            </button>
-            <button type="submit" className="btn ">
+          <div className="mt-4">
+            <button type="submit" className="btn">
               回答して次のタスクへ
             </button>
           </div>
