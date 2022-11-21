@@ -42,35 +42,38 @@ const SignUp = () => {
 
   return (
     <div className="container mx-auto">
-      <h2 className="font-bold text-2xl">SignUp</h2>
-      <div className="text-xl">ユーザー登録</div>
+      <div className="">
+        <h2 className="font-bold text-2xl">ユーザー登録</h2>
+      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="form-control container mx-auto gap-y-4">
-          <input
-            type="text"
-            placeholder="CrowdId"
-            className="input input-bordered w-full max-w-xs"
-            {...register("crowdId", { required: true, maxLength: 80 })}
-          />
-          <input
-            type="password"
-            placeholder="password"
-            className="input input-bordered w-full max-w-xs"
-            {...register("password", { required: true, maxLength: 80 })}
-          />
-          <select
-            className="select select-bordered w-full max-w-xs"
-            {...register("roleKind", { required: true })}
-          >
-            <option value={RoleKind.WORKER}>ワーカー</option>
-            <option value={RoleKind.WRITER}>ライター</option>
-          </select>
-          <button type="submit" className="btn max-w-xs">
-            登録
-          </button>
-        </div>
-      </form>
+      <div className="mt-4">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="form-control mx-auto gap-y-4">
+            <input
+              type="text"
+              placeholder="CrowdId"
+              className="input input-bordered w-full max-w-md"
+              {...register("crowdId", { required: true, maxLength: 80 })}
+            />
+            <input
+              type="password"
+              placeholder="password"
+              className="input input-bordered w-full max-w-md"
+              {...register("password", { required: true, maxLength: 80 })}
+            />
+            <select
+              className="select select-bordered w-full max-w-md"
+              {...register("roleKind", { required: true })}
+            >
+              <option value={RoleKind.WORKER}>ワーカー</option>
+              <option value={RoleKind.WRITER}>ライター</option>
+            </select>
+            <button type="submit" className="btn max-w-md">
+              登録
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

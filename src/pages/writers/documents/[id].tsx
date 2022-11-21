@@ -3,6 +3,7 @@ import { Layout } from "../../../elements/Layout";
 import { trpc } from "../../../lib/trpc";
 import NextError from "next/error";
 import { useRouter } from "next/router";
+import { paragraphsToSentences } from "../../../utils";
 
 const Documents = () => {
   const router = useRouter();
@@ -36,7 +37,7 @@ const Documents = () => {
         <div className="col-span-4">
           <Document
             title={document.title}
-            sentences={document.sentences}
+            sentences={paragraphsToSentences(document.paragrahs)}
             body={document.body}
             canEdit={false}
           />

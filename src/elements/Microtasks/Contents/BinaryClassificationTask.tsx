@@ -34,14 +34,14 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
   };
 
   return (
-    <>
+    <div className="w-5/6">
       <span className="text-2xl font-semibold">{props.taskTitle}</span>
       <div className="text-lg">
         <span className="bg-green-100 text-green-800">簡単</span>
         <span className="text-green-700">: 3-5分</span>
       </div>
       <div className="font-semibold mt-4">{props.microtask.paragraph.body}</div>
-      <div className="mt-8 w-5/6 mr-auto">
+      <div className="mt-8 mr-auto">
         <form onSubmit={handleSubmit}>
           <p>下記のいずれかを選択してください．</p>
           {props.microtask.kind ===
@@ -121,6 +121,6 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
           </div>
         </form>
       </div>
-    </>
+    </div>
   );
 };

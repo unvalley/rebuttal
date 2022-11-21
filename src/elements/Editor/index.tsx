@@ -22,6 +22,7 @@ const styleHighlightBySentenceKind = (sentences: Sentence[]) =>
     .join("");
 
 export const Editor: React.FC<EditorProps> = ({ sentences }) => {
+  console.log(sentences);
   const editor = useEditor({
     extensions: [StarterKit, Highlight.configure({ multicolor: true })],
     content: styleHighlightBySentenceKind(sentences),

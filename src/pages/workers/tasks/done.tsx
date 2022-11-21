@@ -1,10 +1,8 @@
 import { useEffect } from "react";
 import { Layout } from "../../../elements/Layout";
 
-const COMPELTED_CODE = "JRI4HSJI$#";
-
 const TasksDone = () => {
-  // アサインされているタスクが完了しているか確認
+  // TODO: アサインされているタスクが完了しているか確認
   // 完了していなければアクセスを禁止
   // 完了していれば，タスクアサインを全て外す
   useEffect(() => {}, []);

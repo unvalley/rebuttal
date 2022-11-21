@@ -25,7 +25,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
           </ul>
         </div>
       </header>
-      <main className="flex-grow">{children}</main>
+      <main className="flex-grow p-4">{children}</main>
       <footer className="footer footer-center h-10 p-4 bg-neutral text-neutral-content">
         <div>
           <p>Copyright © 2022 - All right reserved by unvalley</p>

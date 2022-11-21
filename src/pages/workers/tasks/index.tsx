@@ -42,14 +42,16 @@ const Tasks = () => {
     assignedMicrotasks.every((m) => m.status === MicrotaskStatus.DONE);
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold">ワーカー向けタスク実施ページ</h2>
-      <span>ここでは、文書改善タスクを行っていただきます。</span>
+    <div className="container mx-auto">
+      <div>
+        <h2 className="text-2xl font-bold">ワーカー向けタスク実施ページ</h2>
+        <span>ここでは、文書改善タスクを行っていただきます。</span>
+      </div>
 
-      <div className="grid grid-cols-6 pt-4">
+      <div className="grid grid-cols-6 mt-4">
         {/* Left Column */}
         <div className="col-span-4">
-          <div className="w-full bg-base-100">
+          <div className="bg-base-100">
             {isMicrotaskAssigned &&
             assignedMicrotasks &&
             !hasDoneAllAssignedMicrotasks ? (

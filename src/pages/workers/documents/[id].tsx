@@ -6,6 +6,7 @@ import NextError from "next/error";
 import { useRouter } from "next/router";
 import { MicrotaskStatus } from ".prisma/client";
 import { ScreenLoading } from "../../../elements/Parts/Loading";
+import { paragraphsToSentences } from "../../../utils";
 
 const Documents = () => {
   const router = useRouter();
@@ -46,7 +47,6 @@ const Documents = () => {
   }
 
   const { data: document } = documentQuery;
-  const sentences = document.paragrahs.flatMap((p) => p.sentences);
   const { data: microtasks } = microtasksQuery;
 
   const microtaskCount = microtasks.length;
@@ -82,7 +82,7 @@ const Documents = () => {
           <Document
             title={document.title}
             body={document.body}
-            sentences={sentences}
+            sentences={paragraphsToSentences(document.paragrahs)}
             canEdit={false}
           />
         </div>
@@ -110,7 +110,7 @@ const Documents = () => {
                     <div className="">
                       <span>
                         アサインユーザー：
-                        {task.assignee ? task.assignee.name : "未アサイン"}
+                        {task.assignee ? task.assignee.crowdId : "未アサイン"}
                       </span>
                     </div>
                   </div>

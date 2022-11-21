@@ -11,18 +11,18 @@ export const microtasksRouter = router({
     .query(async ({ input }) => {
       const microtask = await prisma.microtask.findUnique({
         where: { id: input.id },
+        include: { paragraph: true, sentence: true },
       });
       return microtask;
     }),
-  // 現状ひとつしかアサインしない想定
   findByUserId: publicProcedure
     .input(z.object({ userId: z.number() }))
     .query(async ({ input }) => {
-      const microtaskWithSentence = await prisma.microtask.findFirst({
+      const microtasks = await prisma.microtask.findFirst({
         where: { assigneeId: input.userId },
-        include: { paragraph: true },
+        include: { paragraph: true, sentence: true },
       });
-      return microtaskWithSentence;
+      return microtasks;
     }),
   findManyByUserId: publicProcedure
     .input(z.object({ userId: z.number(), status: z.string() }))
@@ -115,6 +115,20 @@ export const microtasksRouter = router({
     .mutation(async ({ input }) => {
       const ASSIGN_COUNT = input.assignCount;
 
+      const findUnassignedMicrotasksByKind = async (kind: MicrotaskKinds) => {
+        const tasks = await prisma.microtask.findMany({
+          where: {
+            kind: kind,
+            status: "CREATED",
+          },
+          take: ASSIGN_COUNT,
+          orderBy: { created_at: "asc" },
+        });
+        return tasks;
+      };
+
+      // アサイン対象のマイクロタスクを取得する
+      // MicrotaskKindsのvalueの順序で，status=CREATEDであるマイクロタスクを取得して，ASSIGN_COUNT以上になるまで取得する
       const prepareMicrotasksToAssign = async () => {
         let result: Microtask[] = [];
         // Sequential and mutable, but its ok for now.
@@ -129,18 +143,6 @@ export const microtasksRouter = router({
         return result.slice(0, ASSIGN_COUNT);
       };
 
-      const findUnassignedMicrotasksByKind = async (kind: MicrotaskKinds) => {
-        const tasks = await prisma.microtask.findMany({
-          where: {
-            kind: kind,
-            status: "CREATED",
-          },
-          take: ASSIGN_COUNT,
-          orderBy: { created_at: "asc" },
-        });
-        return tasks;
-      };
-
       const microtasks = await prepareMicrotasksToAssign();
 
       if (!microtasks.length) {
@@ -152,6 +154,7 @@ export const microtasksRouter = router({
         });
       }
 
+      // 取得したマイクロタスクをアサインする
       return await prisma.microtask.updateMany({
         data: {
           assigneeId: input.assigneeId,
