@@ -1,4 +1,6 @@
-# Design Doc
+## Motivation
+TBD
 
-1. Split document to sentences
-2. Create microtasks to each sentences
+## Development Guide
+- fill in the `.env` `DATABASE_URL` to access the data store hosted in PlanetScale.
+
