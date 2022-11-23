@@ -16,27 +16,6 @@ export const microtasksRouter = router({
       });
       return microtask;
     }),
-  findByUserId: publicProcedure
-    .input(z.object({ userId: z.number() }))
-    .query(async ({ input }) => {
-      const microtasks = await prisma.microtask.findFirst({
-        where: { assigneeId: input.userId },
-        include: { paragraph: true, sentence: true },
-      });
-      return microtasks;
-    }),
-  // findAssignedMicrotasksByUserId: publicProcedure
-  //   .input(z.object({ userId: z.number() }))
-  //   .query(async ({ input }) => {
-  //     const microtask = await prisma.microtask.findMany({
-  //       where: {
-  //         assigneeId: input.userId,
-  //         status: MicrotaskStatus.ASSIGNED,
-  //       },
-  //       include: { paragraph: true, sentence: true },
-  //     });
-  //     return microtask;
-  //   }),
   findManyByDocumentId: publicProcedure
     .input(z.object({ documentId: z.number() }))
     .query(async ({ input }) => {
@@ -47,13 +26,6 @@ export const microtasksRouter = router({
           body: true,
           kind: true,
           paragraphId: true,
-          assignee: {
-            select: {
-              id: true,
-              crowdId: true,
-            },
-          },
-          assigneeId: true,
           paragraph: {
             select: {
               id: true,
@@ -74,6 +46,7 @@ export const microtasksRouter = router({
   findMicrotasksToAssign: publicProcedure
     .input(
       z.object({
+        userId: z.number(),
         assignCount: z.number(),
       })
     )
@@ -86,17 +59,32 @@ export const microtasksRouter = router({
           where: {
             kind: kind,
           },
-          include: { microtaskResults: true, paragraph: true, sentence: true },
+          include: {
+            microtaskResults: true,
+            paragraph: true,
+            sentence: true,
+          },
           take: ASSIGN_COUNT,
           orderBy: { created_at: "asc" },
         });
+
+        const userAlreadyCompletedTaskIds = tasks.flatMap((t) => {
+          return t.microtaskResults.map((tr) => {
+            return tr.microtaskId;
+          });
+        });
+
+        // filter microtasks that
+        // - an user has never worked on before
+        // - task results does not reach ASSIGN_COUNT
         const tasksNotCompletedEnough = tasks.flatMap((t) => {
-          if (ASSIGN_COUNT > t.microtaskResults.length) {
-            // We dont need the results
-            const { microtaskResults, ...microtask } = t;
-            return microtask;
-          }
-          return [];
+          const isCompletedEnoughCount =
+            t.microtaskResults.length >= ASSIGN_COUNT;
+          const userHasAlreadyExperienced =
+            userAlreadyCompletedTaskIds.includes(t.id);
+          if (userHasAlreadyExperienced || isCompletedEnoughCount) return [];
+          const { microtaskResults, ...microtask } = t;
+          return microtask;
         });
         return tasksNotCompletedEnough;
       };
@@ -106,6 +94,7 @@ export const microtasksRouter = router({
       const prepareMicrotasksToAssign = async () => {
         let result: ExtendedMicrotask[] = [];
         // Sequential and mutable, but its ok for now.
+        // We don't care performance for now...
         for (const kind of Object.values(MicrotaskKinds)) {
           const _tasks = await findNotCompletedEnoughMicrotasks(kind);
           result = [...result, ..._tasks];

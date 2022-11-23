@@ -18,7 +18,7 @@ model User {
 
   created_at DateTime    @default(now())
   updated_at DateTime    @default(now()) @updatedAt
-  microtask  Microtask[]
+  microtaskResults  MicrotaskResult[]
   document   Document[]
 
   @@map("users")
@@ -125,8 +125,6 @@ model Microtask {
   sentence         Sentence          @relation(fields: [sentenceId], references: [id])
   sentenceId       Int
   microtaskResults MicrotaskResult[]
-  assignee         User?             @relation(fields: [assigneeId], references: [id])
-  assigneeId       Int?
 
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
@@ -147,8 +145,9 @@ model MicrotaskResult {
   executor    Executor  @default(WORKER)
   microtask   Microtask @relation(fields: [microtaskId], references: [id])
   microtaskId Int       @unique
+  assignee      User             @relation(fields: [assigneeId], references: [id])
+  assigneeId    Int
   created_at  DateTime  @default(now())
   updated_at  DateTime  @default(now()) @updatedAt
-
   @@map("microtask_results")
 }

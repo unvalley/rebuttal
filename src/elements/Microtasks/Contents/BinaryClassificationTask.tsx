@@ -1,18 +1,21 @@
 import { MicrotaskKinds } from ".prisma/client";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useWizard } from "react-use-wizard";
-import type { MicrotaskWithParagraph } from "../../../types/MicrotaskResponse";
+import type { ExtendedMicrotask } from "../../../types/MicrotaskResponse";
 import { useCompleteMicrotask } from "../hooks/useCompleteMicrotask";
 
 type Props = {
-  microtask: MicrotaskWithParagraph;
+  microtask: ExtendedMicrotask;
   taskTitle?: string;
   withReason?: boolean;
   actions?: React.ReactNode;
 };
 
 export const BinaryClassficationTask: React.FC<Props> = (props) => {
+  const { data: session } = useSession();
   const { value, setValue, reason, setReason, complete } = useCompleteMicrotask(
+    session?.user.id as number,
     props.microtask.id
   );
   const { nextStep, isLastStep } = useWizard();
@@ -40,7 +43,15 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
         <span className="bg-green-100 text-green-800">簡単</span>
         <span className="text-green-700">: 3-5分</span>
       </div>
-      <div className="font-semibold mt-4">{props.microtask.paragraph.body}</div>
+      {props.microtask.kind === MicrotaskKinds.DISTINGUISH_OPINION_AND_FACT ? (
+        <div className="font-semibold mt-4">
+          {props.microtask.sentence.body}
+        </div>
+      ) : (
+        <div className="font-semibold mt-4">
+          {props.microtask.paragraph.body}
+        </div>
+      )}
       <div className="mt-8 mr-auto">
         <form onSubmit={handleSubmit}>
           <p>下記のいずれかを選択してください．</p>

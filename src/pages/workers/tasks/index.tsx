@@ -6,17 +6,14 @@ import { Wizard } from "react-use-wizard";
 import type { Session } from "next-auth";
 import type { ExtendedMicrotask } from "../../../types/MicrotaskResponse";
 import { ScreenLoading } from "../../../elements/Parts/Loading";
-// import { MicrotaskStatus } from ".prisma/client";
-// import { useAssignMicrotasks } from "../../../elements/Microtasks/hooks/useAssignMicrotasks";
 import { useState } from "react";
 
 const Tasks = () => {
   const { data: session } = useSession();
   // TOOD: sessionのnull対応
-  // const { assignMicrotasks, errorMessage: assignErrorMessage } =
-  //   useAssignMicrotasks(session);
   const microtasksQuery = trpc.microtasks.findMicrotasksToAssign.useQuery(
     {
+      userId: session?.user.id as number,
       assignCount: 5,
     },
     {
@@ -52,7 +49,10 @@ const Tasks = () => {
         <div className="col-span-4">
           <div className="bg-base-100">
             {assignedMicrotasks && (
-              <MicrotaskAssigned microtasks={assignedMicrotasks} />
+              <MicrotaskAssigned
+                session={session}
+                microtasks={assignedMicrotasks}
+              />
             )}
             {/**
 
@@ -91,6 +91,7 @@ const Tasks = () => {
                         {task.title} (ID={task.id})
                       </div>
                       <div>対象パラグラフ(ID={task.paragraphId}): </div>
+                      <div>対象センテンス(ID={task.sentenceId}): </div>
                     </div>
                   </div>
                 ))}
@@ -103,6 +104,7 @@ const Tasks = () => {
 };
 
 const MicrotaskAssigned: React.FC<{
+  session: Session;
   microtasks: ExtendedMicrotask[];
 }> = (props) => {
   return (
