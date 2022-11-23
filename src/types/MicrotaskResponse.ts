@@ -1,3 +1,8 @@
-import type { Microtask, Paragraph } from "@prisma/client";
+import type { Microtask, Paragraph, Sentence } from "@prisma/client";
 
 export type MicrotaskWithParagraph = Microtask & { paragraph: Paragraph };
+
+export type ExtendedMicrotask = Microtask & {
+  paragraph: Paragraph;
+  sentence: Sentence;
+};

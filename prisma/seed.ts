@@ -1,4 +1,4 @@
-import { MicrotaskKinds, MicrotaskStatus, PrismaClient } from "@prisma/client";
+import { MicrotaskKinds, PrismaClient } from "@prisma/client";
 import type { MicroTaskKinds } from "../constants/microtasks";
 import { hash } from "argon2";
 import { parse } from "@textlint/text-to-ast";
@@ -115,7 +115,6 @@ async function main() {
               body: "",
               sentenceId: sentence.id,
               paragraphId: paragraph.id,
-              status: MicrotaskStatus.CREATED,
               kind: microtask.kind,
             } as const;
           });
@@ -127,7 +126,6 @@ async function main() {
               body: "",
               sentenceId: paragraph.sentences[0]?.id as number,
               paragraphId: paragraph.id,
-              status: MicrotaskStatus.CREATED,
               kind: microtask.kind as MicrotaskKinds,
             } as const,
           ];

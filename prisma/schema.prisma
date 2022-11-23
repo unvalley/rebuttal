@@ -106,11 +106,6 @@ model Comment {
   @@map("comments")
 }
 
-enum MicrotaskStatus {
-  CREATED
-  ASSIGNED
-  DONE
-}
 
 enum MicrotaskKinds {
   DISTINGUISH_OPINION_AND_FACT
@@ -124,7 +119,6 @@ model Microtask {
   id               Int               @id @default(autoincrement())
   title            String
   body             String
-  status           MicrotaskStatus   @default(CREATED)
   kind             MicrotaskKinds
   paragraph        Paragraph         @relation(fields: [paragraphId], references: [id])
   paragraphId      Int

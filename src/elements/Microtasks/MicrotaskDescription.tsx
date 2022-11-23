@@ -1,11 +1,11 @@
 import { match } from "ts-pattern";
 import { ReviewTask } from "./Contents/ReviewTask";
-import type { MicrotaskWithParagraph } from "../../types/MicrotaskResponse";
+import type { ExtendedMicrotask } from "../../types/MicrotaskResponse";
 import { BinaryClassficationTask } from "./Contents/BinaryClassificationTask";
 import { MicrotaskKinds } from ".prisma/client";
 
 export const MicrotaskDescription: React.FC<{
-  microtask: MicrotaskWithParagraph;
+  microtask: ExtendedMicrotask;
 }> = ({ microtask }) => {
   return (
     <div>
