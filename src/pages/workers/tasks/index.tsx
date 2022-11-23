@@ -4,26 +4,23 @@ import { useSession } from "next-auth/react";
 import { MicrotaskDescription } from "../../../elements/Microtasks/MicrotaskDescription";
 import { Wizard } from "react-use-wizard";
 import type { Session } from "next-auth";
-import type { MicrotaskWithParagraph } from "../../../types/MicrotaskResponse";
+import type { ExtendedMicrotask } from "../../../types/MicrotaskResponse";
 import { ScreenLoading } from "../../../elements/Parts/Loading";
-import { MicrotaskStatus } from ".prisma/client";
-import { useAssignMicrotasks } from "../../../elements/Microtasks/hooks/useAssignMicrotasks";
 import { useState } from "react";
 
 const Tasks = () => {
   const { data: session } = useSession();
   // TOOD: sessionのnull対応
-  const { assignMicrotasks, errorMessage: assignErrorMessage } =
-    useAssignMicrotasks(session);
-  const microtasksQuery =
-    trpc.microtasks.findAssignedMicrotasksByUserId.useQuery(
-      {
-        userId: session?.user?.id as number,
-      },
-      {
-        refetchOnWindowFocus: false,
-      }
-    );
+  const microtasksQuery = trpc.microtasks.findMicrotasksToAssign.useQuery(
+    {
+      userId: session?.user.id as number,
+      assignCount: 5,
+    },
+    {
+      refetchOnWindowFocus: false,
+      retry: false,
+    }
+  );
 
   if (session == null) {
     return <p>ログインが必要です</p>;
@@ -34,12 +31,11 @@ const Tasks = () => {
   }
 
   const { data: assignedMicrotasks } = microtasksQuery;
-  const isMicrotaskAssigned = assignedMicrotasks?.length !== 0;
-  const hasDoneAllAssignedMicrotasks =
-    assignedMicrotasks &&
-    assignedMicrotasks?.length >= 1 &&
-    // NOTE: [].every() return true
-    assignedMicrotasks.every((m) => m.status === MicrotaskStatus.DONE);
+  // const isMicrotaskAssigned = assignedMicrotasks?.length !== 0;
+  // const hasDoneAllAssignedMicrotasks =
+  //   assignedMicrotasks && assignedMicrotasks?.length >= 1;
+  // NOTE: [].every() return true
+  // assignedMicrotasks.every((m) => m.status === MicrotaskStatus.DONE);
 
   return (
     <div className="container mx-auto">
@@ -52,22 +48,29 @@ const Tasks = () => {
         {/* Left Column */}
         <div className="col-span-4">
           <div className="bg-base-100">
-            {isMicrotaskAssigned &&
-            assignedMicrotasks &&
-            !hasDoneAllAssignedMicrotasks ? (
-              <MicrotaskAssigned microtasks={assignedMicrotasks} />
-            ) : (
-              <>
-                {hasDoneAllAssignedMicrotasks === true && (
-                  <p>再度タスクを行っていただきありがとうございます．</p>
-                )}
-                <MicrotaskUnassigned
-                  session={session}
-                  assign={assignMicrotasks}
-                  errorMessage={assignErrorMessage}
-                />
-              </>
+            {assignedMicrotasks && (
+              <MicrotaskAssigned
+                session={session}
+                microtasks={assignedMicrotasks}
+              />
             )}
+            {/**
+
+            // !hasDoneAllAssignedMicrotasks ? (
+              <MicrotaskAssigned microtasks={assignedMicrotasks} />
+            // ) : (
+            //   <>
+            //     {hasDoneAllAssignedMicrotasks === true && (
+            //       <p>再度タスクを行っていただきありがとうございます．</p>
+            //     )}
+            //     <MicrotaskUnassigned
+            //       session={session}
+            //       assign={assignMicrotasks}
+            //       errorMessage={assignErrorMessage}
+            //     />
+            //   </>
+            // )}
+             */}
           </div>
         </div>
         {/* Right Column */}
@@ -87,8 +90,8 @@ const Tasks = () => {
                       <div className="card-title font-semibold text-sm">
                         {task.title} (ID={task.id})
                       </div>
-                      <div>タスクステータス: {task.status}</div>
                       <div>対象パラグラフ(ID={task.paragraphId}): </div>
+                      <div>対象センテンス(ID={task.sentenceId}): </div>
                     </div>
                   </div>
                 ))}
@@ -101,7 +104,8 @@ const Tasks = () => {
 };
 
 const MicrotaskAssigned: React.FC<{
-  microtasks: MicrotaskWithParagraph[];
+  session: Session;
+  microtasks: ExtendedMicrotask[];
 }> = (props) => {
   return (
     <div>
@@ -114,41 +118,41 @@ const MicrotaskAssigned: React.FC<{
   );
 };
 
-const MicrotaskUnassigned: React.FC<{
-  session: Session;
-  errorMessage: string;
-  assign: (session: Session) => Promise<void>;
-}> = ({ session, assign, errorMessage }) => {
-  const [loading, setLoading] = useState(false);
-  const handleClick = async () => {
-    setLoading(true);
-    await assign(session)
-      .then(() => {
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setLoading(false);
-      });
-  };
+// const MicrotaskUnassigned: React.FC<{
+//   session: Session;
+//   errorMessage: string;
+//   assign: (session: Session) => Promise<void>;
+// }> = ({ session, assign, errorMessage }) => {
+//   const [loading, setLoading] = useState(false);
+//   const handleClick = async () => {
+//     setLoading(true);
+//     await assign(session)
+//       .then(() => {
+//         setLoading(false);
+//       })
+//       .catch((error) => {
+//         console.error(error);
+//         setLoading(false);
+//       });
+//   };
 
-  return (
-    <div>
-      <div className="text-md">タスクがまだ割り当てられていません</div>
-      <p>ボタンを押すと，タスクが割り当てられます．</p>
-      {errorMessage && <p className="text-red-600">{errorMessage}</p>}
-      <div className="">
-        {loading ? (
-          <button className="btn btn-square loading"></button>
-        ) : (
-          <button className="btn mt-4" onClick={handleClick}>
-            割り当てを行う
-          </button>
-        )}
-      </div>
-    </div>
-  );
-};
+//   return (
+//     <div>
+//       <div className="text-md">タスクがまだ割り当てられていません</div>
+//       <p>ボタンを押すと，タスクが割り当てられます．</p>
+//       {errorMessage && <p className="text-red-600">{errorMessage}</p>}
+//       <div className="">
+//         {loading ? (
+//           <button className="btn btn-square loading"></button>
+//         ) : (
+//           <button className="btn mt-4" onClick={handleClick}>
+//             割り当てを行う
+//           </button>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
 
 Tasks.getLayout = function getLayout(page: React.ReactElement) {
   return <Layout>{page}</Layout>;
