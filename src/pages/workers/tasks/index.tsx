@@ -118,41 +118,41 @@ const MicrotaskAssigned: React.FC<{
   );
 };
 
-const MicrotaskUnassigned: React.FC<{
-  session: Session;
-  errorMessage: string;
-  assign: (session: Session) => Promise<void>;
-}> = ({ session, assign, errorMessage }) => {
-  const [loading, setLoading] = useState(false);
-  const handleClick = async () => {
-    setLoading(true);
-    await assign(session)
-      .then(() => {
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setLoading(false);
-      });
-  };
+// const MicrotaskUnassigned: React.FC<{
+//   session: Session;
+//   errorMessage: string;
+//   assign: (session: Session) => Promise<void>;
+// }> = ({ session, assign, errorMessage }) => {
+//   const [loading, setLoading] = useState(false);
+//   const handleClick = async () => {
+//     setLoading(true);
+//     await assign(session)
+//       .then(() => {
+//         setLoading(false);
+//       })
+//       .catch((error) => {
+//         console.error(error);
+//         setLoading(false);
+//       });
+//   };
 
-  return (
-    <div>
-      <div className="text-md">タスクがまだ割り当てられていません</div>
-      <p>ボタンを押すと，タスクが割り当てられます．</p>
-      {errorMessage && <p className="text-red-600">{errorMessage}</p>}
-      <div className="">
-        {loading ? (
-          <button className="btn btn-square loading"></button>
-        ) : (
-          <button className="btn mt-4" onClick={handleClick}>
-            割り当てを行う
-          </button>
-        )}
-      </div>
-    </div>
-  );
-};
+//   return (
+//     <div>
+//       <div className="text-md">タスクがまだ割り当てられていません</div>
+//       <p>ボタンを押すと，タスクが割り当てられます．</p>
+//       {errorMessage && <p className="text-red-600">{errorMessage}</p>}
+//       <div className="">
+//         {loading ? (
+//           <button className="btn btn-square loading"></button>
+//         ) : (
+//           <button className="btn mt-4" onClick={handleClick}>
+//             割り当てを行う
+//           </button>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
 
 Tasks.getLayout = function getLayout(page: React.ReactElement) {
   return <Layout>{page}</Layout>;
