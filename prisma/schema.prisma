@@ -16,8 +16,8 @@ model User {
   roleId   Int
   password String
 
-  created_at          DateTime              @default(now())
-  updated_at          DateTime              @default(now()) @updatedAt
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @default(now()) @updatedAt
   document            Document[]
   microtaskAllocation MicrotaskAllocation[]
 
@@ -47,8 +47,8 @@ model Document {
   authorId  Int
   paragrahs Paragraph[]
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@map("documents")
 }
@@ -80,8 +80,8 @@ model Paragraph {
   microtasks Microtask[]
   sentences  Sentence[]
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@map("paragrahs")
 }
@@ -102,8 +102,8 @@ model Microtask {
   paragraph   Paragraph      @relation(fields: [paragraphId], references: [id])
   paragraphId Int
 
-  created_at          DateTime              @default(now())
-  updated_at          DateTime              @default(now()) @updatedAt
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @default(now()) @updatedAt
   microtaskAllocation MicrotaskAllocation[]
 
   @@map("microtasks")
@@ -111,19 +111,20 @@ model Microtask {
 
 model MicrotaskResult {
   id     Int     @id @default(autoincrement())
-  // MTask1: OPINION or FACT
-  // MTask2/3: TRUE or FALSE (as string)
+  // MTask1: OPINION or FACT, MTask2/3: TRUE or FALSE (as string)
   value  String
+  // MTask1 : NULL, MTask2/3: the reason
   reason String?
 
-  created_at          DateTime              @default(now())
-  updated_at          DateTime              @default(now()) @updatedAt
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @default(now()) @updatedAt
   microtaskAllocation MicrotaskAllocation[]
   sentence            Sentence              @relation(fields: [sentenceId], references: [id])
   sentenceId          Int
 
   @@map("microtask_results")
 }
+
 
 model MicrotaskAllocation {
   id                Int             @id @default(autoincrement())
@@ -133,8 +134,10 @@ model MicrotaskAllocation {
   microtaskId       Int
   microtaskResult   MicrotaskResult @relation(fields: [microtaskResultId], references: [id])
   microtaskResultId Int
-  created_at        DateTime        @default(now())
-  updated_at        DateTime        @default(now()) @updatedAt
+  startedAt         DateTime        @default(now())
+  completedAt       DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @default(now()) @updatedAt
 
   @@map("microtask_alocations")
 }
