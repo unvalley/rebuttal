@@ -78,7 +78,7 @@ export const nextAuthOptions: NextAuthOptions = {
   },
   // TODO: use NEXTAUTH_SECRET env
   // https://next-auth.js.org/configuration/options#secret
-  secret: "super-secret",
+  secret: process.env["NEXTAUTH_SECRET"] as string,
   theme: {
     colorScheme: "light",
     brandColor: "purple", // Hex color code,
