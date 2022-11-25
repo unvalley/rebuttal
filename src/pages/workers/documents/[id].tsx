@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { trpc } from "../../../lib/trpc";
 import { Layout } from "../../../elements/Layout";
 import { Document } from "../../../elements/Documents/Document";
@@ -19,6 +19,14 @@ const Documents = () => {
     }
     // { refetchInterval: 1000 }
   );
+  const [selectedData, setSelectedData] = useState<
+    | {
+        sentenceId: number;
+        paragraphId: number;
+        microtaskId: number;
+      }
+    | undefined
+  >(undefined);
 
   if (documentQuery.error) {
     return (
@@ -80,31 +88,53 @@ const Documents = () => {
             title={document.title}
             body={document.body}
             sentences={paragraphsToSentences(document.paragrahs)}
+            selectedData={selectedData}
             canEdit={false}
           />
         </div>
 
         <div className="col-span-2">
           <div className="bg-base-200 p-2">
-            <div className="font-bold">タスク ({resultCount}件が完了済み)</div>
+            <div className="font-bold">
+              フィードバック ({resultCount}件が完了済み)
+            </div>
           </div>
           <div>
             <div>
               {microtasks.map((task) => (
                 <div
                   key={task.id}
-                  className="mt-2 card card-compact w-full bg-base-100 shadow-lg"
+                  className={`my-4 card card-compact w-full bg-base-100 shadow-md 
+                      ${
+                        JSON.stringify(selectedData) ===
+                        JSON.stringify({
+                          sentenceId: task.sentenceId,
+                          paragraphId: task.paragraphId,
+                          microtaskId: task.id,
+                        })
+                          ? "shadow-emerald-400"
+                          : ""
+                      }
+                  `}
+                  onMouseEnter={() =>
+                    setSelectedData({
+                      sentenceId: task.sentenceId,
+                      paragraphId: task.paragraphId,
+                      microtaskId: task.id,
+                    })
+                  }
+                  onMouseLeave={() => setSelectedData(undefined)}
                 >
-                  <div className="card-body">
+                  <div className={`card-body`}>
                     <div className="card-title font-semibold text-sm">
                       {task.title}
                     </div>
-                    {/* <div>ステータス：{task.status}</div> */}
                     <div>対象パラグラフ：{task.paragraph.body}</div>
+                    <div>対象センテンス：{task.sentence.body}</div>
                     <div className="">
                       <span>
-                        アサインユーザー：
-                        {/* {task.assignee ? task.assignee.crowdId : "未アサイン"} */}
+                        アサインユーザーID：
+                        {task.microtaskResults.map((e) => e.assigneeId)}
                       </span>
                     </div>
                   </div>
