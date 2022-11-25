@@ -36,6 +36,19 @@ const Documents = () => {
       />
     );
   }
+  const microtaskResultsQuery =
+    trpc.microtask_results.findByDocumentId.useQuery({
+      documentId: documentId,
+    });
+
+  if (microtaskResultsQuery.error) {
+    return (
+      <NextError
+        title={microtaskResultsQuery.error.message}
+        statusCode={microtaskResultsQuery.error.data?.httpStatus ?? 500}
+      />
+    );
+  }
 
   const microtasksQuery = trpc.microtasks.findManyByDocumentId.useQuery({
     documentId,
@@ -49,9 +62,16 @@ const Documents = () => {
     );
   }
 
-  if (documentQuery.isLoading || microtasksQuery.isLoading) {
+  if (
+    documentQuery.isLoading ||
+    microtasksQuery.isLoading ||
+    microtaskResultsQuery.isLoading
+  ) {
     return <ScreenLoading />;
   }
+
+  // only microtask(2)/(3)
+  const { data: microtaskResults } = microtaskResultsQuery;
 
   const { data: document } = documentQuery;
   const { data: microtasks } = microtasksQuery;
@@ -101,16 +121,16 @@ const Documents = () => {
           </div>
           <div>
             <div>
-              {microtasks.map((task) => (
+              {microtaskResults.map((result) => (
                 <div
-                  key={task.id}
+                  key={result.id}
                   className={`my-4 card card-compact w-full bg-base-100 shadow-md 
                       ${
                         JSON.stringify(selectedData) ===
                         JSON.stringify({
-                          sentenceId: task.sentenceId,
-                          paragraphId: task.paragraphId,
-                          microtaskId: task.id,
+                          sentenceId: result.microtask.sentenceId,
+                          paragraphId: result.microtask.paragraphId,
+                          microtaskId: result.id,
                         })
                           ? "shadow-emerald-400"
                           : ""
@@ -118,24 +138,27 @@ const Documents = () => {
                   `}
                   onMouseEnter={() =>
                     setSelectedData({
-                      sentenceId: task.sentenceId,
-                      paragraphId: task.paragraphId,
-                      microtaskId: task.id,
+                      sentenceId: result.microtask.sentenceId,
+                      paragraphId: result.microtask.paragraphId,
+                      microtaskId: result.id,
                     })
                   }
                   onMouseLeave={() => setSelectedData(undefined)}
                 >
                   <div className={`card-body`}>
                     <div className="card-title font-semibold text-sm">
-                      {task.title}
+                      {result.microtask.title}
                     </div>
-                    <div>対象パラグラフ：{task.paragraph.body}</div>
-                    <div>対象センテンス：{task.sentence.body}</div>
+                    <div>
+                      対象パラグラフ：(id: {result.microtask.paragraphId})
+                      {result.microtask.paragraph.body}
+                    </div>
+                    <div>
+                      対象センテンス：(id: {result.microtask.sentenceId})
+                      {result.microtask.sentence.body}
+                    </div>
                     <div className="">
-                      <span>
-                        アサインユーザーID：
-                        {task.microtaskResults.map((e) => e.assigneeId)}
-                      </span>
+                      <span>アサインユーザーID：{result.assigneeId}</span>
                     </div>
                   </div>
                 </div>
