@@ -20,25 +20,15 @@ export const microtasksRouter = router({
     .input(z.object({ documentId: z.number() }))
     .query(async ({ input }) => {
       const microtasks = await prisma.microtask.findMany({
-        select: {
-          id: true,
-          title: true,
-          body: true,
-          kind: true,
-          paragraphId: true,
-          paragraph: {
-            select: {
-              id: true,
-              body: true,
-              documentId: true,
-              sentences: true,
-            },
-          },
-        },
         where: {
           paragraph: {
             documentId: input.documentId,
           },
+        },
+        include: {
+          sentence: true,
+          paragraph: true,
+          microtaskResults: true,
         },
       });
       return microtasks;

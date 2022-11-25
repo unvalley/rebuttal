@@ -47,6 +47,9 @@ const Documents = () => {
 
   const { data: document } = documentQuery;
   const { data: microtasks } = microtasksQuery;
+  const resultCount = microtasks
+    .flatMap((m) => m.microtaskResults.length)
+    .reduce((sum, e) => sum + e, 0);
 
   return (
     <div className="container mx-auto p-4">
@@ -83,10 +86,7 @@ const Documents = () => {
 
         <div className="col-span-2">
           <div className="bg-base-200 p-2">
-            {/* <div className="font-bold">
-              タスク ({microtaskCount}件中{doneMicrotaskCount}件が完了済み)
-              {microtaskCount === doneMicrotaskCount && "🎊"}
-            </div> */}
+            <div className="font-bold">タスク ({resultCount}件が完了済み)</div>
           </div>
           <div>
             <div>
