@@ -4,6 +4,12 @@ import { router, publicProcedure } from "../trpc";
 import { prisma } from "../../lib/prismaClient";
 
 export const documentsRouter = router({
+  saveAndInsertMicrotasks: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      // TODO: write logic to save microtasks
+      console.log(input);
+    }),
   findById: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {

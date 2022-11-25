@@ -4,7 +4,6 @@ import { Layout } from "../../../elements/Layout";
 import { Document } from "../../../elements/Documents/Document";
 import NextError from "next/error";
 import { useRouter } from "next/router";
-import { MicrotaskStatus } from ".prisma/client";
 import { ScreenLoading } from "../../../elements/Parts/Loading";
 import { paragraphsToSentences } from "../../../utils";
 
@@ -49,11 +48,6 @@ const Documents = () => {
   const { data: document } = documentQuery;
   const { data: microtasks } = microtasksQuery;
 
-  const microtaskCount = microtasks.length;
-  const doneMicrotaskCount = microtasks.filter(
-    (microtask) => microtask.status === MicrotaskStatus.DONE
-  ).length;
-
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-xl font-bold">ワーカー用ドキュメントページ</h2>
@@ -89,10 +83,10 @@ const Documents = () => {
 
         <div className="col-span-2">
           <div className="bg-base-200 p-2">
-            <div className="font-bold">
+            {/* <div className="font-bold">
               タスク ({microtaskCount}件中{doneMicrotaskCount}件が完了済み)
               {microtaskCount === doneMicrotaskCount && "🎊"}
-            </div>
+            </div> */}
           </div>
           <div>
             <div>
@@ -105,12 +99,12 @@ const Documents = () => {
                     <div className="card-title font-semibold text-sm">
                       {task.title}
                     </div>
-                    <div>ステータス：{task.status}</div>
+                    {/* <div>ステータス：{task.status}</div> */}
                     <div>対象パラグラフ：{task.paragraph.body}</div>
                     <div className="">
                       <span>
                         アサインユーザー：
-                        {task.assignee ? task.assignee.crowdId : "未アサイン"}
+                        {/* {task.assignee ? task.assignee.crowdId : "未アサイン"} */}
                       </span>
                     </div>
                   </div>

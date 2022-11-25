@@ -6,7 +6,6 @@ import { Wizard } from "react-use-wizard";
 import type { Session } from "next-auth";
 import type { ExtendedMicrotask } from "../../../types/MicrotaskResponse";
 import { ScreenLoading } from "../../../elements/Parts/Loading";
-import { useState } from "react";
 
 const Tasks = () => {
   const { data: session } = useSession();
