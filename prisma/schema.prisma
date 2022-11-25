@@ -44,7 +44,6 @@ model Document {
   // should be lexical replesantation
   body            String
   isRebuttalReady Boolean     @default(false)
-  comments        Comment[]
   author          User        @relation(fields: [authorId], references: [id])
   authorId        Int
   paragrahs       Paragraph[]
@@ -86,26 +85,6 @@ model Paragraph {
 
   @@map("paragrahs")
 }
-
-enum CommentKind {
-  REBUTTAL
-  INFORMATION
-}
-
-model Comment {
-  id   Int         @id @default(autoincrement())
-  body String
-  kind CommentKind
-
-  document   Document @relation(fields: [documentId], references: [id])
-  documentId Int
-
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
-
-  @@map("comments")
-}
-
 
 enum MicrotaskKinds {
   DISTINGUISH_OPINION_AND_FACT
