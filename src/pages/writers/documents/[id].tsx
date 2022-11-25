@@ -39,6 +39,7 @@ const Documents = () => {
             title={document.title}
             sentences={paragraphsToSentences(document.paragrahs)}
             body={document.body}
+            selectedData={undefined}
             canEdit={false}
           />
         </div>
