@@ -16,10 +16,10 @@ model User {
   roleId   Int
   password String
 
-  created_at DateTime    @default(now())
-  updated_at DateTime    @default(now()) @updatedAt
-  microtaskResults  MicrotaskResult[]
-  document   Document[]
+  created_at          DateTime              @default(now())
+  updated_at          DateTime              @default(now()) @updatedAt
+  document            Document[]
+  microtaskAllocation MicrotaskAllocation[]
 
   @@map("users")
 }
@@ -39,14 +39,13 @@ model Role {
 }
 
 model Document {
-  id              Int         @id @default(autoincrement())
-  title           String
+  id        Int         @id @default(autoincrement())
+  title     String
   // should be lexical replesantation
-  body            String
-  isRebuttalReady Boolean     @default(false)
-  author          User        @relation(fields: [authorId], references: [id])
-  authorId        Int
-  paragrahs       Paragraph[]
+  body      String
+  author    User        @relation(fields: [authorId], references: [id])
+  authorId  Int
+  paragrahs Paragraph[]
 
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
@@ -60,14 +59,15 @@ enum SentenceKind {
   NONE
 }
 
+// タスクで表示するのはパラグラフごとだが，センテンスに対する結果が必要
 model Sentence {
   id   Int          @id @default(autoincrement())
   body String
   kind SentenceKind @default(NONE)
 
-  paragraph   Paragraph @relation(fields: [paragraphId], references: [id])
-  paragraphId Int
-  microtasks Microtask[]
+  paragraph       Paragraph         @relation(fields: [paragraphId], references: [id])
+  paragraphId     Int
+  microtaskResult MicrotaskResult[]
 
   @@map("sentences")
 }
@@ -95,39 +95,46 @@ enum MicrotaskKinds {
 
 // センテンスとパラグラフを一意に特定できるモデル
 model Microtask {
-  id               Int               @id @default(autoincrement())
-  title            String
-  body             String
-  kind             MicrotaskKinds
-  paragraph        Paragraph         @relation(fields: [paragraphId], references: [id])
-  paragraphId      Int
-  sentence         Sentence          @relation(fields: [sentenceId], references: [id])
-  sentenceId       Int
-  microtaskResults MicrotaskResult[]
+  id          Int            @id @default(autoincrement())
+  title       String
+  body        String
+  kind        MicrotaskKinds
+  paragraph   Paragraph      @relation(fields: [paragraphId], references: [id])
+  paragraphId Int
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  created_at          DateTime              @default(now())
+  updated_at          DateTime              @default(now()) @updatedAt
+  microtaskAllocation MicrotaskAllocation[]
 
   @@map("microtasks")
 }
-enum Executor {
-  WORKER
-  SYSTEM
-}
 
 model MicrotaskResult {
-  id          Int       @id @default(autoincrement())
+  id     Int     @id @default(autoincrement())
   // MTask1: OPINION or FACT
   // MTask2/3: TRUE or FALSE (as string)
-  value       String
-  reason      String?
-  executor    Executor  @default(WORKER)
-  microtask   Microtask @relation(fields: [microtaskId], references: [id])
-  microtaskId Int
-  assignee      User             @relation(fields: [assigneeId], references: [id])
-  assigneeId    Int
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @default(now()) @updatedAt
+  value  String
+  reason String?
+
+  created_at          DateTime              @default(now())
+  updated_at          DateTime              @default(now()) @updatedAt
+  microtaskAllocation MicrotaskAllocation[]
+  sentence            Sentence              @relation(fields: [sentenceId], references: [id])
+  sentenceId          Int
+
   @@map("microtask_results")
 }
 
+model MicrotaskAllocation {
+  id                Int             @id @default(autoincrement())
+  user              User            @relation(fields: [userId], references: [id])
+  userId            Int
+  microtask         Microtask       @relation(fields: [microtaskId], references: [id])
+  microtaskId       Int
+  microtaskResult   MicrotaskResult @relation(fields: [microtaskResultId], references: [id])
+  microtaskResultId Int
+  created_at        DateTime        @default(now())
+  updated_at        DateTime        @default(now()) @updatedAt
+
+  @@map("microtask_alocations")
+}
