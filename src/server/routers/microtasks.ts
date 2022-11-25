@@ -59,8 +59,11 @@ export const microtasksRouter = router({
         });
 
         const userAlreadyCompletedTaskIds = tasks.flatMap((t) => {
-          return t.microtaskResults.map((tr) => {
-            return tr.microtaskId;
+          return t.microtaskResults.flatMap((tr) => {
+            if (tr.assigneeId === input.userId) {
+              return tr.microtaskId;
+            }
+            return [];
           });
         });
 

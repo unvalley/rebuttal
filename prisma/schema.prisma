@@ -123,10 +123,11 @@ model MicrotaskResult {
   reason      String?
   executor    Executor  @default(WORKER)
   microtask   Microtask @relation(fields: [microtaskId], references: [id])
-  microtaskId Int       @unique
+  microtaskId Int
   assignee      User             @relation(fields: [assigneeId], references: [id])
   assigneeId    Int
   created_at  DateTime  @default(now())
   updated_at  DateTime  @default(now()) @updatedAt
   @@map("microtask_results")
 }
+
