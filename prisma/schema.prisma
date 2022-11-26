@@ -16,9 +16,10 @@ model User {
   roleId   Int
   password String
 
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @default(now()) @updatedAt
-  document  Document[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @default(now()) @updatedAt
+  document         Document[]
+  microtaskResults MicrotaskResult[]
 
   @@map("users")
 }
@@ -54,11 +55,11 @@ model Document {
 
 // タスクで表示するのはパラグラフごとだが，センテンスに対する結果が必要
 model Sentence {
-  id              Int               @id @default(autoincrement())
-  body            String
-  paragraph       Paragraph         @relation(fields: [paragraphId], references: [id])
-  paragraphId     Int
-  microtaskResult MicrotaskResult[]
+  id               Int               @id @default(autoincrement())
+  body             String
+  paragraph        Paragraph         @relation(fields: [paragraphId], references: [id])
+  paragraphId      Int
+  microtaskResults MicrotaskResult[]
 
   @@map("sentences")
 }
@@ -85,16 +86,16 @@ enum MicrotaskKinds {
 
 // センテンスとパラグラフを一意に特定できるモデル
 model Microtask {
-  id          Int            @id @default(autoincrement())
-  title       String
-  body        String
-  kind        MicrotaskKinds
-  paragraph   Paragraph      @relation(fields: [paragraphId], references: [id])
-  paragraphId Int
+  id               Int               @id @default(autoincrement())
+  title            String
+  body             String
+  kind             MicrotaskKinds
+  paragraph        Paragraph         @relation(fields: [paragraphId], references: [id])
+  paragraphId      Int
+  microtaskResults MicrotaskResult[]
 
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @default(now()) @updatedAt
-  microtaskResult MicrotaskResult[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@map("microtasks")
 }
@@ -106,13 +107,16 @@ model MicrotaskResult {
   // MTask1 : NULL, MTask2/3: the reason
   reason String?
 
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+  sentence    Sentence  @relation(fields: [sentenceId], references: [id])
+  sentenceId  Int
   microtask   Microtask @relation(fields: [microtaskId], references: [id])
   microtaskId Int
-
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now()) @updatedAt
-  sentence   Sentence @relation(fields: [sentenceId], references: [id])
-  sentenceId Int
+  assignee    User      @relation(fields: [assigneeId], references: [id])
+  assigneeId  Int
 
   @@map("microtask_results")
 }
+
+

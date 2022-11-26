@@ -37,8 +37,11 @@ export const microtaskResultsRouter = router({
         include: {
           microtask: {
             include: {
-              paragraph: true,
-              sentence: true,
+              paragraph: {
+                include: {
+                  sentences: true,
+                },
+              },
             },
           },
         },
@@ -59,17 +62,18 @@ export const microtaskResultsRouter = router({
         microtaskId: z.number(),
         value: z.string(),
         reason: z.string(),
+        sentenceId: z.number(),
       })
     )
     .mutation(async ({ input }) => {
-      // Create Result
+      // TODO: validation
       await prisma.microtaskResult.create({
         data: {
           assigneeId: input.userId,
           microtaskId: input.microtaskId,
           value: input.value,
           reason: input.reason,
-          executor: "WORKER",
+          sentenceId: input.sentenceId,
         },
       });
     }),

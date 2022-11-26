@@ -12,7 +12,13 @@ export const microtasksRouter = router({
     .query(async ({ input }) => {
       const microtask = await prisma.microtask.findUnique({
         where: { id: input.id },
-        include: { paragraph: true, sentence: true },
+        include: {
+          paragraph: {
+            include: {
+              sentences: true,
+            },
+          },
+        },
       });
       return microtask;
     }),
@@ -26,8 +32,11 @@ export const microtasksRouter = router({
           },
         },
         include: {
-          sentence: true,
-          paragraph: true,
+          paragraph: {
+            include: {
+              sentences: true,
+            },
+          },
           microtaskResults: true,
         },
       });
@@ -51,11 +60,14 @@ export const microtasksRouter = router({
           },
           include: {
             microtaskResults: true,
-            paragraph: true,
-            sentence: true,
+            paragraph: {
+              include: {
+                sentences: true,
+              },
+            },
           },
           take: ASSIGN_COUNT,
-          orderBy: { created_at: "asc" },
+          orderBy: { createdAt: "asc" },
         });
 
         const userAlreadyCompletedTaskIds = tasks.flatMap((t) => {
