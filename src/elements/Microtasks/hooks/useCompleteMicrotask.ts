@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { trpc } from "../../../lib/trpc";
 
-export const useCompleteMicrotask = (userId: number, microtaskId: number) => {
+export const useCompleteMicrotask = ({
+  userId,
+  microtaskId,
+  sentenceId,
+}: {
+  userId: number;
+  microtaskId: number;
+  sentenceId: number;
+}) => {
   const [value, setValue] = useState<
     "OPINION" | "FACT" | "TRUE" | "FALSE" | undefined
   >();
@@ -15,6 +23,7 @@ export const useCompleteMicrotask = (userId: number, microtaskId: number) => {
     }
     return mutation.mutate({
       userId,
+      sentenceId,
       microtaskId,
       value: value,
       reason,

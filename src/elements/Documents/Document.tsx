@@ -1,4 +1,4 @@
-import { Sentence, SentenceKind } from "@prisma/client";
+import type { Sentence } from "@prisma/client";
 
 interface DocumentProps {
   title: string;
@@ -14,9 +14,9 @@ interface DocumentProps {
   canEdit: boolean;
 }
 
-const opinionOrFactStyle = (sentenceKind: SentenceKind) => {
-  if (sentenceKind === SentenceKind.OPINION) return "bg-orange-100";
-  if (sentenceKind === SentenceKind.FACT) return "bg-blue-100";
+const opinionOrFactStyle = (sentenceKind: "OPINION" | "FACT") => {
+  if (sentenceKind === "OPINION") return "bg-orange-100";
+  if (sentenceKind === "FACT") return "bg-blue-100";
   return "bg-orange-100";
 };
 
@@ -32,9 +32,9 @@ export const Document: React.FC<DocumentProps> = (props) => {
         return (
           <span
             key={s.id}
-            className={`${opinionOrFactStyle(s.kind)} ${selectedSentenceStyle(
-              s.id
-            )}`}
+            className={`${opinionOrFactStyle(
+              "OPINION"
+            )} ${selectedSentenceStyle(s.id)}`}
           >
             {s.body}
           </span>
