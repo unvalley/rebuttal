@@ -43,7 +43,7 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
         <span className="bg-green-100 text-green-800">簡単</span>
         <span className="text-green-700">: 3-5分</span>
       </div>
-      {props.microtask.kind === MicrotaskKinds.DISTINGUISH_OPINION_AND_FACT ? (
+      {props.microtask.kind === MicrotaskKinds.CHECK_OP_OR_FACT ? (
         <div className="font-semibold mt-4">
           {props.microtask.sentence.body}
         </div>
@@ -55,8 +55,7 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
       <div className="mt-8 mr-auto">
         <form onSubmit={handleSubmit}>
           <p>下記のいずれかを選択してください．</p>
-          {props.microtask.kind ===
-          MicrotaskKinds.DISTINGUISH_OPINION_AND_FACT ? (
+          {props.microtask.kind === MicrotaskKinds.CHECK_OP_OR_FACT ? (
             <>
               <div className="form-control">
                 <label className="label cursor-pointer">

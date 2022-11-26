@@ -15,7 +15,7 @@ export const MicrotaskDescription: React.FC<{
       </div>
       <div className="mt-2">
         {match(microtask.kind)
-          .with(MicrotaskKinds.DISTINGUISH_OPINION_AND_FACT, () => {
+          .with(MicrotaskKinds.CHECK_OP_OR_FACT, () => {
             return (
               <BinaryClassficationTask
                 microtask={microtask}
@@ -30,7 +30,7 @@ export const MicrotaskDescription: React.FC<{
               withReason={true}
             />
           ))
-          .with(MicrotaskKinds.CHECK_IF_OPINION_HAS_VALID_FACT, () => (
+          .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () => (
             <BinaryClassficationTask
               microtask={microtask}
               taskTitle="次のパラグラフにおいて、意見に対して、それを根拠付ける妥当な事実が書かれていますか？"

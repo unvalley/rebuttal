@@ -45,7 +45,7 @@ export const microtaskResultsRouter = router({
       });
       const filtered = results.flatMap((r) => {
         const ok =
-          r.microtask.kind === MicrotaskKinds.CHECK_IF_OPINION_HAS_VALID_FACT ||
+          r.microtask.kind === MicrotaskKinds.CHECK_OPINION_VALIDNESS ||
           r.microtask.kind === MicrotaskKinds.CHECK_FACT_RESOURCE;
         if (!ok) return [];
         return r;
