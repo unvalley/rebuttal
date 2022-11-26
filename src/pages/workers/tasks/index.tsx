@@ -108,14 +108,13 @@ const MicrotaskAssigned: React.FC<{
   session: Session;
   microtasks: ExtendedMicrotask[];
 }> = (props) => {
+  console.log(
+    `実際にやる回数：${props.microtasks
+      .flatMap((m) => m.paragraph.sentences.length)
+      .reduce((sum, e) => sum + e, 0)}`
+  );
   return (
     <div>
-      <p>
-        実際にやる回数：
-        {props.microtasks
-          .flatMap((m) => m.paragraph.sentences.length)
-          .reduce((sum, e) => sum + e, 0)}
-      </p>
       <Wizard>
         {props.microtasks.map((microtask) => {
           const sentences = microtask.paragraph.sentences;
