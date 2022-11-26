@@ -101,8 +101,9 @@ model Microtask {
   paragraph   Paragraph      @relation(fields: [paragraphId], references: [id])
   paragraphId Int
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now()) @updatedAt
+  microtaskResult MicrotaskResult[]
 
   @@map("microtasks")
 }
@@ -113,6 +114,9 @@ model MicrotaskResult {
   value  String
   // MTask1 : NULL, MTask2/3: the reason
   reason String?
+
+  microtask   Microtask @relation(fields: [microtaskId], references: [id])
+  microtaskId Int
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now()) @updatedAt
