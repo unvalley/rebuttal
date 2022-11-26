@@ -1,4 +1,4 @@
-import { MicrotaskKinds } from ".prisma/client";
+import { MicrotaskKinds, Sentence } from ".prisma/client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useWizard } from "react-use-wizard";
@@ -7,19 +7,30 @@ import { useCompleteMicrotask } from "../hooks/useCompleteMicrotask";
 
 type Props = {
   microtask: ExtendedMicrotask;
+  // TODO:  使えると確信できたらrequired
+  sentence: Sentence;
   taskTitle?: string;
   withReason?: boolean;
   actions?: React.ReactNode;
 };
 
+const hightlihgtIfTrue = (pred: boolean) => {
+  if (pred) return "bg-blue-200";
+  return "";
+};
+
 export const BinaryClassficationTask: React.FC<Props> = (props) => {
-  const { data: session } = useSession();
-  const { value, setValue, reason, setReason, complete } = useCompleteMicrotask(
-    session?.user.id as number,
-    props.microtask.id
-  );
-  const { nextStep, isLastStep } = useWizard();
   const router = useRouter();
+  const { data: session } = useSession();
+  const { nextStep, isLastStep } = useWizard();
+
+  const { value, setValue, reason, setReason, complete } = useCompleteMicrotask(
+    {
+      userId: session?.user.id as number,
+      microtaskId: props.microtask.id,
+      sentenceId: props.sentence.id,
+    }
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,15 +54,42 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
         <span className="bg-green-100 text-green-800">簡単</span>
         <span className="text-green-700">: 3-5分</span>
       </div>
-      {props.microtask.kind === MicrotaskKinds.CHECK_OP_OR_FACT ? (
-        <div className="font-semibold mt-4">
-          {props.microtask.sentence.body}
-        </div>
-      ) : (
-        <div className="font-semibold mt-4">
-          {props.microtask.paragraph.body}
-        </div>
-      )}
+      <div className="mt-4">
+        {/* タスクに関わらず，全てセンテンスに対して紐付ける */}
+        <span className="">
+          {props.microtask.kind === MicrotaskKinds.CHECK_OP_OR_FACT ? (
+            <>{props.sentence.body}</>
+          ) : (
+            <>
+              {/* MTask(2)/(3)では，パラグラフを表示する */}
+              {props.microtask.paragraph.sentences.map((s) => {
+                return (
+                  <span
+                    key={s.id}
+                    className={hightlihgtIfTrue(s.id === props.sentence.id)}
+                  >
+                    {s.body}
+                  </span>
+                );
+              })}
+            </>
+          )}
+        </span>
+      </div>
+
+      <div className="mt-4">
+        <label htmlFor="modal" className="btn btn-info btn-sm">
+          文書全体を表示する
+        </label>
+        <input type="checkbox" id="modal" className="modal-toggle" />
+        <label htmlFor="modal" className="modal cursor-pointer">
+          <label className="modal-box relative" htmlFor="">
+            <h3 className="text-lg font-bold">タイトル</h3>
+            <p className="py-4">WIP</p>
+          </label>
+        </label>
+      </div>
+
       <div className="mt-8 mr-auto">
         <form onSubmit={handleSubmit}>
           <p>下記のいずれかを選択してください．</p>

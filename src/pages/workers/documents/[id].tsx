@@ -128,7 +128,7 @@ const Documents = () => {
                       ${
                         JSON.stringify(selectedData) ===
                         JSON.stringify({
-                          sentenceId: result.microtask.sentenceId,
+                          sentenceId: result.sentenceId,
                           paragraphId: result.microtask.paragraphId,
                           microtaskId: result.id,
                         })
@@ -138,7 +138,7 @@ const Documents = () => {
                   `}
                   onMouseEnter={() =>
                     setSelectedData({
-                      sentenceId: result.microtask.sentenceId,
+                      sentenceId: result.sentenceId,
                       paragraphId: result.microtask.paragraphId,
                       microtaskId: result.id,
                     })
@@ -154,8 +154,8 @@ const Documents = () => {
                       {result.microtask.paragraph.body}
                     </div>
                     <div>
-                      対象センテンス：(id: {result.microtask.sentenceId})
-                      {result.microtask.sentence.body}
+                      対象センテンス：(id: {result.sentenceId})
+                      {result.sentence.body}
                     </div>
                     <div className="">
                       <span>アサインユーザーID：{result.assigneeId}</span>

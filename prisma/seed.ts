@@ -92,19 +92,19 @@ const createParagraphsByDocumentIds = async (documentIds: number[]) => {
     },
   });
 
-  // NOTE: document to sentences, create documentId and sentenceBody object
-  const documentAndSentences = docs.flatMap((doc) => {
+  const documentAndParagraphs = docs.flatMap((doc) => {
     const paragraphs = textToParagraphs(doc.body);
-    return paragraphs.flatMap((p) => {
+    return paragraphs.flatMap((p, idx) => {
       return {
         documentId: doc.id,
+        position: idx,
         body: p,
       };
     });
   });
 
   await prisma.paragraph.createMany({
-    data: documentAndSentences,
+    data: documentAndParagraphs,
     skipDuplicates: true,
   });
 };
@@ -124,9 +124,10 @@ const createSentencesByDocumentIds = async (documentIds: number[]) => {
   });
 
   const documentAndSentences = paragraphs.flatMap((p) => {
-    return textToSentences(p.body).map((b) => {
+    return textToSentences(p.body).map((b, idx) => {
       return {
         body: b,
+        position: idx,
         paragraphId: p.id,
       };
     });

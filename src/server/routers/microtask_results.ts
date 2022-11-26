@@ -35,13 +35,10 @@ export const microtaskResultsRouter = router({
           },
         },
         include: {
+          sentence: true,
           microtask: {
             include: {
-              paragraph: {
-                include: {
-                  sentences: true,
-                },
-              },
+              paragraph: true,
             },
           },
         },

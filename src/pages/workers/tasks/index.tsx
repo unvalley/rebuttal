@@ -3,9 +3,9 @@ import { trpc } from "../../../lib/trpc";
 import { useSession } from "next-auth/react";
 import { MicrotaskDescription } from "../../../elements/Microtasks/MicrotaskDescription";
 import { Wizard } from "react-use-wizard";
+import { ScreenLoading } from "../../../elements/Parts/Loading";
 import type { Session } from "next-auth";
 import type { ExtendedMicrotask } from "../../../types/MicrotaskResponse";
-import { ScreenLoading } from "../../../elements/Parts/Loading";
 
 const Tasks = () => {
   const { data: session } = useSession();
@@ -23,6 +23,10 @@ const Tasks = () => {
 
   if (session == null) {
     return <p>ログインが必要です</p>;
+  }
+
+  if (microtasksQuery.isError) {
+    return <p>実行対象のマイクロタスクがありません．</p>;
   }
 
   if (microtasksQuery.isLoading) {
@@ -54,7 +58,6 @@ const Tasks = () => {
               />
             )}
             {/**
-
             // !hasDoneAllAssignedMicrotasks ? (
               <MicrotaskAssigned microtasks={assignedMicrotasks} />
             // ) : (
@@ -72,7 +75,6 @@ const Tasks = () => {
              */}
           </div>
         </div>
-        {/* Right Column */}
         <div className="col-span-2">
           <div className="">
             <div className="bg-base-200 p-2">
@@ -90,7 +92,7 @@ const Tasks = () => {
                         {task.title} (ID={task.id})
                       </div>
                       <div>対象パラグラフ(ID={task.paragraphId}): </div>
-                      <div>対象センテンス(ID={task.sentenceId}): </div>
+                      {/* <div>対象センテンス(ID={}): </div> */}
                     </div>
                   </div>
                 ))}
@@ -108,10 +110,23 @@ const MicrotaskAssigned: React.FC<{
 }> = (props) => {
   return (
     <div>
+      <p>
+        実際にやる回数：
+        {props.microtasks
+          .flatMap((m) => m.paragraph.sentences.length)
+          .reduce((sum, e) => sum + e, 0)}
+      </p>
       <Wizard>
-        {props.microtasks.map((microtask) => (
-          <MicrotaskDescription key={microtask.id} microtask={microtask} />
-        ))}
+        {props.microtasks.map((microtask) => {
+          const sentences = microtask.paragraph.sentences;
+          return sentences.map((s) => (
+            <MicrotaskDescription
+              key={microtask.id}
+              microtask={microtask}
+              sentence={s}
+            />
+          ));
+        })}
       </Wizard>
     </div>
   );

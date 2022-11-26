@@ -57,6 +57,7 @@ model Document {
 model Sentence {
   id               Int               @id @default(autoincrement())
   body             String
+  position         Int
   paragraph        Paragraph         @relation(fields: [paragraphId], references: [id])
   paragraphId      Int
   microtaskResults MicrotaskResult[]
@@ -69,6 +70,7 @@ model Paragraph {
   body       String
   document   Document    @relation(fields: [documentId], references: [id])
   documentId Int
+  position   Int
   microtasks Microtask[]
   sentences  Sentence[]
 
@@ -118,5 +120,3 @@ model MicrotaskResult {
 
   @@map("microtask_results")
 }
-
-
