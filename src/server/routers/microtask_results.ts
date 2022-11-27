@@ -3,9 +3,24 @@ import { router } from "../trpc";
 import { publicProcedure } from "../trpc";
 import { prisma } from "../../lib/prismaClient";
 import { MicrotaskKinds } from ".prisma/client";
+import type { AggregatedResultsBySentence } from "../../types/MicrotaskResponse";
+
+const groupBy = <K, V>(
+  array: readonly V[],
+  getKey: (cur: V, idx: number, src: readonly V[]) => K
+): [K, V[]][] =>
+  Array.from(
+    array.reduce((map, cur, idx, src) => {
+      const key = getKey(cur, idx, src);
+      const list = map.get(key);
+      if (list) list.push(cur);
+      else map.set(key, [cur]);
+      return map;
+    }, new Map<K, V[]>())
+  );
 
 export const microtaskResultsRouter = router({
-  findByDocumentId: publicProcedure
+  findAggregatedMicrotaskResultsByDocumentId: publicProcedure
     .input(
       z.object({
         documentId: z.number(),
@@ -43,14 +58,53 @@ export const microtaskResultsRouter = router({
           },
         },
       });
-      const filtered = results.flatMap((r) => {
-        const ok =
-          r.microtask.kind === MicrotaskKinds.CHECK_OPINION_VALIDNESS ||
-          r.microtask.kind === MicrotaskKinds.CHECK_FACT_RESOURCE;
-        if (!ok) return [];
-        return r;
-      });
-      return filtered;
+
+      const aggregatedResults = groupBy(results, (r) => r.sentenceId).map(
+        ([sentenceId, results]) => {
+          // Microtask(1)の集約
+          const factCount = results.filter((v) => v.value === "FACT").length;
+          const opCount = results.filter((v) => v.value === "OPINION").length;
+          console.info(`factCount=${factCount}, opCount=${opCount}`);
+          // OPINIONを優先
+          const isFact = factCount >= opCount;
+
+          // Microtask(2)の集約(結果集積でフィルタリングなどはしていない)
+          // valueがあるかどうかなのでちゃんと集約すべき
+          const resourceCheckResults = results
+            .filter(
+              (r) => r.microtask.kind === MicrotaskKinds.CHECK_FACT_RESOURCE
+            )
+            .map((r) => {
+              return {
+                value: r.value,
+                reason: r.reason,
+              };
+            });
+
+          // Microtask(3)の集約(結果集積でフィルタリングなどはしていない)
+          // valueがあるかどうかなのでちゃんと集約すべき
+          const opinonValidnessResults = results
+            .filter(
+              (r) => r.microtask.kind === MicrotaskKinds.CHECK_OPINION_VALIDNESS
+            )
+            .map((r) => {
+              return {
+                value: r.value,
+                reason: r.reason,
+              };
+            });
+
+          return {
+            sentenceId,
+            sentence: results[0]?.sentence,
+            isFact,
+            resourceCheckResults,
+            opinonValidnessResults,
+          } as AggregatedResultsBySentence;
+        }
+      );
+
+      return aggregatedResults;
     }),
   completeMicrotask: publicProcedure
     .input(

@@ -5,7 +5,7 @@ import { Document } from "../../../elements/Documents/Document";
 import NextError from "next/error";
 import { useRouter } from "next/router";
 import { ScreenLoading } from "../../../elements/Parts/Loading";
-import { paragraphsToSentences } from "../../../utils";
+import { MICROTASKS } from "../../../../constants/microtasks";
 
 const Documents = () => {
   const router = useRouter();
@@ -16,16 +16,13 @@ const Documents = () => {
   const documentQuery = trpc.documents.findWithSentencesById.useQuery(
     {
       id: documentId,
+    },
+    {
+      refetchOnWindowFocus: false,
     }
-    // { refetchInterval: 1000 }
   );
-  const [selectedData, setSelectedData] = useState<
-    | {
-        sentenceId: number;
-        paragraphId: number;
-        microtaskId: number;
-      }
-    | undefined
+  const [selectedSentenceId, setSelectedSentenceId] = useState<
+    number | undefined
   >(undefined);
 
   if (documentQuery.error) {
@@ -36,23 +33,35 @@ const Documents = () => {
       />
     );
   }
-  const microtaskResultsQuery =
-    trpc.microtask_results.findByDocumentId.useQuery({
-      documentId: documentId,
-    });
 
-  if (microtaskResultsQuery.error) {
+  const aggregatedResultsQuery =
+    trpc.microtask_results.findAggregatedMicrotaskResultsByDocumentId.useQuery(
+      {
+        documentId: documentId,
+      },
+      {
+        refetchOnWindowFocus: false,
+      }
+    );
+
+  if (aggregatedResultsQuery.error) {
     return (
       <NextError
-        title={microtaskResultsQuery.error.message}
-        statusCode={microtaskResultsQuery.error.data?.httpStatus ?? 500}
+        title={aggregatedResultsQuery.error.message}
+        statusCode={aggregatedResultsQuery.error.data?.httpStatus ?? 500}
       />
     );
   }
 
-  const microtasksQuery = trpc.microtasks.findManyByDocumentId.useQuery({
-    documentId,
-  });
+  const microtasksQuery = trpc.microtasks.findManyByDocumentId.useQuery(
+    {
+      documentId,
+    },
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
+
   if (microtasksQuery.error) {
     return (
       <NextError
@@ -65,14 +74,12 @@ const Documents = () => {
   if (
     documentQuery.isLoading ||
     microtasksQuery.isLoading ||
-    microtaskResultsQuery.isLoading
+    aggregatedResultsQuery.isLoading
   ) {
     return <ScreenLoading />;
   }
 
-  // only microtask(2)/(3)
-  const { data: microtaskResults } = microtaskResultsQuery;
-
+  const { data: aggregatedResults } = aggregatedResultsQuery;
   const { data: document } = documentQuery;
   const { data: microtasks } = microtasksQuery;
   const resultCount = microtasks
@@ -81,7 +88,7 @@ const Documents = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-xl font-bold">ワーカー用ドキュメントページ</h2>
+      <h2 className="text-xl font-bold">ドキュメントフィードバックページ</h2>
       <div className="grid grid-cols-8 gap-2">
         <div className="col-span-2">
           <div className="bg-base-200 p-2">
@@ -91,12 +98,11 @@ const Documents = () => {
             センテンス数: {document.sentences.length}
           </p> */}
           <div className="py-4">
-            <p>オレンジ色のハイライト箇所: 意見</p>
-            <p>青色のハイライト箇所: 事実</p>
+            <div className="bg-orange-100">
+              オレンジ色のハイライト箇所: 意見
+            </div>
+            <div className="bg-blue-100">青色のハイライト箇所: 事実</div>
           </div>
-          <p>
-            このページでは、学生が書いたレポートに対して、フィードバックタスクを行ってもらいます。
-          </p>
           <p>他になにか必要な情報があれば、ここに書き加えます。</p>
         </div>
 
@@ -107,8 +113,8 @@ const Documents = () => {
           <Document
             title={document.title}
             body={document.body}
-            sentences={paragraphsToSentences(document.paragrahs)}
-            selectedData={selectedData}
+            aggregatedResults={aggregatedResults}
+            sentenceSelection={{ selectedSentenceId, setSelectedSentenceId }}
             canEdit={false}
           />
         </div>
@@ -120,45 +126,48 @@ const Documents = () => {
             </div>
           </div>
           <div>
-            <div>
-              {microtaskResults.map((result) => (
+            {/* // fix style */}
+            <div className="overflow-scroll" style={{ height: "700px" }}>
+              {[...aggregatedResults].map((result, idx) => (
                 <div
-                  key={result.id}
+                  key={idx}
                   className={`my-4 card card-compact w-full bg-base-100 shadow-md 
                       ${
-                        JSON.stringify(selectedData) ===
-                        JSON.stringify({
-                          sentenceId: result.sentenceId,
-                          paragraphId: result.microtask.paragraphId,
-                          microtaskId: result.id,
-                        })
+                        selectedSentenceId === result.sentenceId
                           ? "shadow-emerald-400"
                           : ""
                       }
                   `}
-                  onMouseEnter={() =>
-                    setSelectedData({
-                      sentenceId: result.sentenceId,
-                      paragraphId: result.microtask.paragraphId,
-                      microtaskId: result.id,
-                    })
-                  }
-                  onMouseLeave={() => setSelectedData(undefined)}
+                  onMouseEnter={() => setSelectedSentenceId(result.sentenceId)}
+                  onMouseLeave={() => setSelectedSentenceId(undefined)}
                 >
                   <div className={`card-body`}>
                     <div className="card-title font-semibold text-sm">
-                      {result.microtask.title}
+                      対象センテンス「({result.sentence?.body})」(id=
+                      {result.sentenceId})へのフィードバック
                     </div>
-                    <div>
-                      対象パラグラフ：(id: {result.microtask.paragraphId})
-                      {result.microtask.paragraph.body}
+
+                    <div className="mt-2">
+                      <div className="font-semibold">
+                        {MICROTASKS.CHECK_FACT_RESOURCE}
+                      </div>
+                      {result.opinonValidnessResults.map((o, idx) => (
+                        <div key={idx}>
+                          <p>値: {o.value}</p>
+                          <p>根拠: {o.reason}</p>
+                        </div>
+                      ))}
                     </div>
-                    <div>
-                      対象センテンス：(id: {result.sentenceId})
-                      {result.sentence.body}
-                    </div>
-                    <div className="">
-                      <span>アサインユーザーID：{result.assigneeId}</span>
+                    <div className="mt-4">
+                      <div className="font-semibold">
+                        {MICROTASKS.CHECK_OPINION_VALIDNESS}
+                      </div>
+                      {result.resourceCheckResults.map((o, idx) => (
+                        <div key={idx}>
+                          <p>値: {o.value}</p>
+                          <p>根拠: {o.reason}</p>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
