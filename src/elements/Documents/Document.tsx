@@ -1,42 +1,49 @@
-import type { Sentence } from "@prisma/client";
+import type { AggregatedResultsBySentence } from "../../types/MicrotaskResponse";
 
 interface DocumentProps {
   title: string;
   body: string;
-  sentences: Sentence[];
-  selectedData:
+  aggregatedResults: AggregatedResultsBySentence[];
+  sentenceSelection:
     | {
-        sentenceId: number;
-        paragraphId: number;
-        microtaskId: number;
+        selectedSentenceId: number | undefined;
+        setSelectedSentenceId: React.Dispatch<
+          React.SetStateAction<number | undefined>
+        >;
       }
     | undefined;
   canEdit: boolean;
 }
 
-const opinionOrFactStyle = (sentenceKind: "OPINION" | "FACT") => {
-  if (sentenceKind === "OPINION") return "bg-orange-100";
-  if (sentenceKind === "FACT") return "bg-blue-100";
-  return "bg-orange-100";
+const opinionOrFactStyle = (isFact: boolean) => {
+  return isFact ? "bg-blue-100" : "bg-orange-100";
 };
 
 export const Document: React.FC<DocumentProps> = (props) => {
   const selectedSentenceStyle = (sentenceId: number) =>
-    props.selectedData?.sentenceId === sentenceId ? "bg-emerald-100" : "";
+    props.sentenceSelection?.selectedSentenceId === sentenceId
+      ? "bg-emerald-100"
+      : "";
 
   return (
     <div className="bg-base-100">
       <div className="font-bold">{props.title || "Untitled"}</div>
 
-      {props.sentences.map((s) => {
+      {props.aggregatedResults.map((s) => {
         return (
           <span
-            key={s.id}
-            className={`${opinionOrFactStyle(
-              "OPINION"
-            )} ${selectedSentenceStyle(s.id)}`}
+            key={s.sentenceId}
+            className={`${opinionOrFactStyle(s.isFact)} ${selectedSentenceStyle(
+              s.sentenceId
+            )}`}
+            onMouseEnter={() =>
+              props.sentenceSelection?.setSelectedSentenceId(s.sentenceId)
+            }
+            onMouseLeave={() =>
+              props.sentenceSelection?.setSelectedSentenceId(undefined)
+            }
           >
-            {s.body}
+            {s.sentence?.body}
           </span>
         );
       })}

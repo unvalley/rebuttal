@@ -7,3 +7,17 @@ export type ExtendedMicrotask = Microtask & {
     sentences: Sentence[];
   };
 };
+
+export type AggregatedResultsBySentence = {
+  sentenceId: number;
+  sentence: Sentence | undefined;
+  isFact: boolean;
+  resourceCheckResults: {
+    value: string;
+    reason: string | null;
+  }[];
+  opinonValidnessResults: {
+    value: string;
+    reason: string | null;
+  }[];
+};
