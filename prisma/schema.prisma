@@ -40,9 +40,9 @@ model Role {
 
 model Document {
   id        Int         @id @default(autoincrement())
-  title     String
+  title     String      @db.LongText
   // should be lexical replesantation
-  body      String
+  body      String      @db.LongText
   author    User        @relation(fields: [authorId], references: [id])
   authorId  Int
   paragrahs Paragraph[]
@@ -56,7 +56,7 @@ model Document {
 // タスクで表示するのはパラグラフごとだが，センテンスに対する結果が必要
 model Sentence {
   id               Int               @id @default(autoincrement())
-  body             String
+  body             String            @db.LongText
   position         Int
   paragraph        Paragraph         @relation(fields: [paragraphId], references: [id])
   paragraphId      Int
@@ -67,7 +67,7 @@ model Sentence {
 
 model Paragraph {
   id         Int         @id @default(autoincrement())
-  body       String
+  body       String      @db.LongText
   document   Document    @relation(fields: [documentId], references: [id])
   documentId Int
   position   Int
@@ -107,7 +107,7 @@ model MicrotaskResult {
   // MTask1: OPINION or FACT, MTask2/3: TRUE or FALSE (as string)
   value  String
   // MTask1 : NULL, MTask2/3: the reason
-  reason String?
+  reason String? @db.Text
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now()) @updatedAt
