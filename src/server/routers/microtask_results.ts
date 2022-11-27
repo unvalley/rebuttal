@@ -65,7 +65,6 @@ export const microtaskResultsRouter = router({
           const factCount = results.filter((v) => v.value === "FACT").length;
           const opCount = results.filter((v) => v.value === "OPINION").length;
           console.info(`factCount=${factCount}, opCount=${opCount}`);
-          // OPINIONを優先
           const isFact = factCount >= opCount;
 
           // Microtask(2)の集約(結果集積でフィルタリングなどはしていない)
