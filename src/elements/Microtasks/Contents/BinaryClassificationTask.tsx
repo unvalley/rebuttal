@@ -42,8 +42,11 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
           router.push("/workers/tasks/done");
         }
       }
-    } catch {
-      alert("必須項目が入力されていません");
+    } catch (err) {
+      if (err instanceof Error) {
+        alert(err.message);
+        console.error(err);
+      }
     }
   };
 
@@ -78,7 +81,7 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
       </div>
 
       <div className="mt-4">
-        <label htmlFor="modal" className="btn btn-info btn-sm">
+        <label htmlFor="modal" className="btn btn-outline btn-sm">
           文書全体を表示する
         </label>
         <input type="checkbox" id="modal" className="modal-toggle" />
@@ -96,8 +99,7 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
           {props.microtask.kind === MicrotaskKinds.CHECK_OP_OR_FACT ? (
             <>
               <div className="form-control">
-                <label className="label cursor-pointer">
-                  <span className="label-text text-lg">意見</span>
+                <label className="label cursor-pointer justify-start">
                   <input
                     type="radio"
                     value="OPINION"
@@ -105,11 +107,11 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
                     className="radio checked:bg-orange-500"
                     onChange={() => setValue("OPINION")}
                   />
+                  <span className="label-text text-lg ml-2">意見</span>
                 </label>
               </div>
               <div className="form-control">
-                <label className="label cursor-pointer">
-                  <span className="label-text text-lg">事実</span>
+                <label className="label cursor-pointer justify-start">
                   <input
                     type="radio"
                     value="FACT"
@@ -117,6 +119,7 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
                     className="radio checked:bg-blue-500"
                     onChange={() => setValue("FACT")}
                   />
+                  <span className="label-text text-lg ml-2">事実</span>
                 </label>
               </div>
             </>
