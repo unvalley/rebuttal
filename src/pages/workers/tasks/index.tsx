@@ -4,33 +4,28 @@ import { useSession } from "next-auth/react";
 import { MicrotaskDescription } from "../../../elements/Microtasks/MicrotaskDescription";
 import { Wizard } from "react-use-wizard";
 import { ScreenLoading } from "../../../elements/Parts/Loading";
-// import { useBeforeUnload } from "react-use";
-// import { useRouter } from "next/router";
-// import { useEffect } from "react";
+import { MicrotaskKinds, Sentence } from ".prisma/client";
+import { match } from "ts-pattern";
+import type { ExtendedMicrotask } from "../../../types/MicrotaskResponse";
 
-// const useLeavePageConfirmation = (
-//   showAlert = true,
-//   message = "入力した内容がキャンセルされますがよろしいでしょうか？"
-// ) => {
-//   useBeforeUnload(showAlert, message);
-//   const router = useRouter();
-//   useEffect(() => {
-//     const handler = () => {
-//       if (showAlert && !window.confirm(message)) {
-//         throw "キャンセル";
-//       }
-//     };
-//     router.events.on("routeChangeStart", handler);
-//     return () => {
-//       router.events.off("routeChangeStart", handler);
-//     };
-//   }, [showAlert, message, router.events]);
-// };
+const filteredSentencesByKind = (
+  kind: MicrotaskKinds,
+  sentences: Array<Sentence & { isFact?: boolean | undefined }>
+) => {
+  const res = match(kind)
+    .with(MicrotaskKinds.CHECK_OP_OR_FACT, () => sentences)
+    .with(MicrotaskKinds.CHECK_FACT_RESOURCE, () =>
+      sentences.filter((s) => s.isFact === true)
+    )
+    .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () =>
+      sentences.filter((s) => s.isFact === false)
+    )
+    .exhaustive();
+  return res;
+};
 
 const Tasks = () => {
   const { data: session } = useSession();
-  // useLeavePageConfirmation();
-
   // TOOD: sessionのnull対応
   const microtasksQuery = trpc.microtasks.findMicrotasksToAssign.useQuery(
     {
@@ -57,6 +52,17 @@ const Tasks = () => {
 
   const { data: assignedMicrotasks } = microtasksQuery;
 
+  const existsTaksToWork = (assignedMicrotasks: ExtendedMicrotask[]) => {
+    const res = assignedMicrotasks.flatMap((microtask) => {
+      const sentences = filteredSentencesByKind(
+        microtask.kind,
+        microtask.paragraph.sentences
+      );
+      return Boolean(sentences.length);
+    });
+    return res.some((e) => e === true);
+  };
+
   return (
     <div className="container mx-auto">
       <div>
@@ -68,21 +74,26 @@ const Tasks = () => {
         {/* Left Column */}
         <div className="col-span-4">
           <div className="bg-base-100">
-            {assignedMicrotasks && (
-              <div>
-                <Wizard>
-                  {assignedMicrotasks.map((microtask) => {
-                    const sentences = microtask.paragraph.sentences;
-                    return sentences.map((s) => (
+            {assignedMicrotasks && existsTaksToWork(assignedMicrotasks) ? (
+              <Wizard>
+                {assignedMicrotasks.map((microtask) => {
+                  const sentences = filteredSentencesByKind(
+                    microtask.kind,
+                    microtask.paragraph.sentences
+                  );
+                  return sentences.map((s) => {
+                    return (
                       <MicrotaskDescription
-                        key={microtask.id}
+                        key={s.id}
                         microtask={microtask}
                         sentence={s}
                       />
-                    ));
-                  })}
-                </Wizard>
-              </div>
+                    );
+                  });
+                })}
+              </Wizard>
+            ) : (
+              <p>現在，実施対象となるタスクがありません．</p>
             )}
           </div>
         </div>
@@ -106,9 +117,16 @@ const Tasks = () => {
                       <div>
                         {task.paragraph.sentences.map((s, idx) => {
                           return (
-                            <p key={s.id}>
-                              {idx}: {s.body}
-                            </p>
+                            <div key={s.id}>
+                              <p>
+                                {idx}: {s.body}
+                                (事実：
+                                {s.isFact === undefined
+                                  ? "undefined"
+                                  : String(s.isFact)}
+                                )
+                              </p>
+                            </div>
                           );
                         })}
                       </div>

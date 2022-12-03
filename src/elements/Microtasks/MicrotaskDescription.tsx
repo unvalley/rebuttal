@@ -3,25 +3,12 @@ import type { ExtendedMicrotask } from "../../types/MicrotaskResponse";
 import { BinaryClassficationTask } from "./Contents/BinaryClassificationTask";
 import { MicrotaskKinds, Sentence } from ".prisma/client";
 import { useWizard } from "react-use-wizard";
-import { useSessionStorage } from "react-use";
-import { useEffect } from "react";
 
 export const MicrotaskDescription: React.FC<{
   microtask: ExtendedMicrotask;
   sentence: Sentence;
 }> = ({ microtask, sentence }) => {
-  const { activeStep, isLoading, stepCount, goToStep } = useWizard();
-  const [savedActiveStep, setSavedActiveStep] = useSessionStorage(
-    "microtaskActiveStep",
-    activeStep
-  );
-
-  useEffect(() => {
-    setSavedActiveStep(activeStep);
-    if (savedActiveStep !== activeStep) {
-      goToStep(activeStep);
-    }
-  }, [activeStep, goToStep, savedActiveStep, setSavedActiveStep]);
+  const { activeStep, isLoading, stepCount } = useWizard();
 
   if (isLoading) {
     return <p>Loading...</p>;

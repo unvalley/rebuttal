@@ -2,9 +2,17 @@ import { z } from "zod";
 import { publicProcedure } from "../trpc";
 import { router } from "../trpc";
 import { prisma } from "../../lib/prismaClient";
-import { MicrotaskKinds } from ".prisma/client";
+import {
+  Microtask,
+  MicrotaskKinds,
+  MicrotaskResult,
+  Paragraph,
+  Sentence,
+} from ".prisma/client";
 import { TRPCError } from "@trpc/server";
 import type { ExtendedMicrotask } from "../../types/MicrotaskResponse";
+import { groupBy } from "../utils";
+import { match } from "ts-pattern";
 
 const uniq = <T>(array: T[]) => {
   return Array.from(new Set(array));
@@ -56,13 +64,30 @@ export const microtasksRouter = router({
     .query(async ({ input }) => {
       const ASSIGN_COUNT = input.assignCount;
 
-      const userAlreadyCompletedTaskIds = await prisma.microtaskResult
+      const myDoneTaskIds = await prisma.microtaskResult
         .findMany({
           where: {
             assigneeId: input.userId,
           },
         })
         .then((res) => uniq(res.map((r) => r.microtaskId)));
+
+      // filter microtasks that an user has never worked on before and task results does not reach ASSIGN_COUNT
+      const notEnoughTasks = (
+        tasksWithResults: (Microtask & {
+          paragraph: Paragraph & {
+            sentences: Sentence[];
+          };
+          microtaskResults: MicrotaskResult[];
+        })[]
+      ) =>
+        tasksWithResults.flatMap((t) => {
+          const hasDoneEnough = t.microtaskResults.length >= ASSIGN_COUNT;
+          const alreadyDone = myDoneTaskIds.includes(t.id);
+          if (alreadyDone || hasDoneEnough) return [];
+          const { microtaskResults, ...microtask } = t;
+          return microtask;
+        });
 
       // We find tasks that not completed enough (= have not enough records count on `microtask_results`).
       const findNotCompletedEnoughMicrotasks = async (kind: MicrotaskKinds) => {
@@ -80,30 +105,118 @@ export const microtasksRouter = router({
           },
           orderBy: { createdAt: "asc" },
         });
+        return notEnoughTasks(tasksWithResults);
+      };
 
-        // filter microtasks that
-        // - an user has never worked on before
-        // - task results does not reach ASSIGN_COUNT
-        const notEnoughTasks = tasksWithResults.flatMap((t) => {
-          const isCompletedEnoughCount =
-            t.microtaskResults.length >= ASSIGN_COUNT;
-          const alreadyExperienced = userAlreadyCompletedTaskIds.includes(t.id);
-          if (alreadyExperienced || isCompletedEnoughCount) return [];
-          const { microtaskResults, ...microtask } = t;
-          return microtask;
+      const groupBySentenceId = (
+        resultWithSentence: (MicrotaskResult & {
+          sentence: Sentence;
+        })[]
+      ) =>
+        groupBy(resultWithSentence, (r) => r.sentenceId).map(
+          ([sentenceId, results]) => {
+            const factCount = results.filter((v) => v.value === "FACT").length;
+            const opCount = results.filter((v) => v.value === "OPINION").length;
+            // console.log(`factCount=${factCount}, opCount=${opCount}`);
+            const isFact = factCount >= opCount;
+            return {
+              sentenceId,
+              sentence: results[0]?.sentence,
+              isFact,
+            };
+          }
+        );
+
+      const getSentenceIdToIsFactObject = async (sentenceIds: number[]) => {
+        const res = await prisma.microtaskResult.findMany({
+          where: { sentenceId: { in: sentenceIds } },
+          include: { sentence: true },
         });
-        return notEnoughTasks;
+        const sentenceIdToIsFact = groupBySentenceId(res).reduce(
+          (obj, item) => {
+            obj[item.sentenceId] = item.isFact;
+            return obj;
+          },
+          {} as Record<string, boolean>
+        );
+        return sentenceIdToIsFact;
+      };
+
+      // センテンスが事実か意見のどちらに評価されているか，現時点のデータを取得する
+      // Microtask(2)/(3)では，意見文のみ，事実文のみを対象にするため，この処理が必要
+      // タスクの取得ではなくてセンテンスの取得で別に処理を走らせることも考えたが，UI変更の煩雑性も生まれるため，ロジックの複雑性をここに一本化する方針を取った
+      const attachIsFactToSentences = async (
+        tasks: ExtendedMicrotask[]
+      ): Promise<ExtendedMicrotask[]> => {
+        const sentenceIds = tasks.flatMap((t) =>
+          t.paragraph.sentences.flatMap((s) => s.id)
+        );
+        const sentenceIdToIsFact = await getSentenceIdToIsFactObject(
+          sentenceIds
+        );
+
+        if (Object.keys(sentenceIdToIsFact).length === 0) {
+          return tasks;
+        }
+
+        return tasks.map((t) => {
+          return {
+            ...t,
+            paragraph: {
+              ...t.paragraph,
+              sentences: t.paragraph.sentences.map((s) => {
+                return {
+                  ...s,
+                  isFact: sentenceIdToIsFact[s.id.toString()],
+                };
+              }),
+            },
+          };
+        });
+      };
+
+      const needsIsFactField = (kind: MicrotaskKinds) =>
+        kind === MicrotaskKinds.CHECK_FACT_RESOURCE ||
+        kind === MicrotaskKinds.CHECK_OPINION_VALIDNESS;
+
+      const validTasksToWork = (assignedMicrotasks: ExtendedMicrotask[]) => {
+        return assignedMicrotasks.flatMap((microtask) => {
+          const sentences = filteredSentencesByKind(
+            microtask.kind,
+            microtask.paragraph.sentences
+          );
+          return Boolean(sentences.length) ? microtask : [];
+        });
+      };
+
+      const filteredSentencesByKind = (
+        kind: MicrotaskKinds,
+        sentences: Array<Sentence & { isFact?: boolean | undefined }>
+      ) => {
+        return match(kind)
+          .with(MicrotaskKinds.CHECK_OP_OR_FACT, () => sentences)
+          .with(MicrotaskKinds.CHECK_FACT_RESOURCE, () =>
+            sentences.filter((s) => s.isFact === true)
+          )
+          .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () =>
+            sentences.filter((s) => s.isFact === false)
+          )
+          .exhaustive();
       };
 
       // アサイン対象のマイクロタスクを取得する
       // MicrotaskKindsのvalueの順序で，status=CREATEDであるマイクロタスクを取得して，ASSIGN_COUNT以上になるまで取得する
       const prepareMicrotasksToAssign = async () => {
         let result: ExtendedMicrotask[] = [];
-        // Sequential and mutable, but its ok for now.
-        // We don't care performance for now...
+        // Sequential and mutable, but its ok for now. We don't care performance for now...
         for (const kind of Object.values(MicrotaskKinds)) {
           const _tasks = await findNotCompletedEnoughMicrotasks(kind);
-          result = [...result, ..._tasks];
+          // Microtask(2)/(3)にて，{isFact: boolean} を追加したSentenceを生成
+          const tasksWithSentenceAttachedIsFact = needsIsFactField(kind)
+            ? await attachIsFactToSentences(_tasks)
+            : _tasks;
+          const validTasks = validTasksToWork(tasksWithSentenceAttachedIsFact);
+          result = [...result, ...validTasks];
           if (result.length >= ASSIGN_COUNT) {
             console.info("OK: We get enough new tasks.");
             break;
@@ -116,7 +229,6 @@ export const microtasksRouter = router({
 
       if (!microtasks.length) {
         throw new TRPCError({
-          // correct?
           code: "INTERNAL_SERVER_ERROR",
           // message: `All microtasks are already done. No microtasks to assign.`,
           message: `全てのマイクロタスクが完了されています．現在，次に取り組むべきタスクが存在しません．`,
