@@ -2,16 +2,49 @@ import { match } from "ts-pattern";
 import type { ExtendedMicrotask } from "../../types/MicrotaskResponse";
 import { BinaryClassficationTask } from "./Contents/BinaryClassificationTask";
 import { MicrotaskKinds, Sentence } from ".prisma/client";
+import { useWizard } from "react-use-wizard";
+import { useSessionStorage } from "react-use";
+import { useEffect } from "react";
 
 export const MicrotaskDescription: React.FC<{
   microtask: ExtendedMicrotask;
   sentence: Sentence;
 }> = ({ microtask, sentence }) => {
+  const { activeStep, isLoading, stepCount, goToStep } = useWizard();
+  const [savedActiveStep, setSavedActiveStep] = useSessionStorage(
+    "microtaskActiveStep",
+    activeStep
+  );
+
+  useEffect(() => {
+    setSavedActiveStep(activeStep);
+    if (savedActiveStep !== activeStep) {
+      goToStep(activeStep);
+    }
+  }, [activeStep, goToStep, savedActiveStep, setSavedActiveStep]);
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  const displaStep = {
+    activeStep: activeStep + 1,
+    stepCount: stepCount,
+  };
+
   return (
-    <div>
+    <div className="w-5/6">
       <div className="">
         <span>タスク：</span>
         <span className="text-lg font-bold">{microtask.title}</span>
+        <span>
+          （{displaStep.activeStep}件目/{displaStep.stepCount}件中）
+        </span>
+        <progress
+          className="progress progress-success"
+          value={activeStep}
+          max={stepCount}
+        />
       </div>
       <div className="mt-2">
         {match(microtask.kind)

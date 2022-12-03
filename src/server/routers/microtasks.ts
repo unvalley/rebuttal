@@ -6,6 +6,10 @@ import { MicrotaskKinds } from ".prisma/client";
 import { TRPCError } from "@trpc/server";
 import type { ExtendedMicrotask } from "../../types/MicrotaskResponse";
 
+const uniq = <T>(array: T[]) => {
+  return Array.from(new Set(array));
+};
+
 export const microtasksRouter = router({
   findById: publicProcedure
     .input(z.object({ id: z.number() }))
@@ -52,9 +56,17 @@ export const microtasksRouter = router({
     .query(async ({ input }) => {
       const ASSIGN_COUNT = input.assignCount;
 
+      const userAlreadyCompletedTaskIds = await prisma.microtaskResult
+        .findMany({
+          where: {
+            assigneeId: input.userId,
+          },
+        })
+        .then((res) => uniq(res.map((r) => r.microtaskId)));
+
       // We find tasks that not completed enough (= have not enough records count on `microtask_results`).
       const findNotCompletedEnoughMicrotasks = async (kind: MicrotaskKinds) => {
-        const tasks = await prisma.microtask.findMany({
+        const tasksWithResults = await prisma.microtask.findMany({
           where: {
             kind: kind,
           },
@@ -66,32 +78,21 @@ export const microtasksRouter = router({
               },
             },
           },
-          take: ASSIGN_COUNT,
           orderBy: { createdAt: "asc" },
-        });
-
-        const userAlreadyCompletedTaskIds = tasks.flatMap((t) => {
-          return t.microtaskResults.flatMap((tr) => {
-            if (tr.assigneeId === input.userId) {
-              return tr.microtaskId;
-            }
-            return [];
-          });
         });
 
         // filter microtasks that
         // - an user has never worked on before
         // - task results does not reach ASSIGN_COUNT
-        const tasksNotCompletedEnough = tasks.flatMap((t) => {
+        const notEnoughTasks = tasksWithResults.flatMap((t) => {
           const isCompletedEnoughCount =
             t.microtaskResults.length >= ASSIGN_COUNT;
-          const userHasAlreadyExperienced =
-            userAlreadyCompletedTaskIds.includes(t.id);
-          if (userHasAlreadyExperienced || isCompletedEnoughCount) return [];
+          const alreadyExperienced = userAlreadyCompletedTaskIds.includes(t.id);
+          if (alreadyExperienced || isCompletedEnoughCount) return [];
           const { microtaskResults, ...microtask } = t;
           return microtask;
         });
-        return tasksNotCompletedEnough;
+        return notEnoughTasks;
       };
 
       // アサイン対象のマイクロタスクを取得する
