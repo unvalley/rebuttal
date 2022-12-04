@@ -63,6 +63,7 @@ export const microtasksRouter = router({
     )
     .query(async ({ input }) => {
       const ASSIGN_COUNT = input.assignCount;
+      const SHOULD_BE_DONE_COUNT = 5;
 
       const myDoneTaskIds = await prisma.microtaskResult
         .findMany({
@@ -82,7 +83,8 @@ export const microtasksRouter = router({
         })[]
       ) =>
         tasksWithResults.flatMap((t) => {
-          const hasDoneEnough = t.microtaskResults.length >= ASSIGN_COUNT;
+          const hasDoneEnough =
+            t.microtaskResults.length >= SHOULD_BE_DONE_COUNT;
           const alreadyDone = myDoneTaskIds.includes(t.id);
           if (alreadyDone || hasDoneEnough) return [];
           const { microtaskResults, ...microtask } = t;
