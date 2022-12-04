@@ -30,7 +30,7 @@ const Tasks = () => {
   const microtasksQuery = trpc.microtasks.findMicrotasksToAssign.useQuery(
     {
       userId: session?.user.id as number,
-      assignCount: 2,
+      assignCount: 3,
     },
     {
       refetchOnWindowFocus: false,

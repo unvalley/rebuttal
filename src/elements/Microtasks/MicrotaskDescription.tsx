@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 import type { ExtendedMicrotask } from "../../types/MicrotaskResponse";
-import { BinaryClassficationTask } from "./Contents/BinaryClassificationTask";
+import { ClassficationTask } from "./Contents/ClassificationTask";
 import { MicrotaskKinds, Sentence } from ".prisma/client";
 import { useWizard } from "react-use-wizard";
 
@@ -37,7 +37,7 @@ export const MicrotaskDescription: React.FC<{
         {match(microtask.kind)
           .with(MicrotaskKinds.CHECK_OP_OR_FACT, () => {
             return (
-              <BinaryClassficationTask
+              <ClassficationTask
                 microtask={microtask}
                 sentence={sentence}
                 taskTitle="次の文（センテンス）は、意見と事実のどちらですか？"
@@ -45,15 +45,14 @@ export const MicrotaskDescription: React.FC<{
             );
           })
           .with(MicrotaskKinds.CHECK_FACT_RESOURCE, () => (
-            <BinaryClassficationTask
+            <ClassficationTask
               microtask={microtask}
               sentence={sentence}
-              taskTitle="次のハイライトされた文（センテンス）には、文献情報がありますか？"
-              withReason={true}
+              taskTitle="次のハイライトされた文（センテンス）には、文献情報が書かれていますか？"
             />
           ))
           .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () => (
-            <BinaryClassficationTask
+            <ClassficationTask
               microtask={microtask}
               sentence={sentence}
               taskTitle="次のハイライトされた意見を表す文（センテンス）には，それを根拠付ける妥当な事実が書かれていますか？"

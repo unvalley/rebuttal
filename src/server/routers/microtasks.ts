@@ -11,12 +11,12 @@ import {
 } from ".prisma/client";
 import { TRPCError } from "@trpc/server";
 import type { ExtendedMicrotask } from "../../types/MicrotaskResponse";
-import { groupBy } from "../utils";
-import { match } from "ts-pattern";
-
-const uniq = <T>(array: T[]) => {
-  return Array.from(new Set(array));
-};
+import {
+  filterSentencesByKindAndIsFact,
+  groupBy,
+  isMicrotaskSecondOrThird,
+  uniq,
+} from "../utils";
 
 export const microtasksRouter = router({
   findById: publicProcedure
@@ -127,19 +127,23 @@ export const microtasksRouter = router({
           }
         );
 
-      const getSentenceIdToIsFactObject = async (sentenceIds: number[]) => {
+      const findMicrotasksBySentenceIds = async (sentenceIds: number[]) => {
         const res = await prisma.microtaskResult.findMany({
           where: { sentenceId: { in: sentenceIds } },
           include: { sentence: true },
         });
-        const sentenceIdToIsFact = groupBySentenceId(res).reduce(
-          (obj, item) => {
-            obj[item.sentenceId] = item.isFact;
-            return obj;
-          },
-          {} as Record<string, boolean>
-        );
-        return sentenceIdToIsFact;
+        return res;
+      };
+
+      // creates {[sentenceId: string]: [isFact: boolean], ...}
+      const acquireSentenceIdToIsFactObject = async (
+        sentenceIds: number[]
+      ): Promise<Record<string, boolean>> => {
+        const res = await findMicrotasksBySentenceIds(sentenceIds);
+        return groupBySentenceId(res).reduce((obj, item) => {
+          obj[item.sentenceId] = item.isFact;
+          return obj;
+        }, {} as Record<string, boolean>);
       };
 
       // センテンスが事実か意見のどちらに評価されているか，現時点のデータを取得する
@@ -151,13 +155,10 @@ export const microtasksRouter = router({
         const sentenceIds = tasks.flatMap((t) =>
           t.paragraph.sentences.flatMap((s) => s.id)
         );
-        const sentenceIdToIsFact = await getSentenceIdToIsFactObject(
+        const sentenceIdToIsFact = await acquireSentenceIdToIsFactObject(
           sentenceIds
         );
-
-        if (Object.keys(sentenceIdToIsFact).length === 0) {
-          return tasks;
-        }
+        if (Object.keys(sentenceIdToIsFact).length === 0) return tasks;
 
         return tasks.map((t) => {
           return {
@@ -175,33 +176,14 @@ export const microtasksRouter = router({
         });
       };
 
-      const needsIsFactField = (kind: MicrotaskKinds) =>
-        kind === MicrotaskKinds.CHECK_FACT_RESOURCE ||
-        kind === MicrotaskKinds.CHECK_OPINION_VALIDNESS;
-
       const validTasksToWork = (assignedMicrotasks: ExtendedMicrotask[]) => {
         return assignedMicrotasks.flatMap((microtask) => {
-          const sentences = filteredSentencesByKind(
+          const sentences = filterSentencesByKindAndIsFact(
             microtask.kind,
             microtask.paragraph.sentences
           );
           return Boolean(sentences.length) ? microtask : [];
         });
-      };
-
-      const filteredSentencesByKind = (
-        kind: MicrotaskKinds,
-        sentences: Array<Sentence & { isFact?: boolean | undefined }>
-      ) => {
-        return match(kind)
-          .with(MicrotaskKinds.CHECK_OP_OR_FACT, () => sentences)
-          .with(MicrotaskKinds.CHECK_FACT_RESOURCE, () =>
-            sentences.filter((s) => s.isFact === true)
-          )
-          .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () =>
-            sentences.filter((s) => s.isFact === false)
-          )
-          .exhaustive();
       };
 
       // アサイン対象のマイクロタスクを取得する
@@ -212,9 +194,10 @@ export const microtasksRouter = router({
         for (const kind of Object.values(MicrotaskKinds)) {
           const _tasks = await findNotCompletedEnoughMicrotasks(kind);
           // Microtask(2)/(3)にて，{isFact: boolean} を追加したSentenceを生成
-          const tasksWithSentenceAttachedIsFact = needsIsFactField(kind)
+          const tasksWithSentenceAttachedIsFact = isMicrotaskSecondOrThird(kind)
             ? await attachIsFactToSentences(_tasks)
             : _tasks;
+          // Microtask(2)/(3)の場合，
           const validTasks = validTasksToWork(tasksWithSentenceAttachedIsFact);
           result = [...result, ...validTasks];
           if (result.length >= ASSIGN_COUNT) {
@@ -222,12 +205,13 @@ export const microtasksRouter = router({
             break;
           }
         }
-        return result.slice(0, ASSIGN_COUNT);
+        return result;
       };
 
       const microtasks = await prepareMicrotasksToAssign();
+      const slicedMicrotasks = microtasks.slice(0, ASSIGN_COUNT);
 
-      if (!microtasks.length) {
+      if (!slicedMicrotasks.length) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           // message: `All microtasks are already done. No microtasks to assign.`,
@@ -235,6 +219,6 @@ export const microtasksRouter = router({
         });
       }
 
-      return microtasks;
+      return slicedMicrotasks;
     }),
 });

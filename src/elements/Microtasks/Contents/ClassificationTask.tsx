@@ -13,13 +13,13 @@ type Props = {
   actions?: React.ReactNode;
 };
 
-const hightlihgtIfTrue = (pred: boolean) => (pred ? "bg-blue-200" : "");
+const highlightByIsFact = (pred: boolean) =>
+  pred ? "bg-blue-200" : "bg-orange-200";
 
-export const BinaryClassficationTask: React.FC<Props> = (props) => {
+export const ClassficationTask: React.FC<Props> = (props) => {
   const router = useRouter();
   const { data: session } = useSession();
   const { nextStep, isLastStep, isLoading } = useWizard();
-
   const { value, setValue, reason, setReason, complete } = useCompleteMicrotask(
     {
       userId: session?.user.id as number,
@@ -31,7 +31,6 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       await complete().then(() => {
         if (confirm("回答を送信しました。次のタスクに進みます。")) {
@@ -64,16 +63,18 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
           ) : (
             <>
               {/* MTask(2)/(3)では，パラグラフを表示する */}
-              {props.microtask.paragraph.sentences.map((s) => {
-                return (
-                  <span
-                    key={s.id}
-                    className={hightlihgtIfTrue(s.id === props.sentence.id)}
-                  >
-                    {s.body}
-                  </span>
-                );
-              })}
+              {props.microtask.paragraph.sentences.map((s) => (
+                <span
+                  key={s.id}
+                  className={
+                    s.id === props.sentence.id
+                      ? highlightByIsFact(s.isFact === true)
+                      : ""
+                  }
+                >
+                  {s.body}
+                </span>
+              ))}
             </>
           )}
         </span>
