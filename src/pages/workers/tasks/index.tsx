@@ -4,8 +4,25 @@ import { useSession } from "next-auth/react";
 import { MicrotaskDescription } from "../../../elements/Microtasks/MicrotaskDescription";
 import { Wizard } from "react-use-wizard";
 import { ScreenLoading } from "../../../elements/Parts/Loading";
-import type { Session } from "next-auth";
+import { MicrotaskKinds, Sentence } from ".prisma/client";
+import { match } from "ts-pattern";
 import type { ExtendedMicrotask } from "../../../types/MicrotaskResponse";
+
+const filteredSentencesByKind = (
+  kind: MicrotaskKinds,
+  sentences: Array<Sentence & { isFact?: boolean | undefined }>
+) => {
+  const res = match(kind)
+    .with(MicrotaskKinds.CHECK_OP_OR_FACT, () => sentences)
+    .with(MicrotaskKinds.CHECK_FACT_RESOURCE, () =>
+      sentences.filter((s) => s.isFact === true)
+    )
+    .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () =>
+      sentences.filter((s) => s.isFact === false)
+    )
+    .exhaustive();
+  return res;
+};
 
 const Tasks = () => {
   const { data: session } = useSession();
@@ -13,7 +30,7 @@ const Tasks = () => {
   const microtasksQuery = trpc.microtasks.findMicrotasksToAssign.useQuery(
     {
       userId: session?.user.id as number,
-      assignCount: 5,
+      assignCount: 3,
     },
     {
       refetchOnWindowFocus: false,
@@ -34,11 +51,17 @@ const Tasks = () => {
   }
 
   const { data: assignedMicrotasks } = microtasksQuery;
-  // const isMicrotaskAssigned = assignedMicrotasks?.length !== 0;
-  // const hasDoneAllAssignedMicrotasks =
-  //   assignedMicrotasks && assignedMicrotasks?.length >= 1;
-  // NOTE: [].every() return true
-  // assignedMicrotasks.every((m) => m.status === MicrotaskStatus.DONE);
+
+  const existsTaksToWork = (assignedMicrotasks: ExtendedMicrotask[]) => {
+    const res = assignedMicrotasks.flatMap((microtask) => {
+      const sentences = filteredSentencesByKind(
+        microtask.kind,
+        microtask.paragraph.sentences
+      );
+      return Boolean(sentences.length);
+    });
+    return res.some((e) => e === true);
+  };
 
   return (
     <div className="container mx-auto">
@@ -47,32 +70,31 @@ const Tasks = () => {
         <span>ここでは、文書改善タスクを行っていただきます。</span>
       </div>
 
-      <div className="grid grid-cols-6 mt-4">
+      <div className="grid grid-cols-6 mt-4 gap-4">
         {/* Left Column */}
         <div className="col-span-4">
           <div className="bg-base-100">
-            {assignedMicrotasks && (
-              <MicrotaskAssigned
-                session={session}
-                microtasks={assignedMicrotasks}
-              />
+            {assignedMicrotasks && existsTaksToWork(assignedMicrotasks) ? (
+              <Wizard>
+                {assignedMicrotasks.map((microtask) => {
+                  const sentences = filteredSentencesByKind(
+                    microtask.kind,
+                    microtask.paragraph.sentences
+                  );
+                  return sentences.map((s) => {
+                    return (
+                      <MicrotaskDescription
+                        key={s.id}
+                        microtask={microtask}
+                        sentence={s}
+                      />
+                    );
+                  });
+                })}
+              </Wizard>
+            ) : (
+              <p>現在，実施対象となるタスクがありません．</p>
             )}
-            {/**
-            // !hasDoneAllAssignedMicrotasks ? (
-              <MicrotaskAssigned microtasks={assignedMicrotasks} />
-            // ) : (
-            //   <>
-            //     {hasDoneAllAssignedMicrotasks === true && (
-            //       <p>再度タスクを行っていただきありがとうございます．</p>
-            //     )}
-            //     <MicrotaskUnassigned
-            //       session={session}
-            //       assign={assignMicrotasks}
-            //       errorMessage={assignErrorMessage}
-            //     />
-            //   </>
-            // )}
-             */}
           </div>
         </div>
         <div className="col-span-2">
@@ -92,7 +114,22 @@ const Tasks = () => {
                         {task.title} (ID={task.id})
                       </div>
                       <div>対象パラグラフ(ID={task.paragraphId}): </div>
-                      {/* <div>対象センテンス(ID={}): </div> */}
+                      <div>
+                        {task.paragraph.sentences.map((s, idx) => {
+                          return (
+                            <div key={s.id}>
+                              <p>
+                                {idx}: {s.body}
+                                (事実：
+                                {s.isFact === undefined
+                                  ? "undefined"
+                                  : String(s.isFact)}
+                                )
+                              </p>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -103,69 +140,6 @@ const Tasks = () => {
     </div>
   );
 };
-
-const MicrotaskAssigned: React.FC<{
-  session: Session;
-  microtasks: ExtendedMicrotask[];
-}> = (props) => {
-  console.log(
-    `実際にやる回数：${props.microtasks
-      .flatMap((m) => m.paragraph.sentences.length)
-      .reduce((sum, e) => sum + e, 0)}`
-  );
-  return (
-    <div>
-      <Wizard>
-        {props.microtasks.map((microtask) => {
-          const sentences = microtask.paragraph.sentences;
-          return sentences.map((s) => (
-            <MicrotaskDescription
-              key={microtask.id}
-              microtask={microtask}
-              sentence={s}
-            />
-          ));
-        })}
-      </Wizard>
-    </div>
-  );
-};
-
-// const MicrotaskUnassigned: React.FC<{
-//   session: Session;
-//   errorMessage: string;
-//   assign: (session: Session) => Promise<void>;
-// }> = ({ session, assign, errorMessage }) => {
-//   const [loading, setLoading] = useState(false);
-//   const handleClick = async () => {
-//     setLoading(true);
-//     await assign(session)
-//       .then(() => {
-//         setLoading(false);
-//       })
-//       .catch((error) => {
-//         console.error(error);
-//         setLoading(false);
-//       });
-//   };
-
-//   return (
-//     <div>
-//       <div className="text-md">タスクがまだ割り当てられていません</div>
-//       <p>ボタンを押すと，タスクが割り当てられます．</p>
-//       {errorMessage && <p className="text-red-600">{errorMessage}</p>}
-//       <div className="">
-//         {loading ? (
-//           <button className="btn btn-square loading"></button>
-//         ) : (
-//           <button className="btn mt-4" onClick={handleClick}>
-//             割り当てを行う
-//           </button>
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
 
 Tasks.getLayout = function getLayout(page: React.ReactElement) {
   return <Layout>{page}</Layout>;

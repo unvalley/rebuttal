@@ -7,41 +7,39 @@ import { useCompleteMicrotask } from "../hooks/useCompleteMicrotask";
 
 type Props = {
   microtask: ExtendedMicrotask;
-  // TODO:  使えると確信できたらrequired
   sentence: Sentence;
   taskTitle?: string;
   withReason?: boolean;
   actions?: React.ReactNode;
 };
 
-const hightlihgtIfTrue = (pred: boolean) => {
-  if (pred) return "bg-blue-200";
-  return "";
-};
+const highlightByIsFact = (pred: boolean) =>
+  pred ? "bg-blue-200" : "bg-orange-200";
 
-export const BinaryClassficationTask: React.FC<Props> = (props) => {
+export const ClassficationTask: React.FC<Props> = (props) => {
   const router = useRouter();
   const { data: session } = useSession();
-  const { nextStep, isLastStep } = useWizard();
-
+  const { nextStep, isLastStep, isLoading } = useWizard();
   const { value, setValue, reason, setReason, complete } = useCompleteMicrotask(
     {
       userId: session?.user.id as number,
       microtaskId: props.microtask.id,
       sentenceId: props.sentence.id,
+      microtaskKind: props.microtask.kind,
     }
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      complete();
-      if (confirm("回答を送信しました。次のタスクに進みます。")) {
-        nextStep();
-        if (isLastStep) {
-          router.push("/workers/tasks/done");
+      await complete().then(() => {
+        if (confirm("回答を送信しました。次のタスクに進みます。")) {
+          nextStep();
+          if (isLastStep) {
+            router.push("/workers/tasks/done");
+          }
         }
-      }
+      });
     } catch (err) {
       if (err instanceof Error) {
         alert(err.message);
@@ -50,13 +48,13 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
     }
   };
 
+  if (isLoading) {
+    <p>Loading..</p>;
+  }
+
   return (
-    <div className="w-5/6">
+    <div className="">
       <span className="text-2xl font-semibold">{props.taskTitle}</span>
-      <div className="text-lg">
-        <span className="bg-green-100 text-green-800">簡単</span>
-        <span className="text-green-700">: 3-5分</span>
-      </div>
       <div className="mt-4">
         {/* タスクに関わらず，全てセンテンスに対して紐付ける */}
         <span className="">
@@ -65,16 +63,18 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
           ) : (
             <>
               {/* MTask(2)/(3)では，パラグラフを表示する */}
-              {props.microtask.paragraph.sentences.map((s) => {
-                return (
-                  <span
-                    key={s.id}
-                    className={hightlihgtIfTrue(s.id === props.sentence.id)}
-                  >
-                    {s.body}
-                  </span>
-                );
-              })}
+              {props.microtask.paragraph.sentences.map((s) => (
+                <span
+                  key={s.id}
+                  className={
+                    s.id === props.sentence.id
+                      ? highlightByIsFact(s.isFact === true)
+                      : ""
+                  }
+                >
+                  {s.body}
+                </span>
+              ))}
             </>
           )}
         </span>
@@ -122,12 +122,25 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
                   <span className="label-text text-lg ml-2">事実</span>
                 </label>
               </div>
+              <div className="form-control">
+                <label className="label cursor-pointer justify-start">
+                  <input
+                    type="radio"
+                    value="UNKNOWN"
+                    checked={value === "UNKNOWN"}
+                    className="radio checked:bg-slate-600"
+                    onChange={() => setValue("UNKNOWN")}
+                  />
+                  <span className="label-text text-lg ml-2">
+                    どちらでもない
+                  </span>
+                </label>
+              </div>
             </>
           ) : (
             <>
               <div className="form-control">
-                <label className="label cursor-pointer">
-                  <span className="label-text text-lg">書かれている</span>
+                <label className="label cursor-pointer justify-start">
                   <input
                     type="radio"
                     value="TRUE"
@@ -135,11 +148,11 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
                     className="radio checked:bg-orange-500"
                     onChange={() => setValue("TRUE")}
                   />
+                  <span className="label-text text-lg ml-2">書かれている</span>
                 </label>
               </div>
               <div className="form-control">
-                <label className="label cursor-pointer">
-                  <span className="label-text text-lg">書かれていない</span>
+                <label className="label cursor-pointer justify-start">
                   <input
                     type="radio"
                     value="FALSE"
@@ -147,6 +160,9 @@ export const BinaryClassficationTask: React.FC<Props> = (props) => {
                     className="radio checked:bg-blue-500"
                     onChange={() => setValue("FALSE")}
                   />
+                  <span className="label-text text-lg ml-2">
+                    書かれていない
+                  </span>
                 </label>
               </div>
             </>

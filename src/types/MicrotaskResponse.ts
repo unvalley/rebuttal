@@ -4,7 +4,7 @@ export type MicrotaskWithParagraph = Microtask & { paragraph: Paragraph };
 
 export type ExtendedMicrotask = Microtask & {
   paragraph: Paragraph & {
-    sentences: Sentence[];
+    sentences: Array<Sentence & { isFact?: boolean | undefined }>;
   };
 };
 
