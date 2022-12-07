@@ -10,6 +10,7 @@ type Props = {
   sentence: Sentence;
   taskTitle?: string;
   withReason?: boolean;
+  reasonText?: string;
   actions?: React.ReactNode;
 };
 
@@ -170,9 +171,7 @@ export const ClassficationTask: React.FC<Props> = (props) => {
           {/* 理由 */}
           {props.withReason && (
             <div className="form-control mt-4">
-              <span className="label-text text-lg">
-                上記の回答理由を述べてください．
-              </span>
+              <span className="label-text text-lg">{props.reasonText}</span>
               <textarea
                 className="textarea textarea-accent"
                 name="textarea"

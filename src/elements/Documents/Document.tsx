@@ -4,49 +4,59 @@ interface DocumentProps {
   title: string;
   body: string;
   aggregatedResults: AggregatedResultsBySentence[];
-  sentenceSelection:
-    | {
-        selectedSentenceId: number | undefined;
-        setSelectedSentenceId: React.Dispatch<
-          React.SetStateAction<number | undefined>
-        >;
-      }
-    | undefined;
+  sentenceSelection: {
+    selectedSentenceId: number | undefined;
+    setSelectedSentenceId: React.Dispatch<
+      React.SetStateAction<number | undefined>
+    >;
+  };
+  scrollToFeedback: (sentenceId: number) => void;
   canEdit: boolean;
 }
 
-const opinionOrFactStyle = (isFact: boolean) => {
-  return isFact ? "bg-blue-100" : "bg-orange-100";
+const borderByIsFact = (isFact: boolean) => {
+  return isFact
+    ? "border-b-2 border-indigo-300 border-b-indigo-300"
+    : "border-b-2 border-orange-300 border-b-orange-300";
 };
 
-export const Document: React.FC<DocumentProps> = (props) => {
-  const selectedSentenceStyle = (sentenceId: number) =>
-    props.sentenceSelection?.selectedSentenceId === sentenceId
-      ? "bg-emerald-100"
-      : "";
+const highlightByIsFact = (isFact: boolean) => {
+  return isFact ? "bg-indigo-100" : "bg-orange-100";
+};
+
+export const Document: React.FC<DocumentProps> = ({
+  title,
+  aggregatedResults,
+  sentenceSelection,
+  scrollToFeedback,
+}) => {
+  const { selectedSentenceId, setSelectedSentenceId } = sentenceSelection;
+  const isSelected = (sentenceId: number) => selectedSentenceId === sentenceId;
 
   return (
     <div className="bg-base-100">
-      <div className="font-bold">{props.title || "Untitled"}</div>
-
-      {props.aggregatedResults.map((s) => {
-        return (
-          <span
-            key={s.sentenceId}
-            className={`${opinionOrFactStyle(s.isFact)} ${selectedSentenceStyle(
-              s.sentenceId
-            )}`}
-            onMouseEnter={() =>
-              props.sentenceSelection?.setSelectedSentenceId(s.sentenceId)
-            }
-            onMouseLeave={() =>
-              props.sentenceSelection?.setSelectedSentenceId(undefined)
-            }
-          >
-            {s.sentence?.body}
-          </span>
-        );
-      })}
+      <div className="font-bold">{title || "Untitled"}</div>
+      <div>
+        {aggregatedResults.map((s) => {
+          return (
+            <span
+              key={s.sentenceId}
+              className={`
+                mx-1
+                ${borderByIsFact(s.isFact)}
+                ${isSelected(s.sentenceId) && highlightByIsFact(s.isFact)}
+              `}
+              onClick={() => scrollToFeedback(s.sentenceId)}
+              onMouseEnter={() => {
+                setSelectedSentenceId(s.sentenceId);
+              }}
+              onMouseLeave={() => setSelectedSentenceId(undefined)}
+            >
+              {s.sentence?.body}
+            </span>
+          );
+        })}
+      </div>
     </div>
   );
 };

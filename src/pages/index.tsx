@@ -6,7 +6,7 @@ import { Layout } from "../elements/Layout";
 const Index = () => {
   const files = [
     "/",
-    "/workers/documents/1",
+    "/documents/1",
     "/workers/tasks",
     "/writers/documents/1",
     "/writers/tasks",
@@ -94,15 +94,13 @@ const Index = () => {
       </div>
       {process.env.NODE_ENV === "development" && (
         <ul className="mt-14">
-          {files.map((file) => {
-            return (
-              <li key={file}>
-                <Link href={file}>
-                  <a className="btn btn-ghost normal-case text-xl">{file}</a>
-                </Link>
-              </li>
-            );
-          })}
+          {files.map((file) => (
+            <li key={file}>
+              <Link href={file}>
+                <a className="btn btn-ghost normal-case text-xl">{file}</a>
+              </Link>
+            </li>
+          ))}
         </ul>
       )}
     </div>
