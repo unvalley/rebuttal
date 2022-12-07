@@ -151,82 +151,129 @@ const Documents = () => {
           <div>
             {/* // fix style */}
             <div className="overflow-scroll" style={{ height: "740px" }}>
-              {[...aggregatedResults].map((result, idx) => (
-                <div
-                  key={idx}
-                  tabIndex={idx}
-                  className={`my-4 mx-4 card bg-base-100 shadow-xl collapse
+              {aggregatedResults.map((result, idx) => {
+                // リファクタ & 数によって見せるか否か
+                const opinionValidnessCount = {
+                  falseCount: result.opinonValidnessResults.filter(
+                    (e) => e.value === "FALSE"
+                  ).length,
+                  resultCount: result.opinonValidnessResults.length,
+                };
+                const resourceCheckCount = {
+                  falseCount: result.resourceCheckResults.filter(
+                    (e) => e.value === "FALSE"
+                  ).length,
+                  resultCount: result.resourceCheckResults.length,
+                };
+
+                return (
+                  <div
+                    key={idx}
+                    tabIndex={idx}
+                    className={`my-4 mx-4 card bg-base-100 shadow-xl collapse
                       ${
                         isSentenceSelected(result.sentenceId)
                           ? "shadow-slate-300 bg-stone-50 border-1 border-stone-100"
                           : ""
                       }
                   `}
-                  ref={listRefs.current[result.sentenceId]}
-                  onMouseEnter={() => setSelectedSentenceId(result.sentenceId)}
-                  onMouseLeave={() => setSelectedSentenceId(undefined)}
-                >
-                  <div className="card-body p-0">
-                    <div
-                      className={`card-title collapse-title font-light text-base ${
-                        isSentenceSelected(result.sentenceId)
-                          ? "font-semibold"
-                          : ""
-                      }`}
-                    >
-                      <span
-                        className={`
-                        ${textColorByIsFact(result.isFact)} text-xs px-1`}
+                    ref={listRefs.current[result.sentenceId]}
+                    onMouseEnter={() =>
+                      setSelectedSentenceId(result.sentenceId)
+                    }
+                    onMouseLeave={() => setSelectedSentenceId(undefined)}
+                  >
+                    <div className="card-body p-0">
+                      <div
+                        className={`card-title collapse-title font-light text-base ${
+                          isSentenceSelected(result.sentenceId)
+                            ? "font-semibold"
+                            : ""
+                        }`}
                       >
-                        ●
-                      </span>
-                      <div className="flex items-center justify-end">
-                        <span className="text-md font-normal">
-                          {result.isFact ? "文献情報の欠落" : "意見が弱い"}
+                        <span
+                          className={`
+                        ${textColorByIsFact(result.isFact)} text-xs px-1`}
+                        >
+                          ●
                         </span>
-                        <span>・</span>
-                        <span className="font-light text-md text-slate-500">
-                          {result.isFact
-                            ? "信頼できる文献情報が必要"
-                            : "妥当な根拠が必要"}
-                        </span>
+                        <div className="flex items-center justify-end">
+                          <span className="text-md font-normal">
+                            {result.isFact ? "文献情報の欠落" : "意見が弱い"}
+                          </span>
+                          <span>・</span>
+                          <span className="font-light text-md text-slate-500">
+                            {result.isFact
+                              ? "信頼できる文献情報が必要"
+                              : "妥当な根拠が必要"}
+                          </span>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="collapse-content">
-                      <div className="">
-                        {result.sentence?.body} (id: {result.sentenceId})
-                      </div>
-                      <div className="mt-2">
-                        {result.isFact ? (
-                          <>
-                            <div className="font-semibold">
-                              {MICROTASKS.CHECK_FACT_RESOURCE}
-                            </div>
-                            {result.resourceCheckResults.map((o, idx) => (
-                              <div key={idx}>
-                                <p>値: {o.value}</p>
+                      <div className="collapse-content">
+                        <div className="">
+                          {result.sentence?.body} (id: {result.sentenceId})
+                        </div>
+                        <div className="mt-2">
+                          {result.isFact ? (
+                            <>
+                              <div>
+                                {resourceCheckCount.resultCount}
+                                人が、この文章において、「
+                                <span className="font-semibold">
+                                  {MICROTASKS.CHECK_FACT_RESOURCE}
+                                </span>
+                                」を行いました。 そのうちの
+                                {resourceCheckCount.falseCount}人が「
+                                <span className="font-semibold">
+                                  妥当な根拠となる情報が書かれていない
+                                </span>
+                                」と述べています。
+                                具体的に、以下のようなフィードバックが得られました。
                               </div>
-                            ))}
-                          </>
-                        ) : (
-                          <>
-                            <div className="font-semibold">
-                              {MICROTASKS.CHECK_OPINION_VALIDNESS}
-                            </div>
-                            {result.opinonValidnessResults.map((o, idx) => (
-                              <div key={idx}>
-                                <p>値: {o.value}</p>
-                                <p>根拠: {o.reason}</p>
+                              <div className="mt-4">
+                                {result.resourceCheckResults.map((o, idx) => (
+                                  <div key={idx}>
+                                    <span className="text-lg">
+                                      👤 : {o.reason != null && o.reason}
+                                    </span>
+                                  </div>
+                                ))}
                               </div>
-                            ))}
-                          </>
-                        )}
+                            </>
+                          ) : (
+                            <>
+                              <div>
+                                {opinionValidnessCount.resultCount}
+                                人が、この文章において、「
+                                <span className="font-semibold">
+                                  {MICROTASKS.CHECK_OPINION_VALIDNESS}
+                                </span>
+                                」を行いました。 そのうちの
+                                {opinionValidnessCount.falseCount}人が「
+                                <span className="font-semibold">
+                                  妥当な根拠となる情報が書かれていない
+                                </span>
+                                」と述べています。
+                                具体的に、以下のようなフィードバックが得られました。
+                              </div>
+                              <div className="mt-4">
+                                {result.opinonValidnessResults.map((o, idx) => (
+                                  <div key={idx}>
+                                    <span className="text-lg">
+                                      👤 : {o.reason != null && o.reason}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
