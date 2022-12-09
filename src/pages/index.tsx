@@ -28,9 +28,9 @@ const Index = () => {
         <article className="mt-4">
           <p>
             本ウェブサイトは，{RECRUIT_WEBSITE}
-            にて掲載している文章編集タスクを行うためのサイトです．
+            にて掲載している文書へのフィードバックタスクを行うためのサイトです．
             <br />
-            本タスクは，静岡大学情報学部で行っている文章編集に関するユーザ実験のために実施しています．
+            本タスクは，静岡大学情報学部で行っている文書編集に関するユーザ実験のために実施しています．
           </p>
           <p>
             タスクを開始するにあたって「{RECRUIT_WEBSITE}
@@ -43,51 +43,60 @@ const Index = () => {
             <br />
             記録したログ情報は匿名化されており，学術研究活動以外の目的で使用することはありません．
           </p>
-          {!session && (
-            <p className="font-weight-bold">
-              以上に同意していただける方のみ，下記SIGN
-              UPボタンをクリックしてユーザ登録を行い，タスクを開始してください．
-            </p>
+          <div className="mt-4">
+            {session ? (
+              <p className="font-bold text-lg">
+                ログインが完了しました。
+                下記の「タスクを開始する」ボタンをクリックして、タスクを開始してください。
+              </p>
+            ) : (
+              <>
+                <p className="font-bold text-lg">
+                  以上に同意していただける方は、「ユーザ登録」ボタンからユーザ登録を行い、その後ログインを行ってください。
+                  （ユーザ登録後、ログイン用画面へ遷移します。そこで、ユーザ登録時の情報を入力してください。）
+                </p>
+                <p className="font-bold text-lg">
+                  ユーザ登録を行い、ログインが完了すると、「タスクの説明へ」と書かれたボタンがクリック可能になります。
+                  ユーザ登録とログインの完了後、「タスクの説明へ」ボタンをクリックして、タスクを開始してください。
+                </p>
+              </>
+            )}
+          </div>
+          {session?.user && (
+            <div className="mt-4">
+              {session.user.crowdId}としてログイン中です。 役割は、
+              {session.user.roleKind}です。
+            </div>
           )}
         </article>
       </div>
       <div className="mt-4">
         {session ? (
           <div>
-            {session.user && (
-              <div>
-                {session.user.crowdId}としてサインイン中です。 役割は、
-                {session.user.roleKind}です。
-              </div>
-            )}
             <div className="mt-4">
               <button className="btn" onClick={() => signOut()}>
-                Sign Out
+                ログアウト
               </button>
-              <Link href="/workers/tasks">
-                <button className="btn btn-primary ml-4">タスクへ</button>
+              <Link href="/workers/tasks/introduction">
+                <button className="btn btn-primary ml-4">タスクの説明へ</button>
               </Link>
             </div>
           </div>
         ) : (
           <div>
-            <div className="mt-4">
-              タスクの実施には、サインアップおよびサインインが必要です。
-              アカウントを登録済みでない方はサインアップから開始してください．
-            </div>
             <div className="flex gap-x-4">
               <button className="btn mt-4" onClick={() => signIn()}>
-                Sign In
+                ログイン
               </button>
               <button
                 className="btn btn-secondary mt-4"
                 onClick={() => signUp()}
               >
-                Sign Up
+                ユーザ登録
               </button>
             </div>
             <div className="mt-4">
-              サインインには、「ランサーズのアカウント名」「4文字以上のパスワード（ランサーズに登録しているパスワードではなく、本実験用サイトに登録する新しいパスワード）」の入力が必要となります。
+              ログインには、「ランサーズのアカウント名」「4文字以上のパスワード（ランサーズに登録しているパスワードではなく、本実験用サイトに登録する新しいパスワード）」の入力が必要となります。
             </div>
           </div>
         )}

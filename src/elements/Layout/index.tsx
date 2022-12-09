@@ -15,7 +15,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
           </Link>
         </div>
 
-        <div className="flex-none">
+        {/* <div className="flex-none">
           <ul className="menu menu-horizontal p-0">
             <li>
               <Link href="/help">
@@ -23,7 +23,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
               </Link>
             </li>
           </ul>
-        </div>
+        </div> */}
       </header>
       <main className="flex-grow p-4">{children}</main>
       <footer className="footer footer-center h-10 p-4 bg-neutral text-neutral-content">

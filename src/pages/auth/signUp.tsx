@@ -10,7 +10,6 @@ import { useRouter } from "next/router";
 type SignUpFormValues = {
   crowdId: string;
   password: string;
-  roleKind: RoleKind;
 };
 
 const SignUp = () => {
@@ -25,7 +24,7 @@ const SignUp = () => {
       mutation.mutate({
         crowdId: data.crowdId,
         password: data.password,
-        roleKind: data.roleKind,
+        roleKind: RoleKind.WORKER,
       });
       if (confirm("ユーザー登録が完了しました．ログイン画面に遷移します．")) {
         router.push("/api/auth/signin");
@@ -37,13 +36,23 @@ const SignUp = () => {
   };
 
   if (session) {
-    return <p>ログインしてるのでredirect</p>;
+    router.push("/");
+    return <p>ログインしているため、リダイレクトします</p>;
   }
 
   return (
     <div className="container mx-auto">
       <div className="">
         <h2 className="font-bold text-2xl">ユーザー登録</h2>
+        <p>
+          クラウドソーシングサイトのIDには、利用しているクラウドソーシングのIDを入力してください。
+        </p>
+        <p>
+          クラウドソーシングサイトのIDとパスワードは、登録後、再度サインインのために入力していただきます。
+        </p>
+        <p>
+          どちらの項目も、ブラウザへ記憶する、もしくは覚えていただく必要があります。
+        </p>
       </div>
 
       <div className="mt-4">
@@ -51,28 +60,24 @@ const SignUp = () => {
           <div className="form-control mx-auto gap-y-4">
             <input
               type="text"
-              placeholder="CrowdId"
+              placeholder="クラウドソーシングサイトのID"
               className="input input-bordered w-full max-w-md"
               {...register("crowdId", { required: true, maxLength: 80 })}
             />
             <input
               type="password"
-              placeholder="password"
+              placeholder="パスワード"
               className="input input-bordered w-full max-w-md"
               {...register("password", { required: true, maxLength: 80 })}
             />
-            <select
-              className="select select-bordered w-full max-w-md"
-              {...register("roleKind", { required: true })}
-            >
-              <option value={RoleKind.WORKER}>ワーカー</option>
-              <option value={RoleKind.WRITER}>ライター</option>
-            </select>
             <button type="submit" className="btn max-w-md">
-              登録
+              登録する
             </button>
           </div>
         </form>
+        <div className="mt-2">
+          登録後、サインイン画面へ遷移します。同じ情報を再度ご入力ください。
+        </div>
       </div>
     </div>
   );
