@@ -8,7 +8,6 @@ const Index = () => {
     "/",
     "/documents/1",
     "/workers/tasks",
-    "/writers/documents/1",
     "/writers/tasks",
     "/help",
     "/auth/signUp",
