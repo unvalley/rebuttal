@@ -1,4 +1,5 @@
 import type { AggregatedResultsBySentence } from "../../types/MicrotaskResponse";
+import { Alert } from "../Parts/Alert";
 
 type DocumentProps = {
   title: string;
@@ -24,7 +25,7 @@ const highlightByIsFact = (isFact: boolean) => {
   return isFact ? "bg-indigo-100" : "bg-orange-100";
 };
 
-export const Document: React.FC<DocumentProps> = ({
+export const FeedbackDocument: React.FC<DocumentProps> = ({
   title,
   body,
   aggregatedResults,
@@ -37,6 +38,9 @@ export const Document: React.FC<DocumentProps> = ({
   return (
     <div className="bg-base-100">
       <div className="font-semibold">{title || "Untitled"}</div>
+      {aggregatedResults.length === 0 && (
+        <Alert message="まだフィードバックが得られていません．" alertClass="" />
+      )}
       <div className="mt-4">
         {aggregatedResults.length === 0 && <p>{body}</p>}
         {aggregatedResults.map((s) => {

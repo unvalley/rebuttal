@@ -1,11 +1,11 @@
 import React, { createRef, RefObject, useRef, useState } from "react";
 import { trpc } from "../../lib/trpc";
 import { Layout } from "../../elements/Layout";
-import { Document } from "../../elements/Documents/Document";
-import NextError from "next/error";
+import { FeedbackDocument } from "../../elements/Documents/FeedbackDocument";
 import { useRouter } from "next/router";
 import { ScreenLoading } from "../../elements/Parts/Loading";
 import { MICROTASKS } from "../../../constants/microtasks";
+import { MyError } from "../../elements/Parts/Error";
 
 const textColorByIsFact = (isFact: boolean) => {
   return isFact ? "text-indigo-400" : "text-orange-400";
@@ -31,15 +31,6 @@ const Documents = () => {
     number | undefined
   >(undefined);
 
-  if (documentQuery.error) {
-    return (
-      <NextError
-        title={documentQuery.error.message}
-        statusCode={documentQuery.error.data?.httpStatus ?? 500}
-      />
-    );
-  }
-
   const aggregatedResultsQuery =
     trpc.microtask_results.findAggregatedMicrotaskResultsByDocumentId.useQuery(
       {
@@ -50,15 +41,6 @@ const Documents = () => {
       }
     );
 
-  if (aggregatedResultsQuery.error) {
-    return (
-      <NextError
-        title={aggregatedResultsQuery.error.message}
-        statusCode={aggregatedResultsQuery.error.data?.httpStatus ?? 500}
-      />
-    );
-  }
-
   const microtasksQuery = trpc.microtasks.findManyByDocumentId.useQuery(
     {
       documentId,
@@ -68,13 +50,12 @@ const Documents = () => {
     }
   );
 
-  if (microtasksQuery.error) {
-    return (
-      <NextError
-        title={microtasksQuery.error.message}
-        statusCode={microtasksQuery.error.data?.httpStatus ?? 500}
-      />
-    );
+  if (
+    documentQuery.isError ||
+    microtasksQuery.isError ||
+    aggregatedResultsQuery.isError
+  ) {
+    return <MyError />;
   }
 
   if (
@@ -111,12 +92,12 @@ const Documents = () => {
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-xl font-bold">論述改善フィードバックページ</h2>
-      <div className="grid grid-cols-8 gap-2">
+      <div className="grid grid-cols-8 gap-2 mt-4">
         <div className="col-span-4">
           <div className="bg-base-200 p-2">
             <div className="font-bold">レポート</div>
           </div>
-          <Document
+          <FeedbackDocument
             title={document.title}
             body={document.body}
             aggregatedResults={aggregatedResults}
@@ -137,18 +118,26 @@ const Documents = () => {
             <div className="overflow-scroll" style={{ height: "740px" }}>
               {aggregatedResults.map((result, idx) => {
                 // リファクタ & 数によって見せるか否か
-                const opinionValidnessCount = {
-                  falseCount: result.opinonValidnessResults.filter(
-                    (e) => e.value === "FALSE"
-                  ).length,
-                  resultCount: result.opinonValidnessResults.length,
-                };
-                const resourceCheckCount = {
-                  falseCount: result.resourceCheckResults.filter(
-                    (e) => e.value === "FALSE"
-                  ).length,
-                  resultCount: result.resourceCheckResults.length,
-                };
+                const opinionValidnessCount = getResultCount(
+                  result.opinonValidnessResults
+                );
+                const resourceCheckCount = getResultCount(
+                  result.resourceCheckResults
+                );
+
+                // 意見と事実の切り分けのみが行われている場合，フィードバック表示は無し
+                if (
+                  (result.isFact && resourceCheckCount.resultCount === 0) ||
+                  (result.isFact &&
+                    resourceCheckCount.resultCount >
+                      resourceCheckCount.falseCount) ||
+                  (!result.isFact &&
+                    opinionValidnessCount.resultCount >
+                      opinionValidnessCount.falseCount) ||
+                  (!result.isFact && opinionValidnessCount.resultCount === 0)
+                ) {
+                  return <></>;
+                }
 
                 return (
                   <div
@@ -168,92 +157,83 @@ const Documents = () => {
                     onMouseLeave={() => setSelectedSentenceId(undefined)}
                   >
                     <div className="card-body p-0">
-                      <div
-                        className={`card-title collapse-title font-light text-base ${
-                          isSentenceSelected(result.sentenceId)
-                            ? "font-semibold"
-                            : ""
-                        }`}
-                      >
-                        <span
-                          className={`
-                        ${textColorByIsFact(result.isFact)} text-xs px-1`}
-                        >
-                          ●
-                        </span>
-                        <div className="flex items-center justify-end">
-                          <span className="text-md font-normal">
-                            {result.isFact ? "文献情報の欠落" : "意見が弱い"}
-                          </span>
-                          <span>・</span>
-                          <span className="font-light text-md text-slate-500">
-                            {result.isFact
-                              ? "信頼できる文献情報が必要"
-                              : "妥当な根拠が必要"}
-                          </span>
+                      {result.isFact ? (
+                        <div>
+                          <div
+                            className={`card-title collapse-title font-light text-base ${
+                              isSentenceSelected(result.sentenceId)
+                                ? "font-semibold"
+                                : ""
+                            }`}
+                          >
+                            <span
+                              className={`${textColorByIsFact(
+                                result.isFact
+                              )} text-xs px-1`}
+                            >
+                              ●
+                            </span>
+                            <div className="flex items-center justify-end">
+                              <span className="text-md font-normal">
+                                文献情報の欠落
+                              </span>
+                              <span>・</span>
+                              <span className="font-light text-md text-slate-500">
+                                信頼できる文献情報が必要
+                              </span>
+                            </div>
+                          </div>
+                          <div className="collapse-content">
+                            <div className="">
+                              {result.sentence?.body} (id: {result.sentenceId})
+                            </div>
+                            <div className="mt-2">
+                              <ResourceCheckFeedback
+                                count={resourceCheckCount}
+                                results={result.resourceCheckResults}
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-
-                      <div className="collapse-content">
-                        <div className="">
-                          {result.sentence?.body} (id: {result.sentenceId})
+                      ) : (
+                        <div>
+                          <div
+                            className={`card-title collapse-title font-light text-base ${
+                              isSentenceSelected(result.sentenceId)
+                                ? "font-semibold"
+                                : ""
+                            }`}
+                          >
+                            <span
+                              className={`${textColorByIsFact(
+                                result.isFact
+                              )} text-xs px-1`}
+                            >
+                              ●
+                            </span>
+                            <div className="flex items-center justify-end">
+                              <span className="text-md font-normal">
+                                意見の説得性が低い
+                              </span>
+                              <span>・</span>
+                              <span className="font-light text-md text-slate-500">
+                                根拠となる事実情報が必要
+                              </span>
+                            </div>
+                          </div>
+                          <div className="collapse-content">
+                            <div className="">
+                              {result.sentence?.body} (id: {result.sentenceId})
+                            </div>
+                            <div className="mt-2">
+                              <OpinionValidnessFeedback
+                                count={opinionValidnessCount}
+                                results={result.opinonValidnessResults}
+                              />
+                            </div>
+                          </div>
                         </div>
-                        <div className="mt-2">
-                          {result.isFact ? (
-                            <>
-                              <div>
-                                {resourceCheckCount.resultCount}
-                                人が，この文章において，「
-                                <span className="font-semibold">
-                                  {MICROTASKS.CHECK_FACT_RESOURCE}
-                                </span>
-                                」を行いました． そのうちの
-                                {resourceCheckCount.falseCount}人が「
-                                <span className="font-semibold">
-                                  妥当な根拠となる情報が書かれていない
-                                </span>
-                                」と述べています．
-                                具体的に，以下のようなフィードバックが得られました．
-                              </div>
-                              <div className="mt-4">
-                                {result.resourceCheckResults.map((o, idx) => (
-                                  <div key={idx}>
-                                    <span className="text-lg">
-                                      👤 : {o.reason != null && o.reason}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <div>
-                                {opinionValidnessCount.resultCount}
-                                人が，この文章において，「
-                                <span className="font-semibold">
-                                  {MICROTASKS.CHECK_OPINION_VALIDNESS}
-                                </span>
-                                」を行いました． そのうちの
-                                {opinionValidnessCount.falseCount}人が「
-                                <span className="font-semibold">
-                                  妥当な根拠となる情報が書かれていない
-                                </span>
-                                」と述べています．
-                                具体的に，以下のようなフィードバックが得られました．
-                              </div>
-                              <div className="mt-4">
-                                {result.opinonValidnessResults.map((o, idx) => (
-                                  <div key={idx}>
-                                    <span className="text-lg">
-                                      👤 : {o.reason != null && o.reason}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 );
@@ -264,6 +244,74 @@ const Documents = () => {
       </div>
     </div>
   );
+};
+
+const OpinionValidnessFeedback: React.FC<{
+  count: {
+    resultCount: number;
+    falseCount: number;
+  };
+  results: Result[];
+}> = ({ count, results }) => {
+  return (
+    <>
+      <div>
+        {count.resultCount}
+        人が，この文章において，「
+        <span className="font-semibold">
+          {MICROTASKS.CHECK_OPINION_VALIDNESS}
+        </span>
+        」を行いました． そのうちの
+        {count.falseCount}人が「
+        <span className="font-semibold">
+          妥当な根拠となる情報が書かれていない
+        </span>
+        」と述べています． 具体的に，以下のようなフィードバックが得られました．
+      </div>
+      <div className="mt-4">
+        {results.map((o, idx) => (
+          <div key={idx}>
+            <span className="text-lg">👤 : {o.reason != null && o.reason}</span>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+};
+
+const ResourceCheckFeedback: React.FC<{
+  count: {
+    resultCount: number;
+    falseCount: number;
+  };
+  results: Result[];
+}> = ({ count }) => {
+  return (
+    <>
+      <div>
+        {count.resultCount}
+        人が，この文章において，「
+        <span className="font-semibold">{MICROTASKS.CHECK_FACT_RESOURCE}</span>
+        」を行いました． そのうちの
+        {count.falseCount}人が「
+        <span className="font-semibold">
+          妥当な根拠となる情報が書かれていない
+        </span>
+        」と述べています． 具体的に，以下のようなフィードバックが得られました．
+      </div>
+    </>
+  );
+};
+
+type Result = {
+  value: string;
+  reason: string | null;
+};
+const getResultCount = (results: Result[]) => {
+  return {
+    falseCount: results.filter((e) => e.value === "FALSE").length,
+    resultCount: results.length,
+  };
 };
 
 Documents.getLayout = function getLayout(page: React.ReactElement) {
