@@ -1,17 +1,10 @@
 import { useSession, signOut, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { RECRUIT_WEBSITE } from "../../constants";
 import { Layout } from "../elements/Layout";
 
 const Index = () => {
-  const files = [
-    "/",
-    "/documents/1",
-    "/workers/tasks",
-    "/writers/tasks",
-    "/help",
-    "/auth/signUp",
-  ];
   const { data: session } = useSession();
 
   const router = useRouter();
@@ -19,11 +12,9 @@ const Index = () => {
     router.push("/auth/signUp");
   };
 
-  const RECRUIT_WEBSITE = "ランサーズ";
   return (
     <article className="container mx-auto prose">
       <h2 className="font-bold text-2xl">調査の全体説明</h2>
-
       <p>
         本ウェブサイトは，{RECRUIT_WEBSITE}
         にて掲載している文書へのフィードバックタスクを行うためのサイトです．
@@ -99,17 +90,6 @@ const Index = () => {
           </div>
         )}
       </div>
-      {process.env.NODE_ENV === "development" && (
-        <ul className="mt-2">
-          {files.map((file) => (
-            <li key={file}>
-              <Link href={file}>
-                <a className="btn btn-ghost normal-case text-xl">{file}</a>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
     </article>
   );
 };

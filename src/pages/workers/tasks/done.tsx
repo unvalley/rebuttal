@@ -1,31 +1,21 @@
-import { useEffect } from "react";
+import { RECRUIT_WEBSITE } from "../../../../constants";
 import { Layout } from "../../../elements/Layout";
 
 const TasksDone = () => {
-  // TODO: アサインされているタスクが完了しているか確認
-  // 完了していなければアクセスを禁止
-  // 完了していれば，タスクアサインを全て外す
-  useEffect(() => {}, []);
-
   return (
-    <div className="container m-4">
-      <h2 className="font-bold text-2xl">タスク終了ページ</h2>
+    <div className="container mx-auto prose">
+      <h2 className="font-bold text-2xl">フィードバックタスク終了ページ</h2>
       <div>
-        <p className="">お疲れさまでした．タスクを終了しました．</p>
+        <p className="">
+          お疲れさまでした．フィードバックタスクを終了しました．
+        </p>
         <p className="mt-4">
-          最後にアンケートの実施をお願いいたします．下のリンクをクリックすると，アンケート画面へ遷移します．．
+          最後にアンケートの実施をお願いいたします．下のリンクをクリックすると，アンケート画面へ遷移します．
         </p>
         <a href="https://google.com">https://google.com</a>
-        {/* <p>
-          完了コードは
-          <span className="text-xl">「{COMPELTED_CODE}」</span>
-          です．
-        </p> */}
-      </div>
-      <div className="mt-4">
-        <p className="">
-          TODO:
-          マイクロタスクが残っていれば，実験に再度参加できることを伝える．残っていなければ案内なし．
+        <p>
+          アンケート回答終了後，報酬受け取りのための完了コードが表示されます．
+          表示された完了コードを，{RECRUIT_WEBSITE}にてご提示ください．
         </p>
       </div>
     </div>

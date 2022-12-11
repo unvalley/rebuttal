@@ -1,0 +1,1 @@
+export const RECRUIT_WEBSITE = "ランサーズ"

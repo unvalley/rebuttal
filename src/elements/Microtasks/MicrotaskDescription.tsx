@@ -40,7 +40,7 @@ export const MicrotaskDescription: React.FC<{
               <ClassficationTask
                 microtask={microtask}
                 sentence={sentence}
-                taskTitle="次の文（センテンス）は、意見と事実のどちらですか？"
+                taskTitle="次の文は、意見と事実のどちらですか？"
               />
             );
           })
@@ -48,14 +48,14 @@ export const MicrotaskDescription: React.FC<{
             <ClassficationTask
               microtask={microtask}
               sentence={sentence}
-              taskTitle="次のハイライトされた文（センテンス）には、文献情報が書かれていますか？"
+              taskTitle="次のハイライトされた文には、文献情報が書かれていますか？"
             />
           ))
           .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () => (
             <ClassficationTask
               microtask={microtask}
               sentence={sentence}
-              taskTitle="次のハイライトされた意見を表す文（センテンス）には，それを根拠付ける妥当な事実が書かれていますか？"
+              taskTitle="次のハイライトされた意見文には，それを根拠付ける妥当な事実が書かれていますか？"
               withReason={true}
               reasonText="上記の回答理由を述べてください。
               「書かれている」と回答した場合、「どの文章を読んで書かれていると判断したのか」を述べてください。

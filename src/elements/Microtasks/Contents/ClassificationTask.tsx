@@ -55,15 +55,15 @@ export const ClassficationTask: React.FC<Props> = (props) => {
 
   return (
     <div className="">
-      <span className="text-2xl font-semibold">{props.taskTitle}</span>
+      <span className="text-xl font-semibold">{props.taskTitle}</span>
+      {/* タスクに関わらず，全てセンテンスに対して紐付ける */}
       <div className="mt-4">
-        {/* タスクに関わらず，全てセンテンスに対して紐付ける */}
         <span className="">
           {props.microtask.kind === MicrotaskKinds.CHECK_OP_OR_FACT ? (
             <>{props.sentence.body}</>
           ) : (
             <>
-              {/* MTask(2)/(3)では，パラグラフを表示する */}
+              {/* MicroTask(2)/(3)では，パラグラフを表示する */}
               {props.microtask.paragraph.sentences.map((s) => (
                 <span
                   key={s.id}
