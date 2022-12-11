@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { TRPCError } from "@trpc/server";
 import { router, publicProcedure } from "../trpc";
 import { prisma } from "../../lib/prismaClient";
 
@@ -13,18 +12,33 @@ export const documentsRouter = router({
   findById: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
-      const doc = await prisma.document.findUnique({
+      const doc = await prisma.document.findUniqueOrThrow({
         where: { id: input.id },
       });
-      if (!doc) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Not found" });
-      }
       return doc;
     }),
+  findByParagraphId: publicProcedure
+    .input(z.object({paragraphId: z.number()}))
+    .query(async ({ input }) => {
+      const paragraph = await prisma.paragraph.findFirstOrThrow({
+        select: {
+          documentId: true
+        },
+        where: {
+          id: input.paragraphId
+        }
+      })
+      const doc = await prisma.document.findFirstOrThrow({
+        where: {
+          id: paragraph.documentId
+        },
+      })
+      return doc;
+  }),
   findWithSentencesById: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
-      const doc = await prisma.document.findUnique({
+      const doc = await prisma.document.findUniqueOrThrow({
         where: { id: input.id },
         include: {
           paragrahs: {
@@ -34,9 +48,6 @@ export const documentsRouter = router({
           },
         },
       });
-      if (!doc) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Not found" });
-      }
       return doc;
     }),
 });

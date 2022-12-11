@@ -2,7 +2,9 @@ import { MicrotaskKinds, Sentence } from ".prisma/client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useWizard } from "react-use-wizard";
+import { trpc } from "../../lib/trpc";
 import type { ExtendedMicrotask } from "../../types/MicrotaskResponse";
+import { Alert } from "../Parts/Alert";
 import { useCompleteMicrotask } from "./hooks/useCompleteMicrotask";
 
 type Props = {
@@ -85,16 +87,7 @@ export const ClassficationTask: React.FC<Props> = (props) => {
       </div>
 
       <div className="mt-4">
-        <label htmlFor="modal" className="btn btn-outline btn-sm">
-          文書全体を表示する
-        </label>
-        <input type="checkbox" id="modal" className="modal-toggle" />
-        <label htmlFor="modal" className="modal cursor-pointer">
-          <label className="modal-box relative" htmlFor="">
-            <h3 className="text-lg font-bold">タイトル</h3>
-            <p className="py-4">WIP</p>
-          </label>
-        </label>
+        <DocumentModal paragraphId={props.microtask.paragraphId} />
       </div>
 
       <div className="mt-8 mr-auto">
@@ -139,6 +132,36 @@ export const ClassficationTask: React.FC<Props> = (props) => {
           </div>
         </form>
       </div>
+    </div>
+  );
+};
+
+const DocumentModal: React.FC<{ paragraphId: number }> = ({ paragraphId }) => {
+  const findDocQuery = trpc.documents.findByParagraphId.useQuery({
+    paragraphId,
+  });
+
+  const { data: doc } = findDocQuery;
+
+  return (
+    <div>
+      <label htmlFor="modal" className="btn btn-outline btn-sm">
+        文書全体を表示する
+      </label>
+      <input type="checkbox" id="modal" className="modal-toggle" />
+
+      <label htmlFor="modal" className="modal cursor-pointer">
+        <label className="modal-box relative w-11/12 max-w-5xl" htmlFor="">
+          {!doc && (
+            <Alert
+              message="文書情報を取得できませんでした．"
+              alertClass="alert-warning"
+            />
+          )}
+          <h3 className="text-lg font-bold">{doc?.title}</h3>
+          <p className="py-4">{doc?.body}</p>
+        </label>
+      </label>
     </div>
   );
 };
