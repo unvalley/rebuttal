@@ -110,24 +110,8 @@ const Documents = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-xl font-bold">ドキュメントフィードバックページ</h2>
+      <h2 className="text-xl font-bold">論述改善フィードバックページ</h2>
       <div className="grid grid-cols-8 gap-2">
-        {/* <div className="col-span-2">
-          <div className="bg-base-200 p-2">
-            <div className="font-bold">情報</div>
-          </div>
-          {/* <p className="text-red-600 font-bold">
-            センテンス数: {document.sentences.length}
-          </p> */}
-        {/* <div className="py-4">
-            <div className="bg-orange-100">
-              オレンジ色のハイライト箇所: 意見
-            </div>
-            <div className="bg-blue-100">青色のハイライト箇所: 事実</div>
-          </div>
-          <p>他になにか必要な情報があれば、ここに書き加えます。</p>
-        </div> */}
-
         <div className="col-span-4">
           <div className="bg-base-200 p-2">
             <div className="font-bold">レポート</div>

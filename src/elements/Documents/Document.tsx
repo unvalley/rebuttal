@@ -1,6 +1,6 @@
 import type { AggregatedResultsBySentence } from "../../types/MicrotaskResponse";
 
-interface DocumentProps {
+type DocumentProps = {
   title: string;
   body: string;
   aggregatedResults: AggregatedResultsBySentence[];
@@ -12,7 +12,7 @@ interface DocumentProps {
   };
   scrollToFeedback: (sentenceId: number) => void;
   canEdit: boolean;
-}
+};
 
 const borderByIsFact = (isFact: boolean) => {
   return isFact
@@ -26,6 +26,7 @@ const highlightByIsFact = (isFact: boolean) => {
 
 export const Document: React.FC<DocumentProps> = ({
   title,
+  body,
   aggregatedResults,
   sentenceSelection,
   scrollToFeedback,
@@ -35,8 +36,9 @@ export const Document: React.FC<DocumentProps> = ({
 
   return (
     <div className="bg-base-100">
-      <div className="font-bold">{title || "Untitled"}</div>
-      <div>
+      <div className="font-semibold">{title || "Untitled"}</div>
+      <div className="mt-4">
+        {aggregatedResults.length === 0 && <p>{body}</p>}
         {aggregatedResults.map((s) => {
           return (
             <span
