@@ -52,14 +52,14 @@ export const MicrotaskDescription: React.FC<{
             <ClassficationTask
               microtask={microtask}
               sentence={sentence}
-              taskTitle="次の青色で強調された文には、文献情報が書かれていますか？"
+              taskTitle="次の青色で強調された事実文には、文献情報が書かれていますか？"
             />
           ))
           .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () => (
             <ClassficationTask
               microtask={microtask}
               sentence={sentence}
-              taskTitle="次のオレンジ色で強調された文には，それを根拠付ける妥当な事実が書かれていますか？"
+              taskTitle="次のオレンジ色で強調された意見文には，それを根拠付ける妥当な事実が書かれていますか？"
               withReason={true}
               reasonText="上記の回答理由を述べてください。
               「書かれている」と回答した場合、「どの文章を読んで書かれていると判断したのか」を述べてください。
@@ -77,7 +77,10 @@ export const MicrotaskDescription: React.FC<{
         <div className="collapse-content bg-base-300">
           <ul>
             <li>本ページでは，ブラウザの「戻る」「更新」は利用できません．</li>
-            <li>タスク途中でページを離脱することはご遠慮ください．</li>
+            <li>タスク途中で，本ページを離脱することはご遠慮ください．</li>
+            <li>
+              本ページを開いたまま，別のタブやウィンドウで，タスクに回答するためのウェブ検索などを行うことは問題ございません．
+            </li>
           </ul>
         </div>
       </div>

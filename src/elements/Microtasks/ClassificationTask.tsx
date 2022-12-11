@@ -167,13 +167,18 @@ const opOrFactCandidates = [
 const factResourceCandidates = [
   {
     value: "TRUE",
-    message: "書かれている",
+    message: "妥当な文献に基づいて，事実が書かれている",
     radioColor: "checked:bg-orange-500",
+  },
+  {
+    value: "LOW_RELIABILITY",
+    message: "事実は書かれているが，文献の信頼性が低い",
+    radioColor: "checked:bg-blue-500",
   },
   {
     value: "FALSE",
     message: "書かれていない",
-    radioColor: "checked:bg-blue-500",
+    radioColor: "checked:bg-slate-600",
   },
 ] as const;
 
@@ -186,7 +191,7 @@ const opValidnessCandidates = [
   {
     value: "FALSE",
     message: "書かれていない",
-    radioColor: "checked:bg-blue-500",
+    radioColor: "checked:bg-slate-600",
   },
 ] as const;
 

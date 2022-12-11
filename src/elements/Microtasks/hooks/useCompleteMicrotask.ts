@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 import { trpc } from "../../../lib/trpc";
 
 export type SentenceKind = "OPINION" | "FACT" | "UNKNOWN";
-export type Ternary = "TRUE" | "FALSE";
+export type Ternary = "TRUE" | "FALSE" | "LOW_RELIABILITY";
 
 export const useCompleteMicrotask = ({
   userId,
