@@ -203,17 +203,17 @@ const Documents = () => {
                             <>
                               <div>
                                 {resourceCheckCount.resultCount}
-                                人が、この文章において、「
+                                人が，この文章において，「
                                 <span className="font-semibold">
                                   {MICROTASKS.CHECK_FACT_RESOURCE}
                                 </span>
-                                」を行いました。 そのうちの
+                                」を行いました． そのうちの
                                 {resourceCheckCount.falseCount}人が「
                                 <span className="font-semibold">
                                   妥当な根拠となる情報が書かれていない
                                 </span>
-                                」と述べています。
-                                具体的に、以下のようなフィードバックが得られました。
+                                」と述べています．
+                                具体的に，以下のようなフィードバックが得られました．
                               </div>
                               <div className="mt-4">
                                 {result.resourceCheckResults.map((o, idx) => (
@@ -229,17 +229,17 @@ const Documents = () => {
                             <>
                               <div>
                                 {opinionValidnessCount.resultCount}
-                                人が、この文章において、「
+                                人が，この文章において，「
                                 <span className="font-semibold">
                                   {MICROTASKS.CHECK_OPINION_VALIDNESS}
                                 </span>
-                                」を行いました。 そのうちの
+                                」を行いました． そのうちの
                                 {opinionValidnessCount.falseCount}人が「
                                 <span className="font-semibold">
                                   妥当な根拠となる情報が書かれていない
                                 </span>
-                                」と述べています。
-                                具体的に、以下のようなフィードバックが得られました。
+                                」と述べています．
+                                具体的に，以下のようなフィードバックが得られました．
                               </div>
                               <div className="mt-4">
                                 {result.opinonValidnessResults.map((o, idx) => (

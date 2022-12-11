@@ -12,7 +12,7 @@ export const ReviewTask: React.FC<ReviewTaskProps> = (props) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (confirm("回答を送信しました。次のタスクに進みます。")) {
+    if (confirm("回答を送信しました．次のタスクに進みます．")) {
       nextStep();
       if (isLastStep) {
         router.push("/workers/tasks/done");
@@ -27,7 +27,7 @@ export const ReviewTask: React.FC<ReviewTaskProps> = (props) => {
         <span className="text-green-700">: 3-5分</span>
       </div>
       <div className="text-red-600">
-        検討：評価対象はワーカーのマイクロタスク。評価タイミングはいつ？評価するために表示する情報は？
+        検討：評価対象はワーカーのマイクロタスク．評価タイミングはいつ？評価するために表示する情報は？
       </div>
       <div className="font-semibold mt-4">{props.microtask.paragraph.body}</div>
       <div className="w-96">

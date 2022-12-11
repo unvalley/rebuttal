@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { RECRUIT_WEBSITE } from "../../constants";
 import { Layout } from "../elements/Layout";
+import { Alert } from "../elements/Parts/Alert";
 
 const Index = () => {
   const { data: session } = useSession();
@@ -32,7 +33,7 @@ const Index = () => {
       </p>
       <div className="">
         以上に同意していただける方は，以下の手順でユーザ登録およびログインを行ってください．
-        ログインには、「ランサーズのアカウント名」「4文字以上のパスワード（ランサーズに登録しているパスワードではなく、本実験用サイトに登録する新しいパスワード）」の入力が必要となります。
+        ログインには，「ランサーズのアカウント名」「4文字以上のパスワード（ランサーズに登録しているパスワードではなく，本実験用サイトに登録する新しいパスワード）」の入力が必要となります．
         <ol>
           <li>
             「ユーザ登録」ボタンからユーザ登録を行う（登録後，自動でログインページに遷移します）
@@ -47,27 +48,10 @@ const Index = () => {
         </ol>
       </div>
       {session && (
-        <div className="alert alert-success shadow-lg">
-          <div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="stroke-current flex-shrink-0 h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>
-              {session.user.crowdId}
-              としてログインが完了しました．下記の「タスクの説明へ」ボタンをクリックして，タスクを開始してください．
-            </span>
-          </div>
-        </div>
+        <Alert
+          message={`${session.user.crowdId}としてログインが完了しました．下記の「タスクの説明へ」ボタンをクリックして，タスクを開始してください．`}
+          alertClass="alert-success"
+        />
       )}
       <div className="mt-4">
         {session ? (

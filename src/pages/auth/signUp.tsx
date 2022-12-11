@@ -37,23 +37,19 @@ const SignUp = () => {
 
   if (session) {
     router.push("/");
-    return <p>ログインしているため、リダイレクトします</p>;
+    return <p>ログインしているため，リダイレクトします</p>;
   }
 
   return (
-    <div className="container mx-auto">
-      <div className="">
-        <h2 className="font-bold text-2xl">ユーザー登録</h2>
-        <p>
-          クラウドソーシングサイトのIDには、利用しているクラウドソーシングのIDを入力してください。
-        </p>
-        <p>
-          クラウドソーシングサイトのIDとパスワードは、登録後、再度サインインのために入力していただきます。
-        </p>
-        <p>
-          どちらの項目も、ブラウザへ記憶する、もしくは覚えていただく必要があります。
-        </p>
-      </div>
+    <div className="container mx-auto prose">
+      <h2 className="font-bold text-2xl">ユーザー登録</h2>
+      <p>
+        クラウドソーシングサイトのIDには，利用しているクラウドソーシングのIDを入力してください．
+        クラウドソーシングサイトのIDとパスワードは，登録後，再度サインインのために入力していただきます．
+      </p>
+      <p>
+        どちらの項目も，ブラウザへ記憶する，もしくは覚えていただく必要があります．
+      </p>
 
       <div className="mt-4">
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -61,22 +57,22 @@ const SignUp = () => {
             <input
               type="text"
               placeholder="クラウドソーシングサイトのID"
-              className="input input-bordered w-full max-w-md"
+              className="input input-bordered w-full"
               {...register("crowdId", { required: true, maxLength: 80 })}
             />
             <input
               type="password"
               placeholder="パスワード"
-              className="input input-bordered w-full max-w-md"
+              className="input input-bordered w-full"
               {...register("password", { required: true, maxLength: 80 })}
             />
-            <button type="submit" className="btn max-w-md">
+            <button type="submit" className="btn">
               登録する
             </button>
           </div>
         </form>
         <div className="mt-2">
-          登録後、サインイン画面へ遷移します。同じ情報を再度ご入力ください。
+          登録後，サインイン画面へ遷移します．同じ情報を再度ご入力ください．
         </div>
       </div>
     </div>
