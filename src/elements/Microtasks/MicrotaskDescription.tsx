@@ -14,7 +14,7 @@ export const MicrotaskDescription: React.FC<{
     "ページを離脱すると，タスク実施は最初からやり直しとなります．本当にページを離脱しますか？"
   );
 
-  const displaStep = {
+  const displayStep = {
     activeStep: activeStep + 1,
     stepCount: stepCount,
   };
@@ -29,7 +29,7 @@ export const MicrotaskDescription: React.FC<{
         <span>フィードバックタスク内容：</span>
         <span className="text-lg font-bold">{microtask.title}</span>
         <span>
-          （{displaStep.activeStep}件目/{displaStep.stepCount}件中）
+          （{displayStep.activeStep}件目/{displayStep.stepCount}件中）
         </span>
         <progress
           className="progress progress-success"

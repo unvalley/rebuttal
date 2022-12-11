@@ -27,6 +27,14 @@ export const ClassficationTask: React.FC<Props> = (props) => {
     }
   );
 
+  const isAnswered = (kind: MicrotaskKinds) => {
+    if (kind === MicrotaskKinds.CHECK_OPINION_VALIDNESS) {
+      return Boolean(value) && reason;
+    } else {
+      return Boolean(value);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -120,7 +128,12 @@ export const ClassficationTask: React.FC<Props> = (props) => {
             </div>
           )}
           <div className="mt-4">
-            <button type="submit" className="btn">
+            <button
+              type="submit"
+              className={`btn ${
+                isAnswered(props.microtask.kind) ? "btn-active" : "btn-disabled"
+              }`}
+            >
               回答して次のタスクへ
             </button>
           </div>
