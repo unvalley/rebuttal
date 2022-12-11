@@ -1,4 +1,4 @@
-import { Layout } from "../../../elements/Layout";
+// import { Layout } from "../../../elements/Layout";
 import { trpc } from "../../../lib/trpc";
 import { useSession } from "next-auth/react";
 import { MicrotaskDescription } from "../../../elements/Microtasks/MicrotaskDescription";
@@ -64,9 +64,11 @@ const Tasks = () => {
   const { data: assignedMicrotasks } = microtasksQuery;
 
   return (
-    <div className="container mx-auto prose">
-      <h2 className="text-2xl font-bold">タスク実施ページ</h2>
-      <div className="mt-4 gap-4">
+    <div className="container mx-auto prose my-8">
+      <div>
+        <h2 className="text-2xl font-bold">タスク実施ページ</h2>
+      </div>
+      <div className="">
         <div className="bg-base-100">
           {assignedMicrotasks && existsTaksToWork(assignedMicrotasks) ? (
             <Wizard>
@@ -136,7 +138,7 @@ const AssignedMicrotaskList: React.FC<{
 };
 
 Tasks.getLayout = function getLayout(page: React.ReactElement) {
-  return <Layout>{page}</Layout>;
+  return <>{page}</>;
 };
 
 export default Tasks;

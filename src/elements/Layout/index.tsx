@@ -9,6 +9,7 @@ const files = [
   "/",
   "/documents/1",
   "/workers/tasks",
+  "/workers/tasks/done",
   "/writers/tasks",
   "/help",
   "/auth/signUp",

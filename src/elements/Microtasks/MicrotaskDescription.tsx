@@ -1,28 +1,32 @@
 import { match } from "ts-pattern";
 import type { ExtendedMicrotask } from "../../types/MicrotaskResponse";
-import { ClassficationTask } from "./Contents/ClassificationTask";
+import { ClassficationTask } from "./ClassificationTask";
 import { MicrotaskKinds, Sentence } from ".prisma/client";
 import { useWizard } from "react-use-wizard";
+import { useBeforeUnload } from "./hooks/useBeforeUnload";
 
 export const MicrotaskDescription: React.FC<{
   microtask: ExtendedMicrotask;
   sentence: Sentence;
 }> = ({ microtask, sentence }) => {
   const { activeStep, isLoading, stepCount } = useWizard();
-
-  if (isLoading) {
-    return <p>Loading...</p>;
-  }
+  useBeforeUnload(
+    "ページを離脱すると，タスク実施は最初からやり直しとなります．本当にページを離脱しますか？"
+  );
 
   const displaStep = {
     activeStep: activeStep + 1,
     stepCount: stepCount,
   };
 
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <div className="w-5/6">
       <div className="">
-        <span>タスク：</span>
+        <span>フィードバックタスク内容：</span>
         <span className="text-lg font-bold">{microtask.title}</span>
         <span>
           （{displaStep.activeStep}件目/{displaStep.stepCount}件中）
@@ -48,14 +52,14 @@ export const MicrotaskDescription: React.FC<{
             <ClassficationTask
               microtask={microtask}
               sentence={sentence}
-              taskTitle="次のハイライトされた文には、文献情報が書かれていますか？"
+              taskTitle="次の青色で強調された文には、文献情報が書かれていますか？"
             />
           ))
           .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () => (
             <ClassficationTask
               microtask={microtask}
               sentence={sentence}
-              taskTitle="次のハイライトされた意見文には，それを根拠付ける妥当な事実が書かれていますか？"
+              taskTitle="次のオレンジ色で強調された文には，それを根拠付ける妥当な事実が書かれていますか？"
               withReason={true}
               reasonText="上記の回答理由を述べてください。
               「書かれている」と回答した場合、「どの文章を読んで書かれていると判断したのか」を述べてください。
@@ -63,6 +67,19 @@ export const MicrotaskDescription: React.FC<{
             />
           ))
           .exhaustive()}
+      </div>
+
+      <div className="collapse collapse-open mt-4">
+        <input type="checkbox" className="peer" />
+        <div className="collapse-title bg-base-200">
+          <span className="font-bold">タスク注意事項</span>
+        </div>
+        <div className="collapse-content bg-base-300">
+          <ul>
+            <li>本ページでは，ブラウザの「戻る」「更新」は利用できません．</li>
+            <li>タスク途中でページを離脱することはご遠慮ください．</li>
+          </ul>
+        </div>
       </div>
     </div>
   );

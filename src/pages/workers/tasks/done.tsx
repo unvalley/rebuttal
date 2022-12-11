@@ -6,10 +6,8 @@ const TasksDone = () => {
     <div className="container mx-auto prose">
       <h2 className="font-bold text-2xl">フィードバックタスク終了ページ</h2>
       <div>
-        <p className="">
-          お疲れさまでした．フィードバックタスクを終了しました．
-        </p>
         <p className="mt-4">
+          お疲れさまでした．フィードバックタスクを終了しました．
           最後にアンケートの実施をお願いいたします．下のリンクをクリックすると，アンケート画面へ遷移します．
         </p>
         <a href="https://google.com">https://google.com</a>

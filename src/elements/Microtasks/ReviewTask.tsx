@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useWizard } from "react-use-wizard";
-import type { MicrotaskWithParagraph } from "../../../types/MicrotaskResponse";
+import type { MicrotaskWithParagraph } from "../../types/MicrotaskResponse";
 
 export type ReviewTaskProps = {
   microtask: MicrotaskWithParagraph;
