@@ -13,7 +13,11 @@ function getBaseUrl() {
   if (typeof window !== "undefined") {
     return "";
   }
-  return "http://localhost:3000";
+  if (process.env.NODE_ENV === "development") {
+    return "http://localhost:3000";
+  } else {
+    return "https://dapper-blancmange-939586.netlify.app";
+  }
 }
 
 export const trpc = createTRPCNext<AppRouter, SSRContext>({
