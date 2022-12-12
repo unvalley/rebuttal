@@ -55,6 +55,15 @@ const Documents = () => {
     microtasksQuery.isError ||
     aggregatedResultsQuery.isError
   ) {
+    console.error(`documentQueryError: ${JSON.stringify(documentQuery.error)}`);
+    console.error(
+      `microtaskQueryError: ${JSON.stringify(microtasksQuery.error)}`
+    );
+    console.error(
+      `aggregatedResultQueryError: ${JSON.stringify(
+        aggregatedResultsQuery.error
+      )}`
+    );
     return <MyError />;
   }
 
