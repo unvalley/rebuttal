@@ -63,7 +63,7 @@ export const ClassficationTask: React.FC<Props> = (props) => {
       <span className="text-xl font-semibold">{props.taskTitle}</span>
       {/* タスクに関わらず，全てセンテンスに対して紐付ける */}
       <div className="mt-4">
-        <span className="">
+        <blockquote className="">
           {props.microtask.kind === MicrotaskKinds.CHECK_OP_OR_FACT ? (
             <>{props.sentence.body}</>
           ) : (
@@ -83,7 +83,7 @@ export const ClassficationTask: React.FC<Props> = (props) => {
               ))}
             </>
           )}
-        </span>
+        </blockquote>
       </div>
 
       <div className="mt-4">

@@ -68,72 +68,30 @@ const Tasks = () => {
       <div>
         <h2 className="text-2xl font-bold">タスク実施ページ</h2>
       </div>
-      <div className="">
-        <div className="bg-base-100">
-          {assignedMicrotasks && existsTaksToWork(assignedMicrotasks) ? (
-            <Wizard>
-              {assignedMicrotasks.map((microtask) => {
-                const sentences = filteredSentencesByKind(
-                  microtask.kind,
-                  microtask.paragraph.sentences
+      <div className="bg-base-100">
+        {assignedMicrotasks && existsTaksToWork(assignedMicrotasks) ? (
+          <Wizard>
+            {assignedMicrotasks.map((microtask) => {
+              const sentences = filteredSentencesByKind(
+                microtask.kind,
+                microtask.paragraph.sentences
+              );
+              return sentences.map((s) => {
+                return (
+                  <MicrotaskDescription
+                    key={s.id}
+                    microtask={microtask}
+                    sentence={s}
+                  />
                 );
-                return sentences.map((s) => {
-                  return (
-                    <MicrotaskDescription
-                      key={s.id}
-                      microtask={microtask}
-                      sentence={s}
-                    />
-                  );
-                });
-              })}
-            </Wizard>
-          ) : (
-            <p>現在，実施対象となるタスクがありません．</p>
-          )}
-        </div>
+              });
+            })}
+          </Wizard>
+        ) : (
+          <p>現在，実施対象となるタスクがありません．</p>
+        )}
       </div>
     </div>
-  );
-};
-
-const AssignedMicrotaskList: React.FC<{
-  assignedMicrotasks: ExtendedMicrotask[];
-}> = ({ assignedMicrotasks }) => {
-  return (
-    <>
-      <div className="bg-base-200 p-2">
-        <div className="font-bold">アサインされたタスク</div>
-      </div>
-      <div>
-        {assignedMicrotasks &&
-          assignedMicrotasks.map((task) => (
-            <div
-              key={task.id}
-              className="mt-2 card card-compact w-full bg-base-100 shadow-lg"
-            >
-              <div className="card-body">
-                <div className="card-title font-semibold text-sm">
-                  {task.title} (ID={task.id})
-                </div>
-                <div>対象パラグラフ(ID={task.paragraphId}): </div>
-                <div>
-                  {task.paragraph.sentences.map((s, idx) => {
-                    return (
-                      <div key={s.id}>
-                        <p>
-                          {idx}: {s.body}
-                          {`事実: ${String(s.isFact)}`}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          ))}
-      </div>
-    </>
   );
 };
 
