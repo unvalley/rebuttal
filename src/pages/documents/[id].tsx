@@ -136,7 +136,7 @@ const Documents = () => {
                       opinionValidnessCount.falseCount) ||
                   (!result.isFact && opinionValidnessCount.resultCount === 0)
                 ) {
-                  return <></>;
+                  return null;
                 }
 
                 return (
