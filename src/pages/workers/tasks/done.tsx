@@ -1,7 +1,13 @@
+import { useSession } from "next-auth/react";
 import { RECRUIT_WEBSITE } from "../../../../constants";
 import { Layout } from "../../../elements/Layout";
 
 const TasksDone = () => {
+  const { data: session } = useSession();
+
+  const userId = session?.user.id;
+  const enqueteUrl = `https://docs.google.com/forms/d/e/1FAIpQLSc2MyxLRUUtyh1Ig8_4hRlXPngHsUJS-kQH02RPo5NGQzBWEw/viewform?usp=pp_url&entry.704465899=${userId}`;
+
   return (
     <div className="container mx-auto prose">
       <h2 className="font-bold text-2xl">フィードバックタスク終了ページ</h2>
@@ -11,7 +17,7 @@ const TasksDone = () => {
           お疲れさまでした．フィードバックタスクを終了しました．
           最後にアンケートの実施をお願いいたします．下のリンクをクリックすると，アンケート画面へ遷移します．
         </p>
-        <a href="https://google.com">https://google.com</a>
+        <a href={enqueteUrl}>アンケートページへのリンク</a>
         <p>
           アンケート回答終了後，報酬受け取りのための完了コードが表示されます．
           表示された完了コードを，{RECRUIT_WEBSITE}にてご提示ください．

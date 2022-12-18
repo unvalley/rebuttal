@@ -24,7 +24,7 @@ export const MicrotaskDescription: React.FC<{
   }
 
   return (
-    <div className="w-5/6">
+    <div className="">
       <div className="">
         <span>フィードバックタスク内容：</span>
         <span className="text-lg font-bold">{microtask.title}</span>
@@ -52,14 +52,14 @@ export const MicrotaskDescription: React.FC<{
             <ClassficationTask
               microtask={microtask}
               sentence={sentence}
-              taskTitle="次の青色で強調された事実文には，文献情報が書かれていますか？"
+              taskTitle="次の青色で強調された文の周囲には，情報源が書かれていますか？"
             />
           ))
           .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () => (
             <ClassficationTask
               microtask={microtask}
               sentence={sentence}
-              taskTitle="次のオレンジ色で強調された意見文には，それを根拠付ける妥当な事実が書かれていますか？"
+              taskTitle="次のオレンジ色で強調された文の周囲には，それを根拠付ける妥当な事実が書かれていますか？"
               withReason={true}
               reasonText="上記の回答理由を述べてください．
               「書かれている」と回答した場合，「どの文章を読んで書かれていると判断したのか」を述べてください．

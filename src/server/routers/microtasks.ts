@@ -149,7 +149,7 @@ export const microtasksRouter = router({
       };
 
       // センテンスが事実か意見のどちらに評価されているか，現時点のデータを取得する
-      // Microtask(2)/(3)では，意見文のみ，事実文のみを対象にするため，この処理が必要
+      // Microtask(2)/(3)では，文のみ，文のみを対象にするため，この処理が必要
       // タスクの取得ではなくてセンテンスの取得で別に処理を走らせることも考えたが，UI変更の煩雑性も生まれるため，ロジックの複雑性をここに一本化する方針を取った
       const attachIsFactToSentences = async (
         tasks: ExtendedMicrotask[]

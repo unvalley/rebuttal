@@ -184,11 +184,11 @@ const Documents = () => {
                             </span>
                             <div className="flex items-center justify-end">
                               <span className="text-md font-normal">
-                                文献情報の欠落
+                                情報源の欠落
                               </span>
                               <span>・</span>
                               <span className="font-light text-md text-slate-500">
-                                信頼できる文献情報が必要
+                                信頼できる情報源が必要
                               </span>
                             </div>
                           </div>

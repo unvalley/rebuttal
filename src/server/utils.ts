@@ -21,8 +21,8 @@ export const uniq = <T>(array: T[]) => {
 
 /**
  * kindに応じて sentence.isFact のフィルタリングを行う
- * - CHECK_FACT_RESOURCE: 事実文のみにフィルタリング
- * - CHECK_OPINION_VALIDNESS: 意見文のみにフィルタリング
+ * - CHECK_FACT_RESOURCE: 文のみにフィルタリング
+ * - CHECK_OPINION_VALIDNESS: 文のみにフィルタリング
  */
 export const filterSentencesByKindAndIsFact = (
   kind: MicrotaskKinds,

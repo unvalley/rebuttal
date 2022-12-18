@@ -90,9 +90,19 @@ export const ClassficationTask: React.FC<Props> = (props) => {
         <DocumentModal paragraphId={props.microtask.paragraphId} />
       </div>
 
+      <div className="mt-4">
+        <span>意見と事実についてのガイド</span>
+        <ul>
+          <li>
+            意見：何事かについて、ある人が下す判断のこと。賛同する人もいれば反対する人もいる。
+          </li>
+          <li>事実：テストや調査によって客観的に真偽を確認できるもの。</li>
+        </ul>
+      </div>
+
       <div className="mt-8 mr-auto">
         <form onSubmit={handleSubmit}>
-          <p>下記のいずれかを選択してください．</p>
+          <span>下記のいずれかを選択してください．</span>
           {getSelectCandidatesByKind(props.microtask.kind).map((c) => (
             <div key={c.value} className="form-control">
               <label className="label cursor-pointer justify-start">
@@ -190,12 +200,12 @@ const opOrFactCandidates = [
 const factResourceCandidates = [
   {
     value: "TRUE",
-    message: "妥当な文献に基づいて，事実が書かれている",
+    message: "妥当な情報源に基づいて，事実が書かれている",
     radioColor: "checked:bg-orange-500",
   },
   {
     value: "LOW_RELIABILITY",
-    message: "事実は書かれているが，文献の信頼性が低い",
+    message: "事実は書かれているが，情報源の信頼性が低い",
     radioColor: "checked:bg-blue-500",
   },
   {
