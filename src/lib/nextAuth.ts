@@ -5,6 +5,7 @@ import { verify } from "argon2";
 import { prisma } from "./prismaClient";
 import { loginSchema } from "../validation/auth";
 import type { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { RECRUIT_WEBSITE } from "../../constants";
 
 export const nextAuthOptions: NextAuthOptions = {
   providers: [
@@ -12,7 +13,7 @@ export const nextAuthOptions: NextAuthOptions = {
       id: "login",
       credentials: {
         crowdId: {
-          label: "crowdId",
+          label: `${RECRUIT_WEBSITE}のユーザー名`,
           type: "text",
           placeholder: "",
         },

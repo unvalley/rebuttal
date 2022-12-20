@@ -6,6 +6,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { RoleKind } from ".prisma/client";
 import { trpc } from "../../lib/trpc";
 import { useRouter } from "next/router";
+import { RECRUIT_WEBSITE } from "../../../constants";
 
 type SignUpFormValues = {
   crowdId: string;
@@ -43,10 +44,18 @@ const SignUp = () => {
   return (
     <div className="container mx-auto prose">
       <h2 className="font-bold text-2xl">ユーザー登録</h2>
-      <p>
-        クラウドソーシングサイトのIDには，利用しているクラウドソーシングのIDを入力してください．
-        クラウドソーシングサイトのIDとパスワードは，登録後，再度サインインのために入力していただきます．
-      </p>
+      {RECRUIT_WEBSITE === "ランサーズ" && (
+        <div>
+          ランサーズのユーザー名が分からない方は，下記のリンクを参照してご入力ください．
+          <a
+            href="https://www.lancers.jp/faq/A1021/487"
+            target="_blank"
+            rel="noreferrer"
+          >
+            ランサーズ - ユーザー名はどこで確認できますか？
+          </a>
+        </div>
+      )}
       <p>
         どちらの項目も，ブラウザへ記憶する，もしくは覚えていただく必要があります．
       </p>
@@ -56,7 +65,7 @@ const SignUp = () => {
           <div className="form-control mx-auto gap-y-4">
             <input
               type="text"
-              placeholder="クラウドソーシングサイトのID"
+              placeholder={`${RECRUIT_WEBSITE}のユーザー名`}
               className="input input-bordered w-full"
               {...register("crowdId", { required: true, maxLength: 80 })}
             />
