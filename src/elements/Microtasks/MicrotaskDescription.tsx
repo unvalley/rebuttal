@@ -26,7 +26,7 @@ export const MicrotaskDescription: React.FC<{
   return (
     <div className="">
       <div className="">
-        <span>フィードバックタスク内容：</span>
+        <span>評価タスク内容：</span>
         <span className="text-lg font-bold">{microtask.title}</span>
         <span>
           （{displayStep.activeStep}件目/{displayStep.stepCount}件中）

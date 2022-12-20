@@ -1,7 +1,49 @@
 import Link from "next/link";
 import { Layout } from "../../../elements/Layout";
+import { useSession } from "next-auth/react";
+import { trpc } from "../../../lib/trpc";
+import { ScreenLoading } from "../../../elements/Parts/Loading";
+import { RECRUIT_WEBSITE } from "../../../../constants";
+import { existsTaksToWork } from "../../../utils";
 
 const Introduction = () => {
+  const { data: session } = useSession();
+  const microtasksQuery = trpc.microtasks.findMicrotasksToAssign.useQuery(
+    {
+      userId: session?.user.id as number,
+      assignCount: 3,
+    },
+    {
+      refetchOnWindowFocus: false,
+      retry: false,
+    }
+  );
+
+  if (microtasksQuery.isError) {
+    return (
+      <article className="container mxa-auto prose">
+        <h2>実行対象のタスクがありません．</h2>
+        <p>全てのタスクが実施完了されました．大変申し訳ございません．</p>
+      </article>
+    );
+  }
+
+  if (microtasksQuery.isLoading) {
+    return <ScreenLoading />;
+  }
+
+  const { data: assignedMicrotasks } = microtasksQuery;
+
+  if (existsTaksToWork(assignedMicrotasks)) {
+    return (
+      <article className="container mxa-auto prose">
+        <h2>実行対象のタスクがありません．</h2>
+        <p>全てのタスクが実施完了されました．大変申し訳ございません．</p>
+        <p>{RECRUIT_WEBSITE}にてタスクを閉じる予定です．</p>
+      </article>
+    );
+  }
+
   return (
     <article className="container mx-auto prose">
       <h2 className="font-bold text-2xl">実施いただくタスクの説明</h2>

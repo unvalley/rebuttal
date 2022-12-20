@@ -63,6 +63,7 @@ export const microtasksRouter = router({
     )
     .query(async ({ input }) => {
       const ASSIGN_COUNT = input.assignCount;
+      // 各センテンスへの結果生成回数
       const SHOULD_BE_DONE_COUNT = 5;
 
       const myDoneTaskIds = await prisma.microtaskResult

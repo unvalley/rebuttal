@@ -1,39 +1,9 @@
-// import { Layout } from "../../../elements/Layout";
 import { trpc } from "../../../lib/trpc";
 import { useSession } from "next-auth/react";
 import { MicrotaskDescription } from "../../../elements/Microtasks/MicrotaskDescription";
 import { Wizard } from "react-use-wizard";
 import { ScreenLoading } from "../../../elements/Parts/Loading";
-import { MicrotaskKinds, Sentence } from ".prisma/client";
-import { match } from "ts-pattern";
-import type { ExtendedMicrotask } from "../../../types/MicrotaskResponse";
-
-const filteredSentencesByKind = (
-  kind: MicrotaskKinds,
-  sentences: Array<Sentence & { isFact?: boolean | undefined }>
-) => {
-  const res = match(kind)
-    .with(MicrotaskKinds.CHECK_OP_OR_FACT, () => sentences)
-    .with(MicrotaskKinds.CHECK_FACT_RESOURCE, () =>
-      sentences.filter((s) => s.isFact === true)
-    )
-    .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () =>
-      sentences.filter((s) => s.isFact === false)
-    )
-    .exhaustive();
-  return res;
-};
-
-const existsTaksToWork = (assignedMicrotasks: ExtendedMicrotask[]) => {
-  const res = assignedMicrotasks.flatMap((microtask) => {
-    const sentences = filteredSentencesByKind(
-      microtask.kind,
-      microtask.paragraph.sentences
-    );
-    return Boolean(sentences.length);
-  });
-  return res.some((e) => e === true);
-};
+import { existsTaksToWork, filteredSentencesByKind } from "../../../utils";
 
 const Tasks = () => {
   const { data: session } = useSession();
@@ -54,7 +24,7 @@ const Tasks = () => {
   }
 
   if (microtasksQuery.isError) {
-    return <p>実行対象のマイクロタスクがありません．</p>;
+    return <p>実行対象のタスクがありません．</p>;
   }
 
   if (microtasksQuery.isLoading) {
@@ -66,7 +36,7 @@ const Tasks = () => {
   return (
     <div className="container mx-auto prose my-8">
       <div>
-        <h2 className="text-2xl font-bold">タスク実施ページ</h2>
+        <h2 className="text-2xl font-bold">評価タスク実施ページ</h2>
       </div>
       <div className="bg-base-100">
         {assignedMicrotasks && existsTaksToWork(assignedMicrotasks) ? (
