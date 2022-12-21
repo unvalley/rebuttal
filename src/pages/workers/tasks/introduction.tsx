@@ -34,7 +34,7 @@ const Introduction = () => {
 
   const { data: assignedMicrotasks } = microtasksQuery;
 
-  if (existsTaksToWork(assignedMicrotasks)) {
+  if (!existsTaksToWork(assignedMicrotasks)) {
     return (
       <article className="container mxa-auto prose">
         <h2>実行対象のタスクがありません．</h2>
