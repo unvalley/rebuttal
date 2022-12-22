@@ -1,4 +1,5 @@
 import { MicrotaskKinds, Sentence } from ".prisma/client";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useWizard } from "react-use-wizard";
@@ -20,12 +21,14 @@ export const ClassficationTask: React.FC<Props> = (props) => {
   const router = useRouter();
   const { data: session } = useSession();
   const { nextStep, isLastStep, isLoading } = useWizard();
+  const [now, _setNow] = useState(new Date());
   const { value, setValue, reason, setReason, complete } = useCompleteMicrotask(
     {
       userId: session?.user.id as number,
       microtaskId: props.microtask.id,
       sentenceId: props.sentence.id,
       microtaskKind: props.microtask.kind,
+      startedAt: now,
     }
   );
 

@@ -109,6 +109,7 @@ model MicrotaskResult {
   // MTask1 : NULL, MTask2/3: the reason
   reason String? @db.Text
 
+  startedAt   DateTime @default(now())
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now()) @updatedAt
   sentence    Sentence  @relation(fields: [sentenceId], references: [id])

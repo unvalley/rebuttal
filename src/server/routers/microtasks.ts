@@ -120,7 +120,6 @@ export const microtasksRouter = router({
           ([sentenceId, results]) => {
             const factCount = results.filter((v) => v.value === "FACT").length;
             const opCount = results.filter((v) => v.value === "OPINION").length;
-            // console.log(`factCount=${factCount}, opCount=${opCount}`);
             const isFact = factCount >= opCount;
             return {
               sentenceId,
