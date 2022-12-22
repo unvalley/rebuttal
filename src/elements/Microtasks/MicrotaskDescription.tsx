@@ -52,7 +52,7 @@ export const MicrotaskDescription: React.FC<{
             <ClassficationTask
               microtask={microtask}
               sentence={sentence}
-              taskTitle="次の青色で強調された文の周囲には，情報源が書かれていますか？"
+              taskTitle="次の青色で強調された文の周囲には，根拠が書かれていますか？"
             />
           ))
           .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () => (

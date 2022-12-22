@@ -63,7 +63,7 @@ export const deafultMicrotasks = (
       kind: MicrotaskKinds.CHECK_OP_OR_FACT,
     },
     {
-      title: "事実に対する情報源の有無の確認",
+      title: "事実に対する根拠の有無の確認",
       kind: MicrotaskKinds.CHECK_FACT_RESOURCE,
     },
     {
