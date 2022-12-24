@@ -17,14 +17,15 @@ const Index = () => {
     <article className="container mx-auto prose">
       <h2 className="font-bold text-2xl">調査の全体説明</h2>
       <p>
-        本ウェブサイトは，{RECRUIT_WEBSITE}
+        本ウェブサイトは，{RECRUIT_WEBSITE.name}
         にて掲載している文書への評価タスクを行うためのサイトです．
         本タスクは，静岡大学情報学部で行っている文書編集に関するユーザ実験のために実施しています．
       </p>
       <p>
-        タスクを開始するにあたって「{RECRUIT_WEBSITE}
-        のユーザ名」と仮のパスワードを登録していただく必要があります．
-        この登録は，本サイトで行ったタスクと{RECRUIT_WEBSITE}
+        タスクを開始するにあたって「{RECRUIT_WEBSITE.name}の
+        {RECRUIT_WEBSITE.identifier}
+        」と仮のパスワードを登録していただく必要があります．
+        この登録は，本サイトで行ったタスクと{RECRUIT_WEBSITE.name}
         でのタスクを紐付け，報酬支払いを行うために必要となります．
       </p>
       <p>
@@ -34,8 +35,8 @@ const Index = () => {
       </p>
       <div className="">
         以上に同意していただける方は，以下の手順でユーザ登録およびログインを行ってください．
-        ログインには，「{RECRUIT_WEBSITE}
-        のアカウント名」「4文字以上のパスワード（{RECRUIT_WEBSITE}
+        ログインには，「{RECRUIT_WEBSITE.name}の{RECRUIT_WEBSITE.identifier}
+        」「4文字以上のパスワード（{RECRUIT_WEBSITE.name}
         に登録しているパスワードではなく，本実験用サイトに登録する新しいパスワード）」の入力が必要となります．
         <ol>
           <li>

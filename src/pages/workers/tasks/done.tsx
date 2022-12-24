@@ -20,7 +20,7 @@ const TasksDone = () => {
         <a href={enqueteUrl}>アンケートページへのリンク</a>
         <p>
           アンケート回答終了後，報酬受け取りのための完了コードが表示されます．
-          表示された完了コードを，{RECRUIT_WEBSITE}にてご提示ください．
+          表示された完了コードを，{RECRUIT_WEBSITE.name}にてご提示ください．
         </p>
       </div>
     </div>

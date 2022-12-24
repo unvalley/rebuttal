@@ -13,7 +13,7 @@ export const nextAuthOptions: NextAuthOptions = {
       id: "login",
       credentials: {
         crowdId: {
-          label: `${RECRUIT_WEBSITE}のユーザー名`,
+          label: `${RECRUIT_WEBSITE.name}の${RECRUIT_WEBSITE.identifier}`,
           type: "text",
           placeholder: "",
         },

@@ -39,7 +39,7 @@ const Introduction = () => {
       <article className="container mxa-auto prose">
         <h2>実行対象のタスクがありません．</h2>
         <p>全てのタスクが実施完了されました．大変申し訳ございません．</p>
-        <p>{RECRUIT_WEBSITE}にてタスクを閉じる予定です．</p>
+        <p>{RECRUIT_WEBSITE.name}にてタスクを閉じる予定です．</p>
       </article>
     );
   }

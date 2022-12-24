@@ -1,1 +1,4 @@
-export const RECRUIT_WEBSITE = "ランサーズ"
+export const RECRUIT_WEBSITE = {
+  name: "クラウドワークス",
+  identifier: "ユーザー名"
+}

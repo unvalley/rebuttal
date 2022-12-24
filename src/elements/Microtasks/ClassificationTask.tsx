@@ -203,17 +203,17 @@ const opOrFactCandidates = [
 const factResourceCandidates = [
   {
     value: "TRUE",
-    message: "妥当な根拠に基づいて，事実が書かれている",
+    message: "妥当な根拠が書かれている",
     radioColor: "checked:bg-orange-500",
   },
   {
     value: "LOW_RELIABILITY",
-    message: "事実は書かれているが，根拠の信頼性が低い",
+    message: "根拠は書かれているが，その信頼性が低い",
     radioColor: "checked:bg-blue-500",
   },
   {
     value: "FALSE",
-    message: "書かれていない",
+    message: "根拠が書かれていない",
     radioColor: "checked:bg-slate-600",
   },
 ] as const;
