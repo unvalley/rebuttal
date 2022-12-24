@@ -150,11 +150,26 @@ export const ClassficationTask: React.FC<Props> = (props) => {
 };
 
 const DocumentModal: React.FC<{ paragraphId: number }> = ({ paragraphId }) => {
-  const findDocQuery = trpc.documents.findByParagraphId.useQuery({
-    paragraphId,
+  const findParagraphQuery = trpc.paragraphs.findManyById.useQuery({
+    id: paragraphId,
   });
 
-  const { data: doc } = findDocQuery;
+  if (findParagraphQuery.isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (findParagraphQuery.isError) {
+    return (
+      <div>
+        <Alert
+          message="文書情報を取得できませんでした．"
+          alertClass="alert-warning"
+        />
+      </div>
+    );
+  }
+
+  const { data } = findParagraphQuery;
 
   return (
     <div>
@@ -165,14 +180,21 @@ const DocumentModal: React.FC<{ paragraphId: number }> = ({ paragraphId }) => {
 
       <label htmlFor="modal" className="modal cursor-pointer">
         <label className="modal-box relative w-11/12 max-w-5xl" htmlFor="">
-          {!doc && (
-            <Alert
-              message="文書情報を取得できませんでした．"
-              alertClass="alert-warning"
-            />
-          )}
-          <h3 className="text-lg font-bold">{doc?.title}</h3>
-          <p className="py-4">{doc?.body}</p>
+          <h3 className="text-lg font-bold">{data.document.title}</h3>
+          <div className="px-4">
+            {data.paragraphs.map((p) => (
+              <>
+                {/* <span>&nbsp;&nbsp;</span> */}
+                <span
+                  key={p.id}
+                  className={`
+                  ${p.id === paragraphId ? "bg-emerald-100" : ""}`}
+                >
+                  {p.body}
+                </span>
+              </>
+            ))}
+          </div>
         </label>
       </label>
     </div>
