@@ -90,7 +90,10 @@ export const ClassficationTask: React.FC<Props> = (props) => {
       </div>
 
       <div className="mt-4">
-        <DocumentModal paragraphId={props.microtask.paragraphId} />
+        <DocumentModal
+          paragraphId={props.microtask.paragraphId}
+          sentenceId={props.sentence.id}
+        />
       </div>
 
       <div className="mt-4">
@@ -149,7 +152,10 @@ export const ClassficationTask: React.FC<Props> = (props) => {
   );
 };
 
-const DocumentModal: React.FC<{ paragraphId: number }> = ({ paragraphId }) => {
+const DocumentModal: React.FC<{ paragraphId: number; sentenceId: number }> = ({
+  paragraphId,
+  sentenceId,
+}) => {
   const findParagraphQuery = trpc.paragraphs.findManyById.useQuery({
     id: paragraphId,
   });
@@ -182,18 +188,17 @@ const DocumentModal: React.FC<{ paragraphId: number }> = ({ paragraphId }) => {
         <label className="modal-box relative w-11/12 max-w-5xl" htmlFor="">
           <h3 className="text-lg font-bold">{data.document.title}</h3>
           <div className="px-4">
-            {data.paragraphs.map((p) => (
-              <>
-                {/* <span>&nbsp;&nbsp;</span> */}
+            {data.paragraphs.map((p) => {
+              return p.sentences.map((s) => (
                 <span
-                  key={p.id}
+                  key={s.id}
                   className={`
-                  ${p.id === paragraphId ? "bg-emerald-100" : ""}`}
+                  ${s.id === sentenceId ? "bg-emerald-100" : ""}`}
                 >
-                  {p.body}
+                  {s.body}
                 </span>
-              </>
-            ))}
+              ));
+            })}
           </div>
         </label>
       </label>

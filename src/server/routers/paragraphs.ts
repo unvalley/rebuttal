@@ -17,6 +17,7 @@ export const paragraphsRouter = router({
 
       const paragraphs = await prisma.paragraph.findMany({
         where: { documentId: paragraph.documentId },
+        include: { sentences: true },
       });
 
       return { paragraphs, document };
