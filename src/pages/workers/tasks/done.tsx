@@ -14,10 +14,15 @@ const TasksDone = () => {
       <div>
         <progress className="progress progress-success" value={1} max={1} />
         <p className="mt-4">
-          お疲れさまでした．評価タスクを終了しました．
+          評価タスクを終了しました．
           最後にアンケートの実施をお願いいたします．下のリンクをクリックすると，アンケート画面へ遷移します．
         </p>
-        <a href={enqueteUrl} target="_blank" rel="noreferrer">
+        <a
+          href={enqueteUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="text-blue-600"
+        >
           アンケートページへのリンク
         </a>
         <p>
