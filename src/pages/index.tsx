@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 import { RECRUIT_WEBSITE } from "../../constants";
 import { Layout } from "../elements/Layout";
 import { Alert } from "../elements/Parts/Alert";
+import { isMobile } from "react-device-detect";
+import { useState, useEffect } from "react";
 
 const Index = () => {
   const { data: session } = useSession();
@@ -12,6 +14,24 @@ const Index = () => {
   const signUp = () => {
     router.push("/auth/signUp");
   };
+
+  const [mobile, setMobile] = useState(false);
+
+  useEffect(() => {
+    if (isMobile) {
+      setMobile(true);
+    }
+  }, []);
+
+  if (mobile) {
+    return (
+      <div className="container">
+        <p className="my-8 font-weight text-2xl">
+          本ウェブサイトの利用には，ブラウザ版GoogleChromeを使っていただくよう，ご協力お願いいたします．
+        </p>
+      </div>
+    );
+  }
 
   return (
     <article className="container mx-auto prose">
