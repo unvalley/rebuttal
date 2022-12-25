@@ -83,6 +83,8 @@ const SignUp = () => {
         </form>
         <div className="mt-2">
           登録後，サインイン画面へ遷移します．同じ情報を再度ご入力ください．
+          入力が完了したら「Sign In With
+          Credentials」ボタンを押して，ログインしてください．
         </div>
       </div>
     </div>

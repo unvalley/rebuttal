@@ -99,7 +99,7 @@ export const microtaskResultsRouter = router({
         value: z.string(),
         reason: z.string(),
         sentenceId: z.number(),
-        startedAt: z.date()
+        startedAt: z.date(),
       })
     )
     .mutation(async ({ input }) => {
@@ -111,7 +111,7 @@ export const microtaskResultsRouter = router({
           value: input.value,
           reason: input.reason,
           sentenceId: input.sentenceId,
-          startedAt: input.startedAt
+          startedAt: input.startedAt,
         },
       });
     }),
