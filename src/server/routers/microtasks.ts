@@ -82,15 +82,28 @@ export const microtasksRouter = router({
           };
           microtaskResults: MicrotaskResult[];
         })[]
-      ) =>
-        tasksWithResults.flatMap((t) => {
-          const hasDoneEnough =
-            t.microtaskResults.length >= SHOULD_BE_DONE_COUNT;
-          const alreadyDone = myDoneTaskIds.includes(t.id);
-          if (alreadyDone || hasDoneEnough) return [];
+      ) => {
+        return tasksWithResults.flatMap((t) => {
+          // 一つもタスクが行われていない
+          if (!t.microtaskResults.length) {
+            const { microtaskResults, ...microtask } = t;
+            return microtask;
+          }
+
+          // すでにタスクが行われているので以下を確認
+          // - あるmicrotaskIdに5種類以上のassigneeIdが紐付いているかどうか（紐付いていなければやる必要あり
+          const assgineeIdByMicrotaskId = uniq(
+            t.microtaskResults.map((m) => m.assigneeId)
+          ).length;
+
+          const hasDoneEnough = assgineeIdByMicrotaskId >= SHOULD_BE_DONE_COUNT;
+
+          const hasAlreadyDoneByMe = myDoneTaskIds.includes(t.id);
+          if (hasAlreadyDoneByMe || hasDoneEnough) return [];
           const { microtaskResults, ...microtask } = t;
           return microtask;
         });
+      };
 
       // We find tasks that not completed enough (= have not enough records count on `microtask_results`).
       const findNotCompletedEnoughMicrotasks = async (kind: MicrotaskKinds) => {

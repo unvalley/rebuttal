@@ -11,13 +11,13 @@ export const useCompleteMicrotask = ({
   microtaskId,
   sentenceId,
   microtaskKind,
-  startedAt
+  startedAt,
 }: {
   userId: number;
   microtaskId: number;
   sentenceId: number;
   microtaskKind: MicrotaskKinds;
-  startedAt: Date
+  startedAt: Date;
 }) => {
   const [value, setValue] = useState<SentenceKind | Ternary | undefined>();
   const [reason, setReason] = useState<string>("");
@@ -42,7 +42,7 @@ export const useCompleteMicrotask = ({
             microtaskId,
             value,
             reason,
-            startedAt
+            startedAt,
           },
           {
             onSuccess: () => cleanUp(),
@@ -61,7 +61,7 @@ export const useCompleteMicrotask = ({
             microtaskId,
             value,
             reason,
-            startedAt
+            startedAt,
           },
           {
             onSuccess: () => cleanUp(),

@@ -1,6 +1,5 @@
 import { useSession } from "next-auth/react";
 import { RECRUIT_WEBSITE } from "../../../../constants";
-import { Layout } from "../../../elements/Layout";
 
 const TasksDone = () => {
   const { data: session } = useSession();
@@ -9,7 +8,7 @@ const TasksDone = () => {
   const enqueteUrl = `https://docs.google.com/forms/d/e/1FAIpQLSc2MyxLRUUtyh1Ig8_4hRlXPngHsUJS-kQH02RPo5NGQzBWEw/viewform?usp=pp_url&entry.704465899=${userId}`;
 
   return (
-    <div className="container mx-auto prose">
+    <div className="container mx-auto prose my-8">
       <h2 className="font-bold text-2xl">評価タスク終了ページ</h2>
       <div>
         <progress className="progress progress-success" value={1} max={1} />
@@ -27,14 +26,12 @@ const TasksDone = () => {
         </a>
         <p>
           アンケート回答終了後，報酬受け取りのための完了コードが表示されます．
-          表示された完了コードを，{RECRUIT_WEBSITE.name}にてご提示ください．
+          表示された完了コードを{RECRUIT_WEBSITE.name}にてご提示ください．
         </p>
+        <p>アンケート回答終了後，このページは閉じていただいて構いません．</p>
       </div>
     </div>
   );
 };
 
-TasksDone.getLayout = function getLayout(page: React.ReactElement) {
-  return <Layout>{page}</Layout>;
-};
 export default TasksDone;

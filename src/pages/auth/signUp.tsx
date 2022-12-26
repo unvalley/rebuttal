@@ -20,16 +20,21 @@ const SignUp = () => {
   const { register, handleSubmit } = useForm<SignUpFormValues>();
   const router = useRouter();
 
-  const onSubmit: SubmitHandler<SignUpFormValues> = (data) => {
+  const onSubmit: SubmitHandler<SignUpFormValues> = async (data) => {
     try {
-      mutation.mutate({
-        crowdId: data.crowdId,
-        password: data.password,
-        roleKind: RoleKind.WORKER,
-      });
-      if (confirm("ユーザー登録が完了しました．ログイン画面に遷移します．")) {
-        router.push("/api/auth/signin");
-      }
+      await mutation
+        .mutateAsync({
+          crowdId: data.crowdId,
+          password: data.password,
+          roleKind: RoleKind.WORKER,
+        })
+        .then(() => {
+          if (
+            confirm("ユーザー登録が完了しました．ログイン画面に遷移します．")
+          ) {
+            router.push("/api/auth/signin");
+          }
+        });
     } catch {
       alert("予期せぬエラーが発生しました");
       return;
