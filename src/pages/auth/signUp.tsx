@@ -44,19 +44,30 @@ const SignUp = () => {
   return (
     <div className="container mx-auto prose">
       <h2 className="font-bold text-2xl">ユーザー登録</h2>
-      {RECRUIT_WEBSITE.name === "ランサーズ" && (
-        <div>
-          {RECRUIT_WEBSITE.name}の{RECRUIT_WEBSITE.identifier}
-          が分からない方は，下記のリンクを参照してご入力ください．
+      <div>
+        {RECRUIT_WEBSITE.name}の{RECRUIT_WEBSITE.identifier}
+        が分からない方は，下記のリンクを参照してご入力ください．
+        <br />
+        {RECRUIT_WEBSITE.name === "ランサーズ" ? (
           <a
             href="https://www.lancers.jp/faq/A1021/487"
             target="_blank"
             rel="noreferrer"
+            className="text-blue-600"
           >
             ランサーズ - ユーザー名はどこで確認できますか？
           </a>
-        </div>
-      )}
+        ) : (
+          <a
+            href="https://crowdworks.secure.force.com/faq/articles/FAQ/10461/?q=%E8%A1%A8%E7%A4%BA%E5%90%8D&l=ja&fs=Search&pn=1&id=kA0100000009298&url=10461"
+            target="_blank"
+            rel="noreferrer"
+            className="text-blue-600"
+          >
+            クラウドワークス - 【共通】自分のID（URL）の確認方法について
+          </a>
+        )}
+      </div>
       <p>
         どちらの項目も，ブラウザへ記憶する，もしくは覚えていただく必要があります．
       </p>
