@@ -9,7 +9,6 @@ import {
   Paragraph,
   Sentence,
 } from ".prisma/client";
-import { TRPCError } from "@trpc/server";
 import type { ExtendedMicrotask } from "../../types/MicrotaskResponse";
 import {
   filterSentencesByKindAndIsFact,
