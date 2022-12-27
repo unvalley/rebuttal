@@ -227,11 +227,10 @@ export const microtasksRouter = router({
       const slicedMicrotasks = microtasks.slice(0, ASSIGN_COUNT);
 
       if (!slicedMicrotasks.length) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          // message: `All microtasks are already done. No microtasks to assign.`,
-          message: `全てのマイクロタスクが完了されています．現在，次に取り組むべきタスクが存在しません．`,
-        });
+        // 採用人数時のミスマッチを防ぐためにloggingにとどめてエラーをthrowしない（throwすると登録したのにタスク実施できない状態になる）
+        console.error(
+          "全てのマイクロタスクが完了されています．次に取り組むべきタスクが存在しません．"
+        );
       }
 
       return slicedMicrotasks;
