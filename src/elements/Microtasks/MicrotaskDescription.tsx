@@ -52,18 +52,18 @@ export const MicrotaskDescription: React.FC<{
             <ClassficationTask
               microtask={microtask}
               sentence={sentence}
-              taskTitle="次の青色で強調された文の周囲には，根拠が書かれていますか？"
+              taskTitle="次の青色で強調された事実を表す文の周囲には，その事実の根拠となる情報源が書かれていますか？"
             />
           ))
           .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () => (
             <ClassficationTask
               microtask={microtask}
               sentence={sentence}
-              taskTitle="次のオレンジ色で強調された文の周囲には，それを根拠付ける妥当な事実が書かれていますか？"
+              taskTitle="次のオレンジ色で強調された意見を表す文の周囲には，その意見を支える妥当な根拠が書かれていますか？"
               withReason={true}
               reasonText="上記の回答理由を述べてください．
-              「書かれている」と回答した場合，「どの文章を読んで書かれていると判断したのか」を述べてください．
-              「書かれていない」と回答した場合，「どのように文章を改善すれば，より根拠のある意見になるか」を述べてください．"
+              「書かれている」と回答した場合，「どの文章を読んで書かれていると判断したのか」を簡単に述べてください．
+              「書かれていない」と回答した場合，「どのように文章を改善すれば，より根拠のある意見になるか」を簡単に述べてください．"
             />
           ))
           .exhaustive()}
