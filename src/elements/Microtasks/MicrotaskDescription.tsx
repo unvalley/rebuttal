@@ -32,7 +32,11 @@ export const MicrotaskDescription: React.FC<{
           （{displayStep.activeStep}件目/{displayStep.stepCount}件中）
         </span>
         <progress
-          className="progress progress-success"
+          className={`progress ${
+            displayStep.activeStep % 2 == 0
+              ? "progress-primary"
+              : "progress-success"
+          }`}
           value={activeStep}
           max={stepCount}
         />
