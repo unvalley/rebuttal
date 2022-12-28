@@ -73,9 +73,7 @@ const SignUp = () => {
           </a>
         )}
       </div>
-      <p>
-        どちらの項目も，ブラウザへ記憶する，もしくは覚えていただく必要があります．
-      </p>
+      <p>どちらの項目も，この次のログイン画面にて利用します．</p>
 
       <div className="mt-4">
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -88,7 +86,7 @@ const SignUp = () => {
             />
             <input
               type="password"
-              placeholder="パスワード"
+              placeholder="仮パスワード"
               className="input input-bordered w-full"
               {...register("password", { required: true, maxLength: 80 })}
             />
