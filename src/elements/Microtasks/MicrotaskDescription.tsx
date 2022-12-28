@@ -4,6 +4,7 @@ import { ClassficationTask } from "./ClassificationTask";
 import { MicrotaskKinds, Sentence } from ".prisma/client";
 import { useWizard } from "react-use-wizard";
 import { useBeforeUnload } from "./hooks/useBeforeUnload";
+import { useEffect } from "react";
 
 export const MicrotaskDescription: React.FC<{
   microtask: ExtendedMicrotask;
@@ -18,6 +19,13 @@ export const MicrotaskDescription: React.FC<{
     activeStep: activeStep + 1,
     stepCount: stepCount,
   };
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, []);
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -48,7 +56,7 @@ export const MicrotaskDescription: React.FC<{
               <ClassficationTask
                 microtask={microtask}
                 sentence={sentence}
-                taskTitle="次の文は，意見と事実のどちらですか？"
+                taskTitle="次のタスク対象の文は，意見と事実のどちらですか？選択肢の中から一つ選んで回答してください．"
               />
             );
           })
@@ -56,14 +64,14 @@ export const MicrotaskDescription: React.FC<{
             <ClassficationTask
               microtask={microtask}
               sentence={sentence}
-              taskTitle="次の青色で強調された事実を表す文の周囲には，その事実の根拠となる情報源が書かれていますか？"
+              taskTitle="次の青色で強調された事実を表すタスク対象の文の周囲には，その事実の根拠となる情報源が書かれていますか？選択肢の中から一つ選んで回答してください．"
             />
           ))
           .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () => (
             <ClassficationTask
               microtask={microtask}
               sentence={sentence}
-              taskTitle="次のオレンジ色で強調された意見を表す文の周囲には，その意見を支える妥当な根拠が書かれていますか？"
+              taskTitle="次のオレンジ色で強調された意見を表すタスク対象の文の周囲には，その意見を支える妥当な根拠が書かれていますか？選択肢の中から一つ選び，同時に回答理由を述べてください．"
               withReason={true}
               reasonText="上記の回答理由を述べてください．
               「書かれている」と回答した場合，「どの文章を読んで書かれていると判断したのか」を簡単に述べてください．
