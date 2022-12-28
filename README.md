@@ -13,3 +13,7 @@ TBD
 If workers are allocated and quit the user experiment, the MicrotaskAllocation record is not executed and will remain.
 If many workers do so, we will not have completed MicrotaskResult.
 So, I have thought that workers should care only about the MicrotaskResult count.
+
+## Code Quality is Low
+
+This is a system for one-time user experiment for now. So I don't care about code quality enough.
