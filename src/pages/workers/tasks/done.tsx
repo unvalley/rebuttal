@@ -1,8 +1,12 @@
 import { useSession } from "next-auth/react";
 import { RECRUIT_WEBSITE } from "../../../../constants";
+import { useBeforeUnload } from "../../../elements/Microtasks/hooks/useBeforeUnload";
 
 const TasksDone = () => {
   const { data: session } = useSession();
+  useBeforeUnload(
+    "ページを離脱すると，タスク実施は最初からやり直しとなります．本当にページを離脱しますか？"
+  );
 
   const userId = session?.user.id;
   const enqueteUrl = `https://docs.google.com/forms/d/e/1FAIpQLSc2MyxLRUUtyh1Ig8_4hRlXPngHsUJS-kQH02RPo5NGQzBWEw/viewform?usp=pp_url&entry.704465899=${userId}`;

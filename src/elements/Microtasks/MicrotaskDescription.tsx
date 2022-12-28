@@ -4,6 +4,7 @@ import { ClassficationTask } from "./ClassificationTask";
 import { MicrotaskKinds, Sentence } from ".prisma/client";
 import { useWizard } from "react-use-wizard";
 import { useBeforeUnload } from "./hooks/useBeforeUnload";
+import { useEffect } from "react";
 
 export const MicrotaskDescription: React.FC<{
   microtask: ExtendedMicrotask;
@@ -18,6 +19,13 @@ export const MicrotaskDescription: React.FC<{
     activeStep: activeStep + 1,
     stepCount: stepCount,
   };
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, []);
 
   if (isLoading) {
     return <p>Loading...</p>;
