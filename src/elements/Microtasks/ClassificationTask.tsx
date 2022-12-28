@@ -1,17 +1,16 @@
-import { MicrotaskKinds, Sentence } from ".prisma/client";
+import { MicrotaskKinds, Paragraph, Sentence } from ".prisma/client";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useWizard } from "react-use-wizard";
 import { trpc } from "../../lib/trpc";
 import type { ExtendedMicrotask } from "../../types/MicrotaskResponse";
-import { Alert } from "../Parts/Alert";
 import { useCompleteMicrotask } from "./hooks/useCompleteMicrotask";
 
 type Props = {
   microtask: ExtendedMicrotask;
   sentence: Sentence;
-  taskTitle?: string;
+  taskTitle: string;
   withReason?: boolean;
   reasonText?: string;
   actions?: React.ReactNode;
@@ -31,6 +30,24 @@ export const ClassficationTask: React.FC<Props> = (props) => {
       startedAt: now,
     }
   );
+
+  const findParagraphWithDocumentQuery = trpc.paragraphs.findManyById.useQuery({
+    id: props.microtask.paragraphId,
+  });
+
+  if (isLoading || findParagraphWithDocumentQuery.isLoading) {
+    return <p>Loading..</p>;
+  }
+
+  if (findParagraphWithDocumentQuery.isError) {
+    return (
+      <p>
+        予期せぬエラーが発生しました．大変申し訳ございませんが，時間をおいて再度タスクを開始いただくようお願いいたします．
+      </p>
+    );
+  }
+
+  const { data } = findParagraphWithDocumentQuery;
 
   const isAnswered = (kind: MicrotaskKinds) => {
     if (kind === MicrotaskKinds.CHECK_OPINION_VALIDNESS) {
@@ -57,15 +74,26 @@ export const ClassficationTask: React.FC<Props> = (props) => {
     }
   };
 
-  if (isLoading) {
-    <p>Loading..</p>;
-  }
+  const sentenceOrParagraph =
+    props.microtask.kind === MicrotaskKinds.CHECK_OP_OR_FACT
+      ? "文"
+      : "パラグラフ";
 
   return (
     <div className="">
-      <span className="text-xl font-semibold">{props.taskTitle}</span>
+      <p>
+        ある学生が
+        <span className="font-bold">【{data?.document.title}】</span>
+        という小論文課題に取り組み，小論文を執筆しました． タスク対象の
+        {sentenceOrParagraph}は，執筆された小論文の中から切り出されたものです．
+        <span className="font-bold underline">{props.taskTitle}</span>
+      </p>
+
       {/* タスクに関わらず，全てセンテンスに対して紐付ける */}
       <div className="mt-4">
+        <p className="font-semibold text-xl">
+          タスク対象の{sentenceOrParagraph}
+        </p>
         <blockquote className="">
           {props.microtask.kind === MicrotaskKinds.CHECK_OP_OR_FACT ? (
             <>{props.sentence.body}</>
@@ -91,16 +119,17 @@ export const ClassficationTask: React.FC<Props> = (props) => {
 
       <div className="mt-4">
         <DocumentModal
-          paragraphId={props.microtask.paragraphId}
           sentenceId={props.sentence.id}
+          documentTitle={data.document.title}
+          paragraphsWithSentences={data.paragraphs}
         />
       </div>
 
-      <div className="mt-4">
-        <span>ガイド</span>
+      <div className="mt-6">
+        <span className="font-semibold">タスク実施のためのガイド</span>
         <ul>
           <li>
-            意見：何事かについて，執筆者が下す判断のこと．賛同する人もいれば反対する人もいる．
+            意見：何事かについて，文章の執筆者が下す判断のこと．賛同する人と反対する人がいる．
           </li>
           <li>事実：テストや調査によって客観的に真偽を確認できるもの．</li>
           <li>
@@ -109,9 +138,11 @@ export const ClassficationTask: React.FC<Props> = (props) => {
         </ul>
       </div>
 
-      <div className="mt-8 mr-auto">
+      <div className="mt-4 mr-auto">
         <form onSubmit={handleSubmit}>
-          <span>下記のいずれかを選択してください．</span>
+          <span className="font-semibold text-xl">
+            回答：下記のいずれかを選択してください．
+          </span>
           {getSelectCandidatesByKind(props.microtask.kind).map((c) => (
             <div key={c.value} className="form-control">
               <label className="label cursor-pointer justify-start">
@@ -155,30 +186,16 @@ export const ClassficationTask: React.FC<Props> = (props) => {
   );
 };
 
-const DocumentModal: React.FC<{ paragraphId: number; sentenceId: number }> = ({
-  paragraphId,
-  sentenceId,
-}) => {
-  const findParagraphQuery = trpc.paragraphs.findManyById.useQuery({
-    id: paragraphId,
-  });
-
-  if (findParagraphQuery.isLoading) {
-    return <p>Loading...</p>;
+const DocumentModal: React.FC<{
+  sentenceId: number;
+  paragraphsWithSentences: (Paragraph & {
+    sentences: Sentence[];
+  })[];
+  documentTitle?: string;
+}> = ({ documentTitle, sentenceId, paragraphsWithSentences }) => {
+  if (!paragraphsWithSentences?.length) {
+    return <p>文章が取得できませんでした．</p>;
   }
-
-  if (findParagraphQuery.isError) {
-    return (
-      <div>
-        <Alert
-          message="文書情報を取得できませんでした．"
-          alertClass="alert-warning"
-        />
-      </div>
-    );
-  }
-
-  const { data } = findParagraphQuery;
 
   return (
     <div>
@@ -189,18 +206,27 @@ const DocumentModal: React.FC<{ paragraphId: number; sentenceId: number }> = ({
 
       <label htmlFor="modal" className="modal cursor-pointer">
         <label className="modal-box relative w-11/12 max-w-5xl" htmlFor="">
-          <h3 className="text-lg font-bold">{data.document.title}</h3>
-          <div className="px-4">
-            {data.paragraphs.map((p) => {
-              return p.sentences.map((s) => (
-                <span
-                  key={s.id}
-                  className={`
+          <span>
+            小論文課題：
+            <span className="font-bold text-base">{documentTitle}</span>
+          </span>
+          <div className="pt-4">
+            {paragraphsWithSentences.map((p) => {
+              return (
+                <span key={p.id}>
+                  &nbsp; &nbsp;
+                  {p.sentences.map((s) => (
+                    <span
+                      key={s.id}
+                      className={`
                   ${s.id === sentenceId ? "bg-emerald-100" : ""}`}
-                >
-                  {s.body}
+                    >
+                      {s.body}
+                    </span>
+                  ))}
+                  <br />
                 </span>
-              ));
+              );
             })}
           </div>
         </label>
