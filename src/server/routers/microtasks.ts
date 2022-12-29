@@ -16,6 +16,8 @@ import {
   isMicrotaskSecondOrThird,
   uniq,
 } from "../utils";
+import { TRPCClientError } from "@trpc/client";
+import { TRPCError } from "@trpc/server";
 
 export const microtasksRouter = router({
   findById: publicProcedure
@@ -224,14 +226,48 @@ export const microtasksRouter = router({
 
       const microtasks = await prepareMicrotasksToAssign();
       const slicedMicrotasks = microtasks.slice(0, ASSIGN_COUNT);
-
-      if (!slicedMicrotasks.length) {
-        // 採用人数時のミスマッチを防ぐためにloggingにとどめてエラーをthrowしない（throwすると登録したのにタスク実施できない状態になる）
-        console.error(
-          "全てのマイクロタスクが完了されています．次に取り組むべきタスクが存在しません．"
-        );
+      // OK
+      if (slicedMicrotasks.length) {
+        return slicedMicrotasks;
       }
 
-      return slicedMicrotasks;
+      // 全てのタスクが終わってしまっているけど，タスクを開始してしまった場合．
+      if (!slicedMicrotasks.length) {
+        try {
+          console.error("全てのタスクが完了しています");
+          let result: ExtendedMicrotask[] = [];
+          const kind = MicrotaskKinds.CHECK_OP_OR_FACT;
+          const tasksWithResults = await prisma.microtask.findMany({
+            where: {
+              kind: kind,
+            },
+            include: {
+              microtaskResults: true,
+              paragraph: {
+                include: {
+                  sentences: true,
+                },
+              },
+            },
+            orderBy: { createdAt: "asc" },
+          });
+          const _tasks = tasksWithResults.flatMap((t) => {
+            const { microtaskResults, ...microtask } = t;
+            return microtask;
+          });
+          const tasksWithSentenceAttachedIsFact = isMicrotaskSecondOrThird(kind)
+            ? await attachIsFactToSentences(_tasks)
+            : _tasks;
+          const validTasks = validTasksToWork(tasksWithSentenceAttachedIsFact);
+          result = [...result, ...validTasks];
+          const res = result.slice(0, ASSIGN_COUNT);
+          return res;
+        } catch {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: `全てのマイクロタスクが完了されています．現在，次に取り組むべきタスクが存在しません．`,
+          });
+        }
+      }
     }),
 });
