@@ -16,8 +16,6 @@ import {
   isMicrotaskSecondOrThird,
   uniq,
 } from "../utils";
-import { TRPCClientError } from "@trpc/client";
-import { TRPCError } from "@trpc/server";
 
 export const microtasksRouter = router({
   findById: publicProcedure
@@ -233,41 +231,35 @@ export const microtasksRouter = router({
 
       // 全てのタスクが終わってしまっているけど，タスクを開始してしまった場合．
       if (!slicedMicrotasks.length) {
-        try {
-          console.error("全てのタスクが完了しています");
-          let result: ExtendedMicrotask[] = [];
-          const kind = MicrotaskKinds.CHECK_OP_OR_FACT;
-          const tasksWithResults = await prisma.microtask.findMany({
-            where: {
-              kind: kind,
-            },
-            include: {
-              microtaskResults: true,
-              paragraph: {
-                include: {
-                  sentences: true,
-                },
+        console.error("全てのタスクが完了しています");
+        let result: ExtendedMicrotask[] = [];
+        const kind = MicrotaskKinds.CHECK_OP_OR_FACT;
+        const tasksWithResults = await prisma.microtask.findMany({
+          where: {
+            kind: kind,
+          },
+          include: {
+            microtaskResults: true,
+            paragraph: {
+              include: {
+                sentences: true,
               },
             },
-            orderBy: { createdAt: "asc" },
-          });
-          const _tasks = tasksWithResults.flatMap((t) => {
-            const { microtaskResults, ...microtask } = t;
-            return microtask;
-          });
-          const tasksWithSentenceAttachedIsFact = isMicrotaskSecondOrThird(kind)
-            ? await attachIsFactToSentences(_tasks)
-            : _tasks;
-          const validTasks = validTasksToWork(tasksWithSentenceAttachedIsFact);
-          result = [...result, ...validTasks];
-          const res = result.slice(0, ASSIGN_COUNT);
-          return res;
-        } catch {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: `全てのマイクロタスクが完了されています．現在，次に取り組むべきタスクが存在しません．`,
-          });
-        }
+          },
+          orderBy: { createdAt: "asc" },
+        });
+        const _tasks = tasksWithResults.flatMap((t) => {
+          const { microtaskResults, ...microtask } = t;
+          return microtask;
+        });
+        const tasksWithSentenceAttachedIsFact = isMicrotaskSecondOrThird(kind)
+          ? await attachIsFactToSentences(_tasks)
+          : _tasks;
+        const validTasks = validTasksToWork(tasksWithSentenceAttachedIsFact);
+        result = [...result, ...validTasks];
+        const res = result.slice(0, ASSIGN_COUNT);
+        return res;
       }
+      return [];
     }),
 });
