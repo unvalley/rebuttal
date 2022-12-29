@@ -160,6 +160,9 @@ export const ClassficationTask: React.FC<Props> = (props) => {
           {/* 理由 */}
           {props.withReason && (
             <div className="form-control mt-4">
+              <span className="font-semibold text-xl">
+                回答：上記の回答理由を述べてください．
+              </span>
               <span className="">{props.reasonText}</span>
               <textarea
                 className="textarea textarea-accent"
