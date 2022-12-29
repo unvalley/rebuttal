@@ -17,7 +17,7 @@ export const nextAuthOptions: NextAuthOptions = {
           type: "text",
           placeholder: "",
         },
-        password: { label: "password", type: "password" },
+        password: { label: "仮パスワード", type: "password" },
       },
       authorize: async (credentials) => {
         try {
