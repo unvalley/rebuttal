@@ -35,7 +35,7 @@ const Index = () => {
 
   return (
     <article className="container mx-auto prose">
-      <h2 className="font-bold text-2xl">調査の全体説明</h2>
+      <h2 className="font-bold text-2xl">タスクの全体説明</h2>
       <p>
         本ウェブサイトは，{RECRUIT_WEBSITE.name}
         にて掲載している文書への評価タスクを行うためのサイトです．
