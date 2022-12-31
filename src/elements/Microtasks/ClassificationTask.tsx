@@ -84,10 +84,10 @@ export const ClassficationTask: React.FC<Props> = (props) => {
       <p>
         ある学生が
         <span className="font-bold">【{data?.document.title}】</span>
-        という小論文課題に取り組み，小論文を執筆しました． タスク対象の
-        {sentenceOrParagraph}は，執筆された小論文の中から切り出されたものです．
-        <span className="font-bold underline">{props.taskTitle}</span>
+        というレポート課題に取り組み，レポートを執筆しました． 以下の
+        {sentenceOrParagraph}は，学生のレポートから切り出された文です．
       </p>
+      <p className="font-bold">{props.taskTitle}</p>
 
       {/* タスクに関わらず，全てセンテンスに対して紐付ける */}
       <div className="mt-4">
@@ -125,19 +125,6 @@ export const ClassficationTask: React.FC<Props> = (props) => {
         />
       </div>
 
-      <div className="mt-6">
-        <span className="font-semibold">タスク実施のためのガイド</span>
-        <ul>
-          <li>
-            意見：何事かについて，文章の執筆者が下す判断のこと．賛同する人と反対する人がいる．
-          </li>
-          <li>事実：テストや調査によって客観的に真偽を確認できるもの．</li>
-          <li>
-            根拠：判断が正しいことを示す拠り所（よりどころ）としての客観的な情報・事実・データのこと．
-          </li>
-        </ul>
-      </div>
-
       <div className="mt-4 mr-auto">
         <form onSubmit={handleSubmit}>
           <span className="font-semibold text-xl">
@@ -173,6 +160,15 @@ export const ClassficationTask: React.FC<Props> = (props) => {
               />
             </div>
           )}
+
+          <div className="mt-6">
+            <span className="font-semibold">タスク実施のためのガイド</span>
+            <ul>
+              <li>意見：何事かについて，文章の執筆者が下す判断のこと．</li>
+              <li>事実：テストや調査によって客観的に真偽を確認できるもの．</li>
+            </ul>
+          </div>
+
           <div className="mt-4">
             <button
               type="submit"
