@@ -6,6 +6,7 @@ import { useWizard } from "react-use-wizard";
 import { trpc } from "../../lib/trpc";
 import type { ExtendedMicrotask } from "../../types/MicrotaskResponse";
 import { useCompleteMicrotask } from "./hooks/useCompleteMicrotask";
+import { match } from "ts-pattern";
 
 type Props = {
   microtask: ExtendedMicrotask;
@@ -164,8 +165,15 @@ export const ClassficationTask: React.FC<Props> = (props) => {
           <div className="mt-6">
             <span className="font-semibold">タスク実施のためのガイド</span>
             <ul>
-              <li>意見：何事かについて，文章の執筆者が下す判断のこと．</li>
-              <li>事実：テストや調査によって客観的に真偽を確認できるもの．</li>
+              {props.microtask.kind === MicrotaskKinds.CHECK_FACT_RESOURCE && (
+                <li>
+                  事実：テストや調査によって客観的に真偽を確認できるもの．
+                </li>
+              )}
+              {props.microtask.kind ===
+                MicrotaskKinds.CHECK_OPINION_VALIDNESS && (
+                <li>意見：何事かについて，文章の執筆者が下す判断のこと．</li>
+              )}
             </ul>
           </div>
 
@@ -206,7 +214,7 @@ const DocumentModal: React.FC<{
       <label htmlFor="modal" className="modal cursor-pointer">
         <label className="modal-box relative w-11/12 max-w-5xl" htmlFor="">
           <span>
-            小論文課題：
+            レポート課題：
             <span className="font-bold text-base">{documentTitle}</span>
           </span>
           <div className="pt-4">
@@ -276,12 +284,17 @@ const factResourceCandidates = [
 const opValidnessCandidates = [
   {
     value: "TRUE",
-    message: "書かれている",
+    message: "妥当な根拠が書かれている",
     radioColor: "checked:bg-orange-500",
   },
   {
+    value: "LOW_RELIABILITY",
+    message: "根拠は書かれているが，その信頼性が低い",
+    radioColor: "checked:bg-blue-500",
+  },
+  {
     value: "FALSE",
-    message: "書かれていない",
+    message: "根拠が書かれていない",
     radioColor: "checked:bg-slate-600",
   },
 ] as const;
