@@ -6,7 +6,6 @@ import { useWizard } from "react-use-wizard";
 import { trpc } from "../../lib/trpc";
 import type { ExtendedMicrotask } from "../../types/MicrotaskResponse";
 import { useCompleteMicrotask } from "./hooks/useCompleteMicrotask";
-import { match } from "ts-pattern";
 
 type Props = {
   microtask: ExtendedMicrotask;
@@ -85,16 +84,13 @@ export const ClassficationTask: React.FC<Props> = (props) => {
       <p>
         ある学生が
         <span className="font-bold">【{data?.document.title}】</span>
-        というレポート課題に取り組み，レポートを執筆しました． 以下の
-        {sentenceOrParagraph}は，学生のレポートから切り出された文です．
+        というレポート課題に取り組み，レポートを執筆しました． 次の
+        {sentenceOrParagraph}は，学生のレポートから切り出された
+        {sentenceOrParagraph}です．
       </p>
-      <p className="font-bold">{props.taskTitle}</p>
 
       {/* タスクに関わらず，全てセンテンスに対して紐付ける */}
       <div className="mt-4">
-        <p className="font-semibold text-xl">
-          タスク対象の{sentenceOrParagraph}
-        </p>
         <blockquote className="">
           {props.microtask.kind === MicrotaskKinds.CHECK_OP_OR_FACT ? (
             <>{props.sentence.body}</>
@@ -129,7 +125,8 @@ export const ClassficationTask: React.FC<Props> = (props) => {
       <div className="mt-4 mr-auto">
         <form onSubmit={handleSubmit}>
           <span className="font-semibold text-xl">
-            回答：下記のいずれかを選択してください．
+            {/* 回答：下記のいずれかを選択してください． */}
+            {props.taskTitle}
           </span>
           {getSelectCandidatesByKind(props.microtask.kind).map((c) => (
             <div key={c.value} className="form-control">
@@ -149,7 +146,7 @@ export const ClassficationTask: React.FC<Props> = (props) => {
           {props.withReason && (
             <div className="form-control mt-4">
               <span className="font-semibold text-xl">
-                回答：上記の回答理由を述べてください．
+                上記の回答理由を簡単に述べてください．
               </span>
               <span className="">{props.reasonText}</span>
               <textarea
@@ -271,7 +268,7 @@ const factResourceCandidates = [
   },
   {
     value: "LOW_RELIABILITY",
-    message: "根拠は書かれているが，その信頼性が低い",
+    message: "根拠は書かれているが，妥当とはいえない",
     radioColor: "checked:bg-blue-500",
   },
   {
@@ -289,7 +286,7 @@ const opValidnessCandidates = [
   },
   {
     value: "LOW_RELIABILITY",
-    message: "根拠は書かれているが，その信頼性が低い",
+    message: "根拠は書かれているが，妥当とはいえない",
     radioColor: "checked:bg-blue-500",
   },
   {

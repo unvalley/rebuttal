@@ -72,7 +72,7 @@ export const deafultMicrotasks = (
       kind: MicrotaskKinds.CHECK_FACT_RESOURCE,
     },
     {
-      title: "意見に対して，それを裏付ける事実が書かれているかの確認",
+      title: "意見に対する根拠の有無の確認",
       kind: MicrotaskKinds.CHECK_OPINION_VALIDNESS,
     },
   ] as { title: string; kind: MicrotaskKinds }[]
