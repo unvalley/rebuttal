@@ -72,7 +72,7 @@ export const MicrotaskDescription: React.FC<{
               <ClassficationTask
                 microtask={microtask}
                 sentence={sentence}
-                taskTitle={`次のタスク対象の文は，意見と事実のどちらですか？選択肢の中から一つ選んで回答してください．`}
+                taskTitle={`上の文は，意見と事実のどちらですか？選択肢の中から一つ選んで回答してください．`}
               />
             );
           })

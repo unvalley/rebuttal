@@ -6,6 +6,7 @@ import { useWizard } from "react-use-wizard";
 import { trpc } from "../../lib/trpc";
 import type { ExtendedMicrotask } from "../../types/MicrotaskResponse";
 import { useCompleteMicrotask } from "./hooks/useCompleteMicrotask";
+import { match } from "ts-pattern";
 
 type Props = {
   microtask: ExtendedMicrotask;
@@ -162,15 +163,26 @@ export const ClassficationTask: React.FC<Props> = (props) => {
           <div className="mt-6">
             <span className="font-semibold">タスク実施のためのガイド</span>
             <ul>
-              {props.microtask.kind === MicrotaskKinds.CHECK_FACT_RESOURCE && (
-                <li>
-                  事実：テストや調査によって客観的に真偽を確認できるもの．
-                </li>
-              )}
-              {props.microtask.kind ===
-                MicrotaskKinds.CHECK_OPINION_VALIDNESS && (
-                <li>意見：何事かについて，文章の執筆者が下す判断のこと．</li>
-              )}
+              {match(props.microtask.kind)
+                .with(MicrotaskKinds.CHECK_OP_OR_FACT, () => (
+                  <>
+                    <li>
+                      意見：何事かについて，文章の執筆者が下す判断のこと．
+                    </li>
+                    <li>
+                      事実：テストや調査によって客観的に真偽を確認できるもの．
+                    </li>
+                  </>
+                ))
+                .with(MicrotaskKinds.CHECK_FACT_RESOURCE, () => (
+                  <li>
+                    事実：テストや調査によって客観的に真偽を確認できるもの．
+                  </li>
+                ))
+                .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () => (
+                  <li>意見：何事かについて，文章の執筆者が下す判断のこと．</li>
+                ))
+                .exhaustive()}
             </ul>
           </div>
 
