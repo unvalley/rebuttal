@@ -80,7 +80,7 @@ export const MicrotaskDescription: React.FC<{
             <ClassficationTask
               microtask={microtask}
               sentence={sentence}
-              taskTitle={`上の青色でハイライトされた文について，妥当な根拠となる情報源が周囲に書かれていますか？選択肢の中から一つ選んで回答してください．`}
+              taskTitle={`上の青色でハイライトされた文について，根拠として妥当な情報源が周囲に書かれていますか？選択肢の中から一つ選んで回答してください．`}
             />
           ))
           .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () => (

@@ -167,20 +167,18 @@ export const ClassficationTask: React.FC<Props> = (props) => {
                 .with(MicrotaskKinds.CHECK_OP_OR_FACT, () => (
                   <>
                     <li>
-                      意見：何事かについて，文章の執筆者が下す判断のこと．
+                      意見：何事かについて，文章の執筆者が下す判断．執筆者の考えのこと．
                     </li>
-                    <li>
-                      事実：テストや調査によって客観的に真偽を確認できるもの．
-                    </li>
+                    <li>事実：実際に起こった，または起こっている事柄</li>
                   </>
                 ))
                 .with(MicrotaskKinds.CHECK_FACT_RESOURCE, () => (
-                  <li>
-                    事実：テストや調査によって客観的に真偽を確認できるもの．
-                  </li>
+                  <li>事実：実際に起こった，または起こっている事柄</li>
                 ))
                 .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () => (
-                  <li>意見：何事かについて，文章の執筆者が下す判断のこと．</li>
+                  <li>
+                    意見：何事かについて，文章の執筆者が下す判断．執筆者の考えのこと．
+                  </li>
                 ))
                 .exhaustive()}
             </ul>
@@ -275,17 +273,17 @@ const opOrFactCandidates = [
 const factResourceCandidates = [
   {
     value: "TRUE",
-    message: "妥当な根拠が書かれている",
+    message: "根拠として妥当な情報源が書かれている",
     radioColor: "checked:bg-orange-500",
   },
   {
     value: "LOW_RELIABILITY",
-    message: "根拠は書かれているが，妥当とはいえない",
+    message: "情報源は書かれているが，妥当とはいえない",
     radioColor: "checked:bg-blue-500",
   },
   {
     value: "FALSE",
-    message: "根拠が書かれていない",
+    message: "情報源は書かれていない",
     radioColor: "checked:bg-slate-600",
   },
 ] as const;
