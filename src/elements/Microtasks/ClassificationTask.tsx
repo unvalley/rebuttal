@@ -169,11 +169,11 @@ export const ClassficationTask: React.FC<Props> = (props) => {
                     <li>
                       意見：何事かについて，文章の執筆者が下す判断．執筆者の考えのこと．
                     </li>
-                    <li>事実：実際に起こった，または起こっている事柄</li>
+                    <li>事実：実際に起こった，または起こっている事柄．</li>
                   </>
                 ))
                 .with(MicrotaskKinds.CHECK_FACT_RESOURCE, () => (
-                  <li>事実：実際に起こった，または起こっている事柄</li>
+                  <li>事実：実際に起こった，または起こっている事柄．</li>
                 ))
                 .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, () => (
                   <li>
