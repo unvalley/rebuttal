@@ -9,6 +9,6 @@ type Lancers = {
 };
 
 export const RECRUIT_WEBSITE: CrowdWorks | Lancers = {
-  name: "クラウドワークス",
-  identifier: "ユーザーID",
+  name: "ランサーズ",
+  identifier: "ユーザー名",
 };
