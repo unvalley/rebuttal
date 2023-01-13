@@ -9,6 +9,10 @@ export const documentsRouter = router({
       // TODO: write logic to save microtasks
       console.log(input);
     }),
+  findAll: publicProcedure.input(z.object({})).query(async () => {
+    const docs = await prisma.document.findMany();
+    return docs;
+  }),
   findById: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
@@ -18,23 +22,23 @@ export const documentsRouter = router({
       return doc;
     }),
   findByParagraphId: publicProcedure
-    .input(z.object({paragraphId: z.number()}))
+    .input(z.object({ paragraphId: z.number() }))
     .query(async ({ input }) => {
       const paragraph = await prisma.paragraph.findFirstOrThrow({
         select: {
-          documentId: true
+          documentId: true,
         },
         where: {
-          id: input.paragraphId
-        }
-      })
+          id: input.paragraphId,
+        },
+      });
       const doc = await prisma.document.findFirstOrThrow({
         where: {
-          id: paragraph.documentId
+          id: paragraph.documentId,
         },
-      })
+      });
       return doc;
-  }),
+    }),
   findWithSentencesById: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {

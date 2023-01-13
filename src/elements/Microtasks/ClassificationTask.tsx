@@ -64,7 +64,7 @@ export const ClassficationTask: React.FC<Props> = (props) => {
       await complete().then(() => {
         nextStep();
         if (isLastStep) {
-          router.push("/workers/tasks/done");
+          router.push("/teachers/tasks/done");
         }
       });
     } catch (err) {

@@ -49,22 +49,6 @@ export const MicrotaskDescription: React.FC<{
           max={stepCount}
         />
       </div>
-      <div className="collapse mt-4 collapse-open">
-        <input type="checkbox" className="peer" />
-        <div className="collapse-title bg-base-200">
-          <span className="font-bold">※ タスク注意事項</span>
-        </div>
-        <div className="collapse-content bg-base-300">
-          <ul>
-            <li>本ページでは，ブラウザの「戻る」「更新」は利用できません．</li>
-            <li>タスク途中で，本ページを離脱することはご遠慮ください．</li>
-            <li>一度回答したタスクは，修正できません．</li>
-            <li>
-              本ページを開いたまま，別のタブやウィンドウで，タスクに回答するためのウェブ検索などを行うことは問題ございません．
-            </li>
-          </ul>
-        </div>
-      </div>
       <div className="mt-2">
         {match(microtask.kind)
           .with(MicrotaskKinds.CHECK_OP_OR_FACT, () => {
@@ -93,6 +77,22 @@ export const MicrotaskDescription: React.FC<{
             />
           ))
           .exhaustive()}
+      </div>
+      <div className="collapse mt-4 collapse-open">
+        <input type="checkbox" className="peer" />
+        <div className="collapse-title bg-base-200">
+          <span className="font-bold">※ タスク注意事項</span>
+        </div>
+        <div className="collapse-content bg-base-300">
+          <ul>
+            <li>本ページでは，ブラウザの「戻る」「更新」は利用できません．</li>
+            <li>タスク途中で，本ページを離脱することはご遠慮ください．</li>
+            <li>一度回答したタスクは，修正できません．</li>
+            <li>
+              本ページを開いたまま，別のタブやウィンドウで，タスクに回答するためのウェブ検索などを行うことは問題ございません．
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   );

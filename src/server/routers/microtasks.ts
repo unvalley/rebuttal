@@ -53,6 +53,146 @@ export const microtasksRouter = router({
       });
       return microtasks;
     }),
+  findMicrotasksToAssginByDocumentId: publicProcedure
+    .input(
+      z.object({
+        userId: z.number(),
+        documentId: z.number(),
+      })
+    )
+    .query(async ({ input }) => {
+      const myDoneTaskIds = await prisma.microtaskResult
+        .findMany({
+          where: {
+            assigneeId: input.userId,
+          },
+        })
+        .then((res) => uniq(res.map((r) => r.microtaskId)));
+
+      const findTasksHasNoResults = async (kind: MicrotaskKinds) => {
+        const tasksWithResults = await prisma.microtask.findMany({
+          where: {
+            kind: kind,
+            paragraph: {
+              documentId: input.documentId,
+            },
+          },
+          include: {
+            microtaskResults: true,
+            paragraph: {
+              include: {
+                sentences: true,
+              },
+            },
+          },
+          orderBy: { createdAt: "asc" },
+        });
+        const tasksHasNoResults = tasksWithResults.filter(
+          (t) => !t.microtaskResults.length && !myDoneTaskIds.includes(t.id)
+        );
+        return tasksHasNoResults;
+      };
+
+      const groupBySentenceId = (
+        resultWithSentence: (MicrotaskResult & {
+          sentence: Sentence;
+        })[]
+      ) =>
+        groupBy(resultWithSentence, (r) => r.sentenceId).map(
+          ([sentenceId, results]) => {
+            const factCount = results.filter((v) => v.value === "FACT").length;
+            const opCount = results.filter((v) => v.value === "OPINION").length;
+            const isFact = factCount >= opCount;
+            return {
+              sentenceId,
+              sentence: results[0]?.sentence,
+              isFact,
+            };
+          }
+        );
+
+      const findMicrotasksBySentenceIds = async (sentenceIds: number[]) => {
+        const res = await prisma.microtaskResult.findMany({
+          where: { sentenceId: { in: sentenceIds } },
+          include: { sentence: true },
+        });
+        return res;
+      };
+
+      // creates {[sentenceId: string]: [isFact: boolean], ...}
+      const acquireSentenceIdToIsFactObject = async (
+        sentenceIds: number[]
+      ): Promise<Record<string, boolean>> => {
+        const res = await findMicrotasksBySentenceIds(sentenceIds);
+        return groupBySentenceId(res).reduce((obj, item) => {
+          obj[item.sentenceId] = item.isFact;
+          return obj;
+        }, {} as Record<string, boolean>);
+      };
+
+      // センテンスが事実か意見のどちらに評価されているか，現時点のデータを取得する
+      // Microtask(2)/(3)では，文のみ，文のみを対象にするため，この処理が必要
+      // タスクの取得ではなくてセンテンスの取得で別に処理を走らせることも考えたが，UI変更の煩雑性も生まれるため，ロジックの複雑性をここに一本化する方針を取った
+      const attachIsFactToSentences = async (
+        tasks: ExtendedMicrotask[]
+      ): Promise<ExtendedMicrotask[]> => {
+        const sentenceIds = tasks.flatMap((t) =>
+          t.paragraph.sentences.flatMap((s) => s.id)
+        );
+        const sentenceIdToIsFact = await acquireSentenceIdToIsFactObject(
+          sentenceIds
+        );
+        if (Object.keys(sentenceIdToIsFact).length === 0) return tasks;
+
+        return tasks.map((t) => {
+          return {
+            ...t,
+            paragraph: {
+              ...t.paragraph,
+              sentences: t.paragraph.sentences.map((s) => {
+                return {
+                  ...s,
+                  isFact: sentenceIdToIsFact[s.id.toString()],
+                };
+              }),
+            },
+          };
+        });
+      };
+
+      const validTasksToWork = (assignedMicrotasks: ExtendedMicrotask[]) => {
+        return assignedMicrotasks.flatMap((microtask) => {
+          const sentences = filterSentencesByKindAndIsFact(
+            microtask.kind,
+            microtask.paragraph.sentences
+          );
+          return Boolean(sentences.length) ? microtask : [];
+        });
+      };
+
+      // アサイン対象のマイクロタスクを取得する
+      // MicrotaskKindsのvalueの順序で，status=CREATEDであるマイクロタスクを取得して，ASSIGN_COUNT以上になるまで取得する
+      const prepareMicrotasksToAssign = async () => {
+        let result: ExtendedMicrotask[] = [];
+        // Sequential and mutable, but its ok for now. We don't care performance for now...
+        for (const kind of Object.values(MicrotaskKinds)) {
+          const _tasks = await findTasksHasNoResults(kind);
+          // Microtask(2)/(3)にて，{isFact: boolean} を追加したSentenceを生成
+          const tasksWithSentenceAttachedIsFact = isMicrotaskSecondOrThird(kind)
+            ? await attachIsFactToSentences(_tasks)
+            : _tasks;
+          // Microtask(2)/(3)の場合，
+          const validTasks = validTasksToWork(tasksWithSentenceAttachedIsFact);
+          result = [...result, ...validTasks];
+          console.info(`result.length = ${result.length}`);
+        }
+        return result;
+      };
+
+      const microtasks = await prepareMicrotasksToAssign();
+      // const slicedMicrotasks = microtasks.slice(0, ASSIGN_COUNT);
+      return microtasks;
+    }),
   findMicrotasksToAssign: publicProcedure
     .input(
       z.object({

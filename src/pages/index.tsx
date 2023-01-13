@@ -73,7 +73,7 @@ const Index = () => {
             <button className="btn" onClick={() => signOut()}>
               ログアウト
             </button>
-            <Link href="/workers/tasks/introduction">
+            <Link href="/teachers/tasks/introduction">
               <button className="btn btn-primary ml-4">タスクの説明へ</button>
             </Link>
           </div>
