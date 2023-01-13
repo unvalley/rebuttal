@@ -82,6 +82,8 @@ const Documents = () => {
     .flatMap((m) => m.microtaskResults.length)
     .reduce((sum, e) => sum + e, 0);
 
+  // console.log(aggregatedResults.map((e) => e.opinonValidnessResults));
+
   aggregatedResults.forEach((r) => {
     listRefs.current[r.sentenceId] = createRef();
   });
@@ -135,16 +137,11 @@ const Documents = () => {
                 );
 
                 // 意見と事実の切り分けのみが行われている場合，フィードバック表示は無し
-                if (
-                  (result.isFact && resourceCheckCount.resultCount === 0) ||
-                  (result.isFact &&
-                    resourceCheckCount.resultCount >
-                      resourceCheckCount.falseCount) ||
-                  (!result.isFact &&
-                    opinionValidnessCount.resultCount >
-                      opinionValidnessCount.falseCount) ||
-                  (!result.isFact && opinionValidnessCount.resultCount === 0)
-                ) {
+                if (result.isFact && resourceCheckCount.resultCount === 0) {
+                  return null;
+                }
+
+                if (!result.isFact && opinionValidnessCount.resultCount === 0) {
                   return null;
                 }
 
@@ -294,7 +291,11 @@ const ResourceCheckFeedback: React.FC<{
     falseCount: number;
   };
   results: Result[];
-}> = ({ count }) => {
+}> = ({ count, results }) => {
+  const lowReliabilityCount = results.filter(
+    (r) => r.value === "LOW_RELIABILITY"
+  ).length;
+
   return (
     <>
       <div>
@@ -306,7 +307,11 @@ const ResourceCheckFeedback: React.FC<{
         <span className="font-semibold">
           妥当な根拠となる情報が書かれていない
         </span>
-        」と述べています． 具体的に，以下のようなフィードバックが得られました．
+        」と述べています．
+        <span>
+          また，{lowReliabilityCount}
+          人が，「根拠は書かれているが妥当ではない」と述べています．
+        </span>
       </div>
     </>
   );
