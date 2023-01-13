@@ -32,7 +32,7 @@ export const useCompleteMicrotask = ({
   const complete = async () => {
     match(microtaskKind)
       .with(MicrotaskKinds.CHECK_OPINION_VALIDNESS, async () => {
-        if (!value || !reason) {
+        if (!value) {
           throw new Error("必須項目が入力されていません");
         }
         return await mutation.mutateAsync(
