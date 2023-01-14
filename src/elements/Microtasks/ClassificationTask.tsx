@@ -52,7 +52,7 @@ export const ClassficationTask: React.FC<Props> = (props) => {
 
   const isAnswered = (kind: MicrotaskKinds) => {
     if (kind === MicrotaskKinds.CHECK_OPINION_VALIDNESS) {
-      return Boolean(value) && reason;
+      return Boolean(value); // && reason;
     } else {
       return Boolean(value);
     }
