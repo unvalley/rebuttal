@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { trpc } from "../../../lib/trpc";
-import { useSession } from "next-auth/react";
 
 const Top = () => {
-  const { data: session } = useSession();
   const docsQuery = trpc.documents.findAll.useQuery(
     {},
     {
