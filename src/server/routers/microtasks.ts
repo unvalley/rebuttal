@@ -184,7 +184,6 @@ export const microtasksRouter = router({
           // Microtask(2)/(3)の場合，
           const validTasks = validTasksToWork(tasksWithSentenceAttachedIsFact);
           result = [...result, ...validTasks];
-          console.info(`result.length = ${result.length}`);
         }
         return result;
       };
