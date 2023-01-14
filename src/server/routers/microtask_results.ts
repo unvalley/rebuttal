@@ -91,6 +91,61 @@ export const microtaskResultsRouter = router({
 
       return aggregatedResults;
     }),
+
+  findDoneMicrotaskCountsByDocumentIds: publicProcedure
+    .input(
+      z.object({
+        userId: z.number(),
+        documentIds: z.array(z.number()),
+      })
+    )
+    .query(async ({ input }) => {
+      const paragraphs = await prisma.paragraph.findMany({
+        where: {
+          documentId: {
+            in: input.documentIds,
+          },
+        },
+        include: {
+          microtasks: true,
+        },
+      });
+
+      const microtasksWithDocumentId = paragraphs.flatMap((p) => {
+        return { documentId: p.documentId, microtasks: p.microtasks };
+      });
+      const microtaskIds = microtasksWithDocumentId.flatMap((m) =>
+        m.microtasks.flatMap((m) => m.id)
+      );
+
+      const results = await prisma.microtaskResult.findMany({
+        where: {
+          microtaskId: {
+            in: microtaskIds,
+          },
+        },
+        include: {
+          microtask: true,
+          assignee: true,
+        },
+      });
+
+      const microtaskIdWithResultCount = groupBy(
+        results,
+        (r) => r.microtaskId
+      ).flatMap((e) => {
+        const microtaskId = e[0];
+        const result = e[1];
+
+        return groupBy(result, (r) => r.microtask.kind).flatMap((e) => {
+          const kind = e[0];
+          const resultLengthByKind = e[1].length;
+          return { microtaskId, kind, resultCount: resultLengthByKind };
+        });
+      });
+
+      return microtaskIdWithResultCount;
+    }),
   completeMicrotask: publicProcedure
     .input(
       z.object({
